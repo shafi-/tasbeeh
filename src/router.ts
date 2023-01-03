@@ -1,9 +1,9 @@
-import LonelyWolfVue from '@/components/LonelyWolf.vue';
+// import LonelyWolfVue from '@/components/LonelyWolf.vue';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 
 import IndexPage from '@/pages/IndexPage.vue'
 import TasbeehPage from '@/pages/tasbeeh/TasbeehIndex.vue';
-import AddTasbeeh from '@/pages/tasbeeh/AddTasbeeh.vue';
+import AddTasbeehPage from '@/pages/tasbeeh/AddTasbeehPage.vue';
 import TahleelPageVue from './pages/TahleelPage.vue';
 
 const routes: Readonly<RouteRecordRaw[]> = [
@@ -24,8 +24,8 @@ const routes: Readonly<RouteRecordRaw[]> = [
   },
   {
     path: '/tasbeeh/add',
-    component: AddTasbeeh,
-    name: 'AddTasbeeh',
+    component: AddTasbeehPage,
+    name: 'AddTasbeehPage',
     meta: {
       title: 'Add New Tasbeeh',
     }
@@ -38,11 +38,11 @@ const routes: Readonly<RouteRecordRaw[]> = [
       title: 'Tahleel',
     },
   },
-  {
-    component: LonelyWolfVue,
-    path: '/lonelywolf(.*)',
-    name: 'Lonelywolf',
-  }
+  // {
+  //   component: LonelyWolfVue,
+  //   path: '/lonelywolf(.*)',
+  //   name: 'Lonelywolf',
+  // }
 ];
 
 const router = createRouter({

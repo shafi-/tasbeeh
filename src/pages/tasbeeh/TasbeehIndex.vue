@@ -1,19 +1,16 @@
 <template>
   <div class="">
-    <div class="col-span-1" @click="gotoTasbeehManager()">Manage Tasbeeh</div>
-    <RouterLink class="text-2xl" to="/tasbeeh/add">+</RouterLink>
-    <TasbeehList />
+    <TasbeehList :tasbeehs="tasbeehs" />
   </div>
 </template>
 
-<script setup lang="ts">
-import { useRouter } from "vue-router";
+<script lang="ts">
+export default defineComponent({
+  name: "TasbeehListPage",
+});
+</script>
 
-const router = useRouter();
-function gotoTasbeehManager() {
-  router.push({
-    name: "ManageTasbeeh",
-    params: { lonelywolf: "" },
-  });
-}
+<script setup lang="ts">
+const store = useStore();
+const tasbeehs = store.tasbeehList;
 </script>

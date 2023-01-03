@@ -1,12 +1,12 @@
 <template>
   <div class="flex h-screen flex-col items-center px-3">
-    <div class="h-[40vh] max-h-[50vh] max-w-xs">
-      <h2 class="my-3 text-4xl">
+    <div class="h-[40vh] max-h-[50vh] max-w-sm w-full">
+      <h2 class="my-3 pl-1 text-2xl text-black">
         {{ tasbeeh.title }}
       </h2>
       <p
         dir="auto"
-        class="my-3 h-[30vh] scroll-p-1.5 overflow-scroll border p-1.5 text-3xl"
+        class="my-3 max-h-[30vh] scroll-p-1.5 overflow-scroll border p-1.5 text-3xl bg-white rounded-lg"
       >
         {{ tasbeeh.text }}
       </p>

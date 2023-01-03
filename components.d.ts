@@ -9,7 +9,6 @@ declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     AddTasbeeh: typeof import('./src/components/AddTasbeeh.vue')['default']
     CreateTasbeehSchedule: typeof import('./src/components/CreateTasbeehSchedule.vue')['default']
-    HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     HomePage: typeof import('./src/components/HomePage.vue')['default']
     LonelyWolf: typeof import('./src/components/LonelyWolf.vue')['default']
     NavBar: typeof import('./src/components/nav/NavBar.vue')['default']
@@ -18,7 +17,6 @@ declare module '@vue/runtime-core' {
     RouterView: typeof import('vue-router')['RouterView']
     TabNavbar: typeof import('./src/components/nav/TabNavbar.vue')['default']
     TasbeehCard: typeof import('./src/components/cards/TasbeehCard.vue')['default']
-    TasbeehCounter: typeof import('./src/components/TasbeehCounter.vue')['default']
     TasbeehList: typeof import('./src/components/TasbeehList.vue')['default']
     TasbeehListPage: typeof import('./src/components/TasbeehListPage.vue')['default']
     TasbeehTahleel: typeof import('./src/components/TasbeehTahleel.vue')['default']

@@ -31,10 +31,12 @@
         />
       </div>
       <div class="pt-3 flex justify-around">
-        <button type="submit" class="px-3 py-1 text-green-400 border rounded">
+        <button type="submit" class="px-3 py-1 bg-white text-green-400 border rounded">
           Save
         </button>
-        <button type="reset" class="px-3 py-1 text-black border rounded">Reset</button>
+        <button type="reset" class="px-3 py-1 bg-white text-black border rounded">
+          Reset
+        </button>
       </div>
     </form>
   </div>
@@ -64,6 +66,12 @@ const tasbeeh = ref(DefaultTasbeeh);
 function onSave(): void {
   const appStore = useStore();
   appStore.addTasbeeh(tasbeeh.value);
-  gotoTasbeehManager();
+  nextTick(() => gotoTasbeehManager());
 }
+</script>
+
+<script lang="ts">
+export default defineComponent({
+  name: "AddTasbeehForm",
+});
 </script>

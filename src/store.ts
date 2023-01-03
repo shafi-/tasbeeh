@@ -34,7 +34,7 @@ export const useStore = defineStore('main', {
       updateStorage(this.tasbeehs);
     },
     deleteTasbeeh(tasbeehId: TasbeehId): void {
-      this.tasbeehs = this.tasbeehs.filter((tasbeeh) => tasbeeh.id === tasbeehId);
+      this.tasbeehs = this.tasbeehs.filter((tasbeeh) => tasbeeh.id !== tasbeehId);
       updateStorage(this.tasbeehs);
     }
   },
