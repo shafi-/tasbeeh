@@ -4,16 +4,19 @@
       <div class="font-bold text-xl mb-2">{{ title }}</div>
       <p class="text-gray-700 text-base">{{ repeatCount }}</p>
     </div>
-    <div class="px-6 py-4">
+    <div class="px-6 py-4 flex justify-around">
       <button
-        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-full"
         @click="tahleelNow"
       >
         Tahleel Now
       </button>
-    </div>
-    <div class="px-6 py-4">
-      <button @click="deleteTasbeeh">Delete</button>
+      <button
+        class="bg-red-500 hover:bg-red-800 text-white font-semibold py-2 px-3 rounded-full"
+        click="deleteTasbeeh"
+      >
+        Delete
+      </button>
     </div>
   </div>
 </template>
