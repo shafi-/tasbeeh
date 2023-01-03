@@ -13,7 +13,7 @@
       </button>
       <button
         class="bg-red-500 hover:bg-red-800 text-white font-semibold py-2 px-3 rounded-full"
-        click="deleteTasbeeh"
+        @click="deleteTasbeeh"
       >
         Delete
       </button>
@@ -48,6 +48,7 @@ export default defineComponent({
     deleteTasbeeh() {
       const store = useStore();
       store.deleteTasbeeh(this.tid);
+      this.$nextTick(() => window.location.reload());
     },
   },
 });
