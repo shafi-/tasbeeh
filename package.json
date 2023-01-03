@@ -1,5 +1,5 @@
 {
-  "name": "vite-ts-tailwind-starter",
+  "name": "TasbeehApp",
   "version": "3.1.0",
   "scripts": {
     "dev": "vite --host",
