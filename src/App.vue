@@ -30,4 +30,10 @@ const menuOpen = ref(false);
 function onMenuStateChange() {
   menuOpen.value = !menuOpen.value;
 }
+
+const router = useRouter();
+
+router.afterEach(() => {
+  menuOpen.value = false;
+});
 </script>
