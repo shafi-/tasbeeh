@@ -53,6 +53,13 @@
               >Tasbeeh List</a
             >
           </router-link>
+          <router-link :to="{ path: '/tasbeeh/add' }">
+            <a
+              href="#"
+              class="block mt-4 md:inline-block md:mt-0 mr-6 text-white hover:text-gray-300"
+              >Add Tasbeeh</a
+            >
+          </router-link>
           <router-link :to="{ path: '/about' }">
             <a
               href="#"
