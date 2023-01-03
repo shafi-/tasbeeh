@@ -2,14 +2,14 @@ import { updateStorage } from './plugin/persist';
 import { defineStore } from 'pinia'
 import Tasbeeh from './schema/Tasbeeh';
 
-interface State {
+export interface State {
   debug: boolean,
   version: string,
   isInitialized: boolean,
   tasbeehs: Tasbeeh[],
 }
 
-type TasbeehId = number;
+export type TasbeehId = number;
 
 const versionString =
   import.meta.env.MODE === 'development'

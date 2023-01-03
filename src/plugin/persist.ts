@@ -1,5 +1,6 @@
 import Tasbeeh from '@/schema/Tasbeeh';
 import { PiniaPluginContext } from 'pinia'
+import { State } from '@/store';
 
 type PersistData = Tasbeeh[];
 
@@ -8,7 +9,7 @@ const Key = 'TasbeehApp';
 const dd = console.debug;
 
 
-export default function plugin(context: PiniaPluginContext): void {
+export default function plugin(context: PiniaPluginContext<string, State>): void {
     dd('Start pinia persist plugin');
     dd('Init persist');
 
@@ -24,7 +25,7 @@ export function updateStorage(data: PersistData): void {
     updateLocalStorage(Key, data);
 }
 
-function subscribeToStoreChange(context: PiniaPluginContext): void {
+function subscribeToStoreChange(context: PiniaPluginContext<string, State>): void {
     context.store.$subscribe(
         () => {
             dd('$subscribe state changes -> updateStorage');
@@ -44,12 +45,15 @@ function updateLocalStorage(key: string, data: PersistData): void {
     dd('updated localStorage', data);
 }
 
-function hydrateStore(context: PiniaPluginContext, key: string): void {
+function hydrateStore(context: PiniaPluginContext<string, State>, key: string): void {
     const hasSavedState = localStorage.getItem(key);
     dd('store hydrated');
 
     if (hasSavedState) {
         dd('$patch saved state', hasSavedState);
-        context.store.$patch({ tasbeehs: JSON.parse(hasSavedState) });
+        context.store.$patch({
+            tasbeehs: (JSON.parse(hasSavedState) as Tasbeeh[])
+                .map((tasbeehData) => Tasbeeh.create(tasbeehData))
+        });
     }
 }

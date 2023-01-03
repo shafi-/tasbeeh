@@ -30,13 +30,13 @@
 
 <script lang="ts">
 import Tasbeeh from "@/schema/Tasbeeh";
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 
 export default defineComponent({
   name: "TasbeehCounter",
   props: {
     tasbeeh: {
-      type: Tasbeeh,
+      type: Object as PropType<Tasbeeh>,
       required: true,
     },
   },
