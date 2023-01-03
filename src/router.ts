@@ -5,13 +5,15 @@ import IndexPage from '@/pages/IndexPage.vue'
 import TasbeehPage from '@/pages/tasbeeh/TasbeehIndex.vue';
 import AddTasbeehPage from '@/pages/tasbeeh/AddTasbeehPage.vue';
 import TahleelPageVue from './pages/TahleelPage.vue';
+import MSCDailyPage from '@/pages/MSCDailyPage.vue';
+import AboutPage from '@/pages/AboutPage.vue';
 
 const routes: Readonly<RouteRecordRaw[]> = [
   {
     path: '/',
     component: IndexPage,
     meta: {
-      title: 'Vite + Vue + TypeScript + Tailwind Starter Template',
+      title: 'HomePage - Tasbeeh App',
     },
   },
   {
@@ -38,6 +40,22 @@ const routes: Readonly<RouteRecordRaw[]> = [
       title: 'Tahleel',
     },
   },
+  {
+    name: 'MSC Daily',
+    path: '/msc-today',
+    component: MSCDailyPage,
+    meta: {
+      title: 'MSC Today'
+    }
+  },
+  {
+    name: 'About',
+    path: '/about',
+    component: AboutPage,
+    meta: {
+      title: 'About- Tasbeeh App',
+    }
+  }
   // {
   //   component: LonelyWolfVue,
   //   path: '/lonelywolf(.*)',
