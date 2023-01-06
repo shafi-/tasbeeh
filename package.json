@@ -1,13 +1,16 @@
 {
-  "name": "TasbeehApp",
+  "name": "tasbeeh-app",
   "version": "3.1.0",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
+    "postbuild": "npm run prepare:sw",
     "preview": "vite build && vite preview",
     "start": "pnpm dev & wait-on tcp:3000 -v",
     "test": "vitest",
+    "prepare:sw": "node scripts/build.sw.js",
     "coverage": "vitest run --coverage",
+    "vite": "vite",
     "test-ct": "playwright test -c playwright-ct.config.ts",
     "test-e2e": "playwright test -c playwright.config.ts",
     "test:ci": "vitest",

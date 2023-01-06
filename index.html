@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="/manifest.json" />
     <title>Tasbeeh App</title>
   </head>
   <body>
@@ -14,5 +15,10 @@
 
       <p>This app requires JavaScript to work.</p>
     </noscript>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./service-worker.sw.js");
+      }
+    </script>
   </body>
 </html>
