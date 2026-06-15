@@ -1,9 +1,14 @@
 import { db } from '../db/db';
 import { Session } from '../db/types';
 import { formatDate } from '../utils/dateUtils';
+import { updateStreak } from './streakService';
 
-export async function addSession(session: Omit<Session, 'id'>): Promise<number> {
+export async function add(session: Omit<Session, 'id'>): Promise<number> {
   const id = await db.sessions.add(session);
+
+  // Automatically update streak after session save
+  await updateStreak(session.zikrId, session.date);
+
   return typeof id === 'number' ? id : parseInt(id as string, 10);
 }
 
@@ -37,3 +42,18 @@ export async function getSessionsByDateRange(startDate: Date, endDate: Date): Pr
   const endDateStr = formatDate(endDate);
   return await db.sessions.where('date').between(startDateStr, endDateStr).toArray();
 }
+
+// Service export
+export const sessionService = {
+  add,
+  updateSession,
+  deleteSession,
+  getSessionById,
+  getAllSessions,
+  getSessionsByZikr,
+  getSessionsByDate,
+  getSessionsByDateRange
+};
+
+// Legacy exports for backward compatibility
+export const addSession = add;

@@ -3,15 +3,24 @@ import { db } from '../db/db';
 import { Session } from '../db/types';
 import { createRetryableSubscription } from '../services/errorRecovery';
 
+interface CurrentSession {
+  zikrId: number | null;
+  count: number;
+}
+
 interface SessionState {
   sessions: Session[];
+  currentSession: CurrentSession;
   loading: boolean;
   error: string | null;
   initialize: () => () => void;
+  setCurrentSession: (session: CurrentSession) => void;
+  clearCurrentSession: () => void;
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
   sessions: [],
+  currentSession: { zikrId: null, count: 0 },
   loading: true,
   error: null,
 
@@ -26,5 +35,9 @@ export const useSessionStore = create<SessionState>((set) => ({
     );
 
     return unsubscribe;
-  }
+  },
+
+  setCurrentSession: (session) => set({ currentSession: session }),
+
+  clearCurrentSession: () => set({ currentSession: { zikrId: null, count: 0 } })
 }));

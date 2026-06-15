@@ -32,3 +32,11 @@ export function daysBetween(date1: Date, date2: Date): number {
   const oneDay = 24 * 60 * 60 * 1000;
   return Math.round((date2.getTime() - date1.getTime()) / oneDay);
 }
+
+export function combineDateTime(date: Date, time: Date): Date {
+  const combined = new Date(date);
+  combined.setHours(time.getHours());
+  combined.setMinutes(time.getMinutes());
+  combined.setSeconds(time.getSeconds());
+  return combined;
+}

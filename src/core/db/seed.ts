@@ -25,5 +25,11 @@ const PREDEFINED_ZIKRS: Omit<Zikr, 'id'>[] = [
 ];
 
 export async function seedZikrs(database: ZikrDatabase): Promise<void> {
+  // Check if already seeded
+  const count = await database.zikrs.count();
+  if (count > 0) {
+    return; // Already seeded
+  }
+
   await database.zikrs.bulkAdd(PREDEFINED_ZIKRS);
 }
