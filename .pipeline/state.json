@@ -1,0 +1,16 @@
+{
+  "phase": "commit-create-pr",
+  "feature": "Epic 1: Foundation & Infrastructure",
+  "branch": "feature/epic-1-foundation",
+  "requirementsPath": ".pipeline/artifacts/requirements.md",
+  "requirementsReviewPath": ".pipeline/artifacts/review-requirements.md",
+  "architecturePath": ".pipeline/artifacts/architecture.md",
+  "designReviewPath": ".pipeline/artifacts/review-design.md",
+  "adrPaths": [],
+  "adrReviewPath": ".pipeline/artifacts/review-adr.md",
+  "implementationPath": ".pipeline/artifacts/implementation.md",
+  "codeReviewPath": ".pipeline/artifacts/review-code.md",
+  "status": "in-progress",
+  "blockedBy": [],
+  "timestamp": "2026-06-15T13:00:00Z"
+}
