@@ -2,12 +2,16 @@ import { db } from '../db/db';
 import { Session } from '../db/types';
 import { formatDate } from '../utils/dateUtils';
 import { updateStreak } from './streakService';
+import { checkCompletion } from './goalService';
 
 export async function add(session: Omit<Session, 'id'>): Promise<number> {
   const id = await db.sessions.add(session);
 
   // Automatically update streak after session save
   await updateStreak(session.zikrId, session.date);
+
+  // Check if any goals are completed
+  await checkCompletion(session.zikrId);
 
   return typeof id === 'number' ? id : parseInt(id as string, 10);
 }

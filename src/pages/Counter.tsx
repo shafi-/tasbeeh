@@ -4,6 +4,7 @@ import { useUIStore } from '../core/stores/uiStore';
 import { sessionService } from '../core/services/sessionService';
 import { useHaptic } from '../hooks/useHaptic';
 import { ZikrList } from '../components/ZikrList';
+import { StreakBadge } from '../components/StreakBadge';
 import { Zikr } from '../core/db/types';
 
 export function Counter() {
@@ -197,6 +198,9 @@ export function Counter() {
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               Tap to change zikr
             </p>
+            <div className="mt-2 flex justify-center">
+              <StreakBadge zikrId={selectedZikr.id!} compact={false} />
+            </div>
           </div>
         ) : (
           <button

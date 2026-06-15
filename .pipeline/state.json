@@ -1,16 +1,16 @@
 {
-  "phase": "commit-create-pr",
-  "feature": "Epic 2: Core Features - Zikrs & Sessions",
-  "branch": "feature/epic-2-core-features",
-  "requirementsPath": ".pipeline/artifacts/epic-2-requirements.md",
+  "phase": "commit-pr",
+  "feature": "Epic 3: Goals & Streaks",
+  "branch": "feature/epic-3-goals-streaks",
+  "requirementsPath": ".pipeline/artifacts/epic-3-requirements.md",
   "requirementsReviewPath": "",
-  "architecturePath": ".pipeline/artifacts/epic-2-architecture.md",
-  "designReviewPath": ".pipeline/artifacts/epic-2-review-design.md",
+  "architecturePath": ".pipeline/artifacts/epic-3-architecture.md",
+  "designReviewPath": ".pipeline/artifacts/epic-3-review-design.md",
   "adrPaths": [],
   "adrReviewPath": "",
-  "implementationPath": ".pipeline/artifacts/epic-2-implementation.md",
-  "codeReviewPath": ".pipeline/artifacts/epic-2-review-code.md",
+  "implementationPath": ".pipeline/artifacts/epic-3-implementation.md",
+  "codeReviewPath": ".pipeline/artifacts/epic-3-review-code.md",
   "status": "in-progress",
   "blockedBy": [],
-  "timestamp": "2026-06-15T17:30:00Z"
+  "timestamp": "2026-06-15T21:00:00Z"
 }

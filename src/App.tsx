@@ -8,6 +8,7 @@ import { ErrorBoundary } from './core/components/ErrorBoundary';
 import { useZikrStore } from './core/stores/zikrStore';
 import { useSessionStore } from './core/stores/sessionStore';
 import { useGoalStore } from './core/stores/goalStore';
+import { useStreakStore } from './core/stores/streakStore';
 import { db } from './core/db/db';
 import { seedZikrs } from './core/db/seed';
 import { useEffect, useState } from 'react';
@@ -24,6 +25,7 @@ function App() {
     const zikrUnsubscribe = useZikrStore.getState().initialize();
     const sessionUnsubscribe = useSessionStore.getState().initialize();
     const goalUnsubscribe = useGoalStore.getState().initialize();
+    const streakUnsubscribe = useStreakStore.getState().initialize();
 
     setStoresInitialized(true);
 
@@ -31,6 +33,7 @@ function App() {
       zikrUnsubscribe();
       sessionUnsubscribe();
       goalUnsubscribe();
+      streakUnsubscribe();
     };
   }, []);
 
