@@ -1,11 +1,16 @@
 {
   "feature": "Add manual progress entry for physical tasbeeh sessions",
   "phase": "complete",
+  "status": "complete",
   "requirementsPath": ".feature-plan/requirements.md",
   "requirementsReviewPath": ".feature-plan/review-requirements.md",
+  "requirementsStatus": "approved-with-notes",
   "architecturePath": ".feature-plan/architecture.md",
   "architectureReviewPath": ".feature-plan/review-architecture.md",
+  "architectureStatus": "approved",
   "testCasesPath": ".feature-plan/test-cases.md",
   "tasksPath": "docs/Tasks.md",
-  "status": "complete"
+  "tasksReviewPath": ".feature-plan/review-tasks.md",
+  "tasksStatus": "approved",
+  "completedAt": "2025-06-15T00:00:00Z"
 }
