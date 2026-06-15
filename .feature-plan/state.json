@@ -1,9 +1,10 @@
 {
   "feature": "Add manual progress entry for physical tasbeeh sessions",
-  "phase": "test-cases",
+  "phase": "tasks",
   "requirementsPath": ".feature-plan/requirements.md",
   "requirementsReviewPath": ".feature-plan/review-requirements.md",
   "architecturePath": ".feature-plan/architecture.md",
   "architectureReviewPath": ".feature-plan/review-architecture.md",
+  "testCasesPath": ".feature-plan/test-cases.md",
   "status": "in-progress"
 }
