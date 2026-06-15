@@ -10,7 +10,7 @@
   "adrReviewPath": "",
   "implementationPath": ".pipeline/artifacts/epic-3-implementation.md",
   "codeReviewPath": ".pipeline/artifacts/epic-3-review-code.md",
-  "status": "in-progress",
-  "blockedBy": [],
-  "timestamp": "2026-06-15T21:00:00Z"
+  "status": "awaiting-remote-setup",
+  "blockedBy": ["no-remote-repository-configured"],
+  "timestamp": "2026-06-15T21:15:00Z"
 }
