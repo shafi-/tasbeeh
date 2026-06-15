@@ -1,16 +1,16 @@
 {
-  "phase": "commit-create-pr",
-  "feature": "Epic 2: Core Features - Zikrs & Sessions",
-  "branch": "feature/epic-2-core-features",
-  "requirementsPath": ".pipeline/artifacts/epic-2-requirements.md",
-  "requirementsReviewPath": "",
-  "architecturePath": ".pipeline/artifacts/epic-2-architecture.md",
-  "designReviewPath": ".pipeline/artifacts/epic-2-review-design.md",
+  "phase": "commit-and-pr",
+  "feature": "Epic 4: Progress, Settings & Polish",
+  "branch": "feature/epic-4-progress-settings-polish",
+  "requirementsPath": ".pipeline/artifacts/epic-4-requirements.md",
+  "requirementsReviewPath": ".pipeline/artifacts/epic-4-review-requirements.md",
+  "architecturePath": ".pipeline/artifacts/epic-4-architecture.md",
+  "designReviewPath": ".pipeline/artifacts/epic-4-review-design.md",
   "adrPaths": [],
   "adrReviewPath": "",
-  "implementationPath": ".pipeline/artifacts/epic-2-implementation.md",
-  "codeReviewPath": ".pipeline/artifacts/epic-2-review-code.md",
+  "implementationPath": ".pipeline/artifacts/epic-4-implementation.md",
+  "codeReviewPath": ".pipeline/artifacts/epic-4-review-code.md",
   "status": "in-progress",
   "blockedBy": [],
-  "timestamp": "2026-06-15T17:30:00Z"
+  "timestamp": "2026-06-16T00:45:00Z"
 }

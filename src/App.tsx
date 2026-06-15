@@ -8,6 +8,7 @@ import { ErrorBoundary } from './core/components/ErrorBoundary';
 import { useZikrStore } from './core/stores/zikrStore';
 import { useSessionStore } from './core/stores/sessionStore';
 import { useGoalStore } from './core/stores/goalStore';
+import { useSettingsStore } from './core/stores/settingsStore';
 import { db } from './core/db/db';
 import { seedZikrs } from './core/db/seed';
 import { useEffect, useState } from 'react';
@@ -25,12 +26,46 @@ function App() {
     const sessionUnsubscribe = useSessionStore.getState().initialize();
     const goalUnsubscribe = useGoalStore.getState().initialize();
 
+    // Initialize dark mode
+    const initializeDarkMode = () => {
+      const settingsStore = useSettingsStore.getState();
+      const darkModeSetting = settingsStore.getSetting('darkMode');
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = darkModeSetting ?? systemPrefersDark;
+
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    };
+
+    initializeDarkMode();
+
+    // Listen for system preference changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemPrefChange = (e: MediaQueryListEvent) => {
+      const settingsStore = useSettingsStore.getState();
+      const darkModeSetting = settingsStore.getSetting('darkMode');
+      // Only apply system preference if user hasn't set explicit preference
+      if (darkModeSetting === null) {
+        if (e.matches) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleSystemPrefChange);
+
     setStoresInitialized(true);
 
     return () => {
       zikrUnsubscribe();
       sessionUnsubscribe();
       goalUnsubscribe();
+      mediaQuery.removeEventListener('change', handleSystemPrefChange);
     };
   }, []);
 
