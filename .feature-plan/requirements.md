@@ -33,10 +33,13 @@ Build a manual session entry system that allows users to:
 
 ### FR-2: Bulk Session Entry
 - User can add multiple sessions in one form submission
-- Each row has: zikr selector, count input, date/time picker
-- Real-time validation per row as user types
+- **Two entry modes:**
+  - **Multi-Zikr Mode**: Each row has zikr selector, count input, date/time picker (for varied sessions)
+  - **Quick Repeat Mode**: Select ONE zikr, enter multiple sessions for it (reduces UI complexity)
 - User can add/remove rows dynamically
+- Real-time validation per row as user types
 - All valid rows are saved in a single transaction
+- **Progressive save for large entries**: 50+ sessions chunked into batches of 10 with progress indicator
 
 ### FR-3: Session History
 - All sessions (app, manual, physical) displayed in chronological order
@@ -94,10 +97,12 @@ Build a manual session entry system that allows users to:
 - **Footer**: Save button (primary), Cancel button
 
 ### Bulk Entry Mode
-- Multiple session rows stacked vertically
-- Each row: zikr | count | date/time | remove button
+- **Mode Toggle**: "Multi-Zikr" vs "Quick Repeat" 
+- **Multi-Zikr**: Each row has zikr | count | date/time | remove button
+- **Quick Repeat**: Zikr selector (once), then rows of count | date/time | remove
 - "Add Row" button at bottom
 - Save button persists all valid rows
+- Progress indicator for large bulk saves (50+ sessions)
 
 ### Session History Screen
 - List grouped by date
@@ -138,6 +143,10 @@ Session {
   zikrId: string (foreign key)
   count: number (min: 1)
   source: 'app' | 'manual' | 'physical'
+  // source clarification:
+  // 'app' = in-app counter tap
+  // 'manual' = app entry after the fact (retroactive logging)
+  // 'physical' = explicitly marked as physical tasbeeh usage
   timestamp: Date
   date: Date (denormalized YYYY-MM-DD)
   editableUntil: Date (timestamp + 3 days)
@@ -184,15 +193,16 @@ Session {
 3. **Bulk entry with errors**: Some rows valid, some invalid
 4. **Race condition**: User edits while bulk save in progress
 5. **Offline behavior**: All operations work offline (IndexedDB)
-6. **Large bulk entry**: 50+ sessions in one save
-7. **Deleted zikr**: Session references deleted zikr (handle gracefully)
+6. **Large bulk entry**: 50+ sessions trigger progressive save (chunked in batches of 10)
+7. **Deleted zikr**: Session references deleted zikr (handle gracefully, show zikr name)
 8. **3-day window**: Edit/delete button appears/disappears at boundary
+9. **Progressive save interruption**: User closes app during chunked save (resume on return)
 
 ## Success Criteria
 
 - [ ] User can add single session with zikr, count, and date/time
-- [ ] User can add 10+ sessions in bulk entry mode
-- [ ] Sessions appear in history with correct source badges
+- [ ] User can add 10+ sessions in bulk entry mode (both multi-zikr and quick repeat)
+- [ ] Sessions appear in history with correct source badges (manual/physical/app)
 - [ ] Edit/delete works within 3 days, disabled after
 - [ ] Smart defaults pre-fill with last count per zikr
 - [ ] Validation prevents invalid entries with clear messages
@@ -200,6 +210,7 @@ Session {
 - [ ] All operations work offline
 - [ ] Dark mode renders correctly
 - [ ] Screen reader can navigate and operate form
+- [ ] Large bulk entry (50+) shows progress indicator and completes successfully
 
 ## Assumptions & Constraints
 
