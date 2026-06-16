@@ -1,5 +1,5 @@
 {
-  "phase": "commit-pr",
+  "phase": "completed",
   "feature": "Move tests to root tests folder",
   "branch": "main2",
   "requirementsPath": ".pipeline/artifacts/move-tests-requirements.md",
@@ -10,7 +10,7 @@
   "adrReviewPath": "",
   "implementationPath": ".pipeline/artifacts/move-tests-implementation.md",
   "codeReviewPath": ".pipeline/artifacts/review-move-tests-code.md",
-  "status": "in-progress",
+  "status": "completed",
   "blockedBy": [],
   "timestamp": "2025-06-16T16:00:00Z"
 }
