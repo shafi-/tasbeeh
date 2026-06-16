@@ -98,6 +98,39 @@ export async function checkCompletion(zikrId: number): Promise<void> {
   }
 }
 
+// Recalculate goal progress for session changes (add/update/delete).
+// Supports advanced manual progress edits: completes goals when their target
+// is reached and reactivates completed goals when an edit/delete drops progress
+// back below target.
+export async function recalculateGoalForSession(
+  session: Session,
+  _operation: 'add' | 'update' | 'delete',
+  _oldValue?: Session
+): Promise<void> {
+  // Consider both active and completed goals for the session's zikr so we can
+  // complete newly-reached goals and reactivate ones that fall behind.
+  const goals = await getGoalsByZikr(session.zikrId);
+  const affectedGoals = goals.filter(
+    g => g.status === 'active' || g.status === 'completed'
+  );
+
+  for (const goal of affectedGoals) {
+    const allSessions = await db.sessions
+      .where('zikrId')
+      .equals(session.zikrId)
+      .toArray();
+
+    const progress = calculateProgress(goal, allSessions);
+
+    if (progress.currentCount >= goal.target && goal.status === 'active') {
+      await update(goal.id!, { status: 'completed', completedAt: new Date() });
+    } else if (progress.currentCount < goal.target && goal.status === 'completed') {
+      // An edit or deletion dropped progress below target — reactivate the goal.
+      await update(goal.id!, { status: 'active', completedAt: undefined });
+    }
+  }
+}
+
 // Service export
 export const goalService = {
   add,
@@ -111,7 +144,8 @@ export const goalService = {
   getCompletedGoals,
   getPausedGoals,
   calculateProgress,
-  checkCompletion
+  checkCompletion,
+  recalculateGoalForSession
 };
 
 // Legacy exports for backward compatibility

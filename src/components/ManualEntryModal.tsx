@@ -86,7 +86,10 @@ export function ManualEntryModal({ isOpen, onClose }: ManualEntryModalProps) {
         count: formData.count,
         source: 'manual',
         timestamp,
-        date: formData.date
+        date: formData.date,
+        editableUntil: new Date(timestamp.getTime() + 3 * 24 * 60 * 60 * 1000),  // 3-day edit window
+        createdAt: timestamp,
+        updatedAt: timestamp
       });
 
       // Streak automatically updated by sessionService

@@ -1,16 +1,16 @@
 {
-  "phase": "design-review-complete",
-  "feature": "Epic 5: Testing & Documentation",
-  "branch": "feature/epic-5-testing-documentation",
-  "requirementsPath": ".pipeline/artifacts/epic-5-requirements.md",
-  "requirementsReviewPath": ".pipeline/artifacts/epic-5-review-requirements.md",
-  "architecturePath": ".pipeline/artifacts/epic-5-architecture.md",
-  "designReviewPath": ".pipeline/artifacts/epic-5-review-design.md",
+  "phase": "commit-pr",
+  "feature": "Epic 6: Advanced Manual Progress Entry",
+  "branch": "feature/epic-6-advanced-manual-progress",
+  "requirementsPath": ".pipeline/artifacts/epic-6-requirements.md",
+  "requirementsReviewPath": ".pipeline/artifacts/epic-6-review-requirements.md",
+  "architecturePath": ".pipeline/artifacts/epic-6-architecture.md",
+  "designReviewPath": ".pipeline/artifacts/epic-6-review-design.md",
   "adrPaths": [],
   "adrReviewPath": "",
-  "implementationPath": "",
-  "codeReviewPath": "",
+  "implementationPath": ".pipeline/artifacts/epic-6-implementation.md",
+  "codeReviewPath": ".pipeline/artifacts/epic-6-review-code.md",
   "status": "in-progress",
   "blockedBy": [],
-  "timestamp": "2026-06-16T12:00:00Z"
+  "timestamp": "2026-06-16T20:00:00Z"
 }
