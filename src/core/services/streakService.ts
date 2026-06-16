@@ -1,5 +1,5 @@
 import { db } from '../db/db';
-import { Streak } from '../db/types';
+import { Streak, Session } from '../db/types';
 import { formatDate, daysBetween } from '../utils/dateUtils';
 
 export async function getStreak(zikrId: number): Promise<Streak | undefined> {
@@ -46,6 +46,72 @@ export async function updateStreak(zikrId: number, sessionDate: Date): Promise<S
   return streak;
 }
 
+// NEW (v2): Update streak for session changes
+export async function updateForSession(
+  session: Session,
+  operation: 'add' | 'update' | 'delete',
+  oldValue?: Session
+): Promise<void> {
+  // For add and update operations, use the session date
+  if (operation === 'add' || operation === 'update') {
+    await updateStreak(session.zikrId, session.timestamp);
+    // oldValue is logged but not used in current implementation
+    if (operation === 'update' && oldValue) {
+      console.log('Session updated from', oldValue.timestamp, 'to', session.timestamp);
+    }
+  }
+  // For delete operations, need to recalculate from scratch
+  else if (operation === 'delete') {
+    await recalculateStreak(session.zikrId);
+  }
+}
+
+// NEW (v2): Recalculate streak from all sessions (for delete operations)
+async function recalculateStreak(zikrId: number): Promise<void> {
+  const sessions = await db.sessions
+    .where('zikrId')
+    .equals(zikrId)
+    .toArray();
+
+  if (sessions.length === 0) {
+    await resetStreak(zikrId);
+    return;
+  }
+
+  // Sort sessions by date ascending
+  sessions.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+
+  let currentStreak = 1;
+  let longestStreak = 1;
+  let lastProcessedDate = sessions[0].timestamp;
+
+  // Calculate streak from all sessions
+  for (let i = 1; i < sessions.length; i++) {
+    const daysSince = daysBetween(lastProcessedDate, sessions[i].timestamp);
+
+    if (daysSince === 1) {
+      currentStreak++;
+    } else if (daysSince > 1) {
+      currentStreak = 1; // Reset streak
+    }
+
+    if (currentStreak > longestStreak) {
+      longestStreak = currentStreak;
+    }
+
+    lastProcessedDate = sessions[i].timestamp;
+  }
+
+  const streak: Streak = {
+    zikrId,
+    currentStreak,
+    longestStreak,
+    lastProcessedDate
+  };
+
+  await db.streaks.put(streak);
+}
+
 export async function resetStreak(zikrId: number): Promise<void> {
   const streak: Streak = {
     zikrId,
@@ -56,3 +122,11 @@ export async function resetStreak(zikrId: number): Promise<void> {
 
   await db.streaks.put(streak);
 }
+
+export const streakService = {
+  getStreak,
+  getAllStreaks,
+  updateStreak,
+  updateForSession,
+  resetStreak
+};

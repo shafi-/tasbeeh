@@ -1,5 +1,5 @@
 import { db } from '../db/db';
-import { Goal } from '../db/types';
+import { Goal, Session } from '../db/types';
 
 export async function addGoal(goal: Omit<Goal, 'id'>): Promise<number> {
   const id = await db.goals.add(goal);
@@ -70,3 +70,47 @@ export async function calculateGoalProgress(goalId: number): Promise<{
     percentage
   };
 }
+
+// NEW (v2): Recalculate goal progress for session changes
+export async function recalculateGoalForSession(
+  session: Session,
+  operation: 'add' | 'update' | 'delete',
+  oldValue?: Session
+): Promise<void> {
+  // Find active goals for session's zikr
+  const goals = await getActiveGoals();
+  const zikrGoals = goals.filter(g => g.zikrId === session.zikrId);
+
+  // Handle session updates (remove old value, add new value)
+  if (operation === 'update' && oldValue) {
+    // For updates, we need to recalculate with the old value removed
+    // This is handled by recalculating the entire goal progress
+  }
+
+  // Update each affected goal
+  for (const goal of zikrGoals) {
+    const progress = await calculateGoalProgress(goal.id!);
+
+    // Update goal status if target reached
+    if (progress.current >= goal.targetCount && goal.status === 'active') {
+      await updateGoal(goal.id!, { status: 'completed' });
+    } else if (progress.current < goal.targetCount && goal.status === 'completed') {
+      // If session was deleted and goal is no longer complete, reactivate
+      await updateGoal(goal.id!, { status: 'active' });
+    }
+  }
+}
+
+export const goalService = {
+  addGoal,
+  updateGoal,
+  deleteGoal,
+  getGoalById,
+  getAllGoals,
+  getGoalsByZikr,
+  getActiveGoals,
+  getCompletedGoals,
+  getPausedGoals,
+  calculateGoalProgress,
+  recalculateGoalForSession
+};

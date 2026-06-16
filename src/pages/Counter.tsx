@@ -72,7 +72,10 @@ export function Counter() {
         count,
         source: 'app',
         timestamp: new Date(),
-        date: new Date()
+        date: new Date(),
+        editableUntil: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),  // 3-day edit window
+        createdAt: new Date(),
+        updatedAt: new Date()
       });
 
       // Clear current session
