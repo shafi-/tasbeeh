@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateZikrName, isDuplicateZikrName, validateCount } from './validation';
+import { validateZikrName, isDuplicateZikrName, validateCount } from '../../src/utils/validation';
 
 describe('validateZikrName', () => {
   it('accepts a valid name', () => {

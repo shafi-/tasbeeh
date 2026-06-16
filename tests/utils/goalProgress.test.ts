@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { calculateProgress } from '../core/services/goalService';
-import { Goal, Session } from '../core/db/types';
+import { calculateProgress } from '../../src/core/services/goalService';
+import { Goal, Session } from '../../src/core/db/types';
 
 // Helpers to build minimal fixture objects without touching the DB
 function makeGoal(overrides: Partial<Goal> = {}): Goal {

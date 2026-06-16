@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatDate, formatTime, daysBetween, isToday, isYesterday, combineDateTime } from './dateUtils';
+import { formatDate, formatTime, daysBetween, isToday, isYesterday, combineDateTime } from '../../../src/core/utils/dateUtils';
 
 // Pin a stable reference date: Wednesday 2026-06-10 14:30:00
 const REF = new Date(2026, 5, 10, 14, 30, 0); // month is 0-indexed

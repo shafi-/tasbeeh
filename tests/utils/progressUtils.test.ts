@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { calculateTodayTotal, calculateTodayBreakdown, calculateWeeklyData } from './progressUtils';
-import { Session } from '../core/db/types';
-import { formatDate, getWeekStart } from './dateUtils';
+import { calculateTodayTotal, calculateTodayBreakdown, calculateWeeklyData } from '../../src/utils/progressUtils';
+import { Session } from '../../src/core/db/types';
+import { getWeekStart } from '../../src/utils/dateUtils';
 
 function makeSession(date: Date, count: number, zikrId = 1, id = 1): Session {
   const midnight = new Date(date);

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { daysBetween } from '../utils/dateUtils';
+import { daysBetween } from '../../../src/core/utils/dateUtils';
 
 // The streak algorithm in streakService.updateStreak operates on these rules:
 //   - same day (daysSince === 0):  no change to streak

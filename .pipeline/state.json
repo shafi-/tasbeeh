@@ -1,16 +1,17 @@
 {
   "phase": "commit-pr",
-  "feature": "Epic 6: Advanced Manual Progress Entry",
-  "branch": "feature/epic-6-advanced-manual-progress",
-  "requirementsPath": ".pipeline/artifacts/epic-6-requirements.md",
-  "requirementsReviewPath": ".pipeline/artifacts/epic-6-review-requirements.md",
-  "architecturePath": ".pipeline/artifacts/epic-6-architecture.md",
-  "designReviewPath": ".pipeline/artifacts/epic-6-review-design.md",
+  "feature": "Move tests to root tests folder",
+  "branch": "refactor/move-tests-to-root-folder",
+  "workingBranch": "main2",
+  "requirementsPath": ".pipeline/artifacts/move-tests-requirements.md",
+  "requirementsReviewPath": ".pipeline/artifacts/review-move-tests-requirements.md",
+  "architecturePath": "",
+  "designReviewPath": "",
   "adrPaths": [],
   "adrReviewPath": "",
-  "implementationPath": ".pipeline/artifacts/epic-6-implementation.md",
-  "codeReviewPath": ".pipeline/artifacts/epic-6-review-code.md",
+  "implementationPath": "",
+  "codeReviewPath": "",
   "status": "in-progress",
   "blockedBy": [],
-  "timestamp": "2026-06-16T20:00:00Z"
+  "timestamp": "2025-06-16T15:45:00Z"
 }
