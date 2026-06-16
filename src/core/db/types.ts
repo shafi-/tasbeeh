@@ -21,12 +21,13 @@ export interface Session {
 export interface Goal {
   id?: number;
   zikrId: number;
-  targetCount: number;
+  target: number;
   period: 'daily' | 'weekly' | 'monthly' | 'custom';
-  startDate: Date;
+  startDate?: Date;
   endDate?: Date;
   status: 'active' | 'completed' | 'paused';
   createdAt: Date;
+  completedAt?: Date;
 }
 
 export interface Streak {
