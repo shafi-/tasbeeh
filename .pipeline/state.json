@@ -1,16 +1,16 @@
 {
-  "phase": "commit-pr",
-  "feature": "Epic 3: Goals & Streaks",
-  "branch": "feature/epic-3-goals-streaks",
-  "requirementsPath": ".pipeline/artifacts/epic-3-requirements.md",
-  "requirementsReviewPath": "",
-  "architecturePath": ".pipeline/artifacts/epic-3-architecture.md",
-  "designReviewPath": ".pipeline/artifacts/epic-3-review-design.md",
+  "phase": "commit-complete",
+  "feature": "Epic 4: Progress, Settings & Polish",
+  "branch": "feature/epic-4-progress-settings-polish",
+  "requirementsPath": ".pipeline/artifacts/epic-4-requirements.md",
+  "requirementsReviewPath": ".pipeline/artifacts/epic-4-review-requirements.md",
+  "architecturePath": ".pipeline/artifacts/epic-4-architecture.md",
+  "designReviewPath": ".pipeline/artifacts/epic-4-review-design.md",
   "adrPaths": [],
   "adrReviewPath": "",
-  "implementationPath": ".pipeline/artifacts/epic-3-implementation.md",
-  "codeReviewPath": ".pipeline/artifacts/epic-3-review-code.md",
-  "status": "awaiting-remote-setup",
-  "blockedBy": ["no-remote-repository-configured"],
-  "timestamp": "2026-06-15T21:15:00Z"
+  "implementationPath": ".pipeline/artifacts/epic-4-implementation.md",
+  "codeReviewPath": ".pipeline/artifacts/epic-4-review-code.md",
+  "status": "complete",
+  "blockedBy": ["no-remote-repository"],
+  "timestamp": "2026-06-16T01:00:00Z"
 }
