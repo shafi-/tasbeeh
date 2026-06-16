@@ -1,17 +1,16 @@
 {
   "phase": "commit-pr",
   "feature": "Move tests to root tests folder",
-  "branch": "refactor/move-tests-to-root-folder",
-  "workingBranch": "main2",
+  "branch": "main2",
   "requirementsPath": ".pipeline/artifacts/move-tests-requirements.md",
   "requirementsReviewPath": ".pipeline/artifacts/review-move-tests-requirements.md",
-  "architecturePath": "",
-  "designReviewPath": "",
+  "architecturePath": ".pipeline/artifacts/move-tests-architecture.md",
+  "designReviewPath": ".pipeline/artifacts/review-move-tests-design.md",
   "adrPaths": [],
   "adrReviewPath": "",
-  "implementationPath": "",
-  "codeReviewPath": "",
+  "implementationPath": ".pipeline/artifacts/move-tests-implementation.md",
+  "codeReviewPath": ".pipeline/artifacts/review-move-tests-code.md",
   "status": "in-progress",
   "blockedBy": [],
-  "timestamp": "2025-06-16T15:45:00Z"
+  "timestamp": "2025-06-16T16:00:00Z"
 }
