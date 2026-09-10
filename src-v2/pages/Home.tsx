@@ -4,7 +4,7 @@
  * INTEGRATED WITH ZUSTAND STORES
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopAppBar from '../components/navigation/TopAppBar';
 import BottomNav from '../components/navigation/BottomNav';
@@ -22,15 +22,25 @@ import { getZikrDisplayInfo } from '../utils/zikrMapping';
 import { formatDate, getToday } from '../../src/core/utils/dateUtils';
 import { Zikr } from '../../src/core/db/types';
 
-const getGreeting = (): string => {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
+/** Rotating hero phrases — one per day, rooted in dhikr itself. */
+const DAILY_PHRASES: Array<{ text: string; source?: string }> = [
+  { text: 'Remember Me, and I will remember you', source: "Qur'an 2:152" },
+  { text: 'Hearts find rest in remembrance', source: "Qur'an 13:28" },
+  { text: 'Truly, remembrance is the greatest', source: "Qur'an 29:45" },
+  { text: 'Keep your tongue moist with remembrance', source: 'Hadith' },
+  { text: 'In stillness, the heart remembers' },
+];
+
+const getPhraseOfDay = () => {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 0);
+  const day = Math.floor((now.getTime() - startOfYear.getTime()) / 86400_000);
+  return DAILY_PHRASES[day % DAILY_PHRASES.length];
 };
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+  const phrase = useMemo(() => getPhraseOfDay(), []);
 
   // Store integrations
   const zikrs = useZikrStore(state => state.zikrs);
@@ -194,7 +204,7 @@ const Home: React.FC = () => {
             </div>
           )}
           <h2 className="relative font-headline-lg-mobile text-headline-lg-mobile text-primary mt-2">
-            {streakDays > 0 ? 'Keep it going!' : getGreeting()}
+            {streakDays > 0 ? 'Keep it going!' : phrase.text}
           </h2>
           <p className="relative font-body-md text-body-md text-on-surface-variant">
             {todayTotal > 0
@@ -202,6 +212,11 @@ const Home: React.FC = () => {
               : 'Begin your practice of remembrance.'
             }
           </p>
+          {streakDays === 0 && phrase.source && (
+            <p className="relative font-caption text-caption text-tertiary">
+              — {phrase.source}
+            </p>
+          )}
         </section>
 
         {/* Daily Goal Progress — mihrab arch */}
