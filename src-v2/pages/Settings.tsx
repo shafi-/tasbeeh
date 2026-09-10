@@ -16,9 +16,11 @@ import { zikrService } from '../../src/core/services/zikrService';
 import { db } from '../../src/core/db/db';
 import { Zikr } from '../../src/core/db/types';
 import { useSharedRoomStore } from '../../src/core/stores/sharedRoomStore';
+import { useI18n, LANGUAGES } from '../../src/core/i18n';
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();
+  const { lang, t } = useI18n();
 
   // Store integrations
   const settings = useSettingsStore(state => state.settings);
@@ -87,7 +89,7 @@ const Settings: React.FC = () => {
       await exportService.exportData();
     } catch (error) {
       console.error('Failed to export data:', error);
-      alert('Failed to export data. Please try again.');
+      alert(t('settings.exportFailed'));
     } finally {
       setIsExporting(false);
     }
@@ -101,20 +103,18 @@ const Settings: React.FC = () => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
 
-      const confirmed = confirm(
-        'This will replace all your current data. This action cannot be undone. Continue?'
-      );
+      const confirmed = confirm(t('settings.importConfirm'));
 
       if (!confirmed) return;
 
       setIsImporting(true);
       try {
         await exportService.importData(file);
-        alert('Data imported successfully! The app will now reload.');
+        alert(t('settings.importSuccess'));
         window.location.reload();
       } catch (error) {
         console.error('Failed to import data:', error);
-        alert('Failed to import data. Please make sure you selected a valid backup file.');
+        alert(t('settings.importFailed'));
       } finally {
         setIsImporting(false);
       }
@@ -123,19 +123,19 @@ const Settings: React.FC = () => {
   };
 
   const handleClearAllData = async () => {
-    const confirmed1 = confirm('Are you sure you want to clear all data? This cannot be undone.');
+    const confirmed1 = confirm(t('settings.clearConfirm1'));
     if (!confirmed1) return;
 
-    const confirmed2 = confirm('This will delete ALL your zikrs, sessions, goals, and settings. Are you absolutely sure?');
+    const confirmed2 = confirm(t('settings.clearConfirm2'));
     if (!confirmed2) return;
 
     try {
       await db.delete();
-      alert('All data cleared. The app will now reload.');
+      alert(t('settings.cleared'));
       window.location.reload();
     } catch (error) {
       console.error('Failed to clear data:', error);
-      alert('Failed to clear data. Please try again.');
+      alert(t('settings.clearFailed'));
     }
   };
 
@@ -149,17 +149,15 @@ const Settings: React.FC = () => {
   };
 
   const handleDeleteZikr = async (zikr: Zikr) => {
-    const confirmed = confirm(
-      `Are you sure you want to delete "${zikr.name}"? This will also delete all associated sessions and goals. This action cannot be undone.`
-    );
+    const confirmed = confirm(t('settings.deleteZikrConfirm', { name: zikr.name }));
     if (!confirmed) return;
 
     try {
       await zikrService.softDelete(zikr.id!);
-      alert('Zikr deleted successfully.');
+      alert(t('settings.zikrDeleted'));
     } catch (error) {
       console.error('Failed to delete zikr:', error);
-      alert('Failed to delete zikr. Please try again.');
+      alert(t('zikrForm.saveFailed'));
     }
   };
 
@@ -177,7 +175,7 @@ const Settings: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-surface text-on-surface antialiased flex items-center justify-center">
-        <div className="text-on-surface-variant">Loading...</div>
+        <div className="text-on-surface-variant">{t('common.loading')}</div>
       </div>
     );
   }
@@ -193,7 +191,7 @@ const Settings: React.FC = () => {
           <MaterialIcon icon="arrow_back" className="text-2xl" />
         </button>
         <div className="font-headline-md text-headline-md text-primary font-bold">
-          Settings
+          {t('settings.heading')}
         </div>
         <div className="w-touch-target-min" />
       </header>
@@ -203,7 +201,7 @@ const Settings: React.FC = () => {
         {/* Preferences Section */}
         <section>
           <h2 className="font-label-md text-label-md text-on-surface-variant mb-4 px-2">
-            Preferences
+            {t('settings.preferences')}
           </h2>
           <div className="flex flex-col gap-2">
             {/* Dark Mode Toggle */}
@@ -213,9 +211,9 @@ const Settings: React.FC = () => {
                   <MaterialIcon icon="dark_mode" className="text-primary text-[20px]" />
                 </div>
                 <div>
-                  <p className="font-body-md text-body-md text-on-surface">Dark Mode</p>
+                  <p className="font-body-md text-body-md text-on-surface">{t('settings.darkMode')}</p>
                   <p className="font-caption text-caption text-on-surface-variant">
-                    Switch between light and dark themes
+                    {t('settings.darkModeDesc')}
                   </p>
                 </div>
               </div>
@@ -229,9 +227,9 @@ const Settings: React.FC = () => {
                   <MaterialIcon icon="vibration" className="text-primary text-[20px]" />
                 </div>
                 <div>
-                  <p className="font-body-md text-body-md text-on-surface">Haptic Feedback</p>
+                  <p className="font-body-md text-body-md text-on-surface">{t('settings.haptics')}</p>
                   <p className="font-caption text-caption text-on-surface-variant">
-                    Vibrate on taps and interactions
+                    {t('settings.hapticsDesc')}
                   </p>
                 </div>
               </div>
@@ -240,10 +238,41 @@ const Settings: React.FC = () => {
           </div>
         </section>
 
+        {/* Language */}
+        <section>
+          <h2 className="font-label-md text-label-md text-on-surface-variant mb-4 px-2">
+            {t('settings.language')}
+          </h2>
+          <div className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="bg-surface-container-high p-2 rounded-lg">
+                <MaterialIcon icon="translate" className="text-primary text-[20px]" />
+              </div>
+              <div>
+                <p className="font-body-md text-body-md text-on-surface">{t('settings.language')}</p>
+                <p className="font-caption text-caption text-on-surface-variant">{t('settings.languageDesc')}</p>
+              </div>
+            </div>
+            <div className="flex gap-2 bg-surface-container-lowest p-1 rounded-xl">
+              {LANGUAGES.map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => saveSetting('language', l.code)}
+                  className={`px-3 py-2 rounded-lg font-label-md text-label-md transition-all ${
+                    lang === l.code ? 'bg-primary-container text-on-primary' : 'text-on-surface-variant hover:bg-surface-variant/50'
+                  }`}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Shared Goals Section */}
         <section>
           <h2 className="font-label-md text-label-md text-on-surface-variant mb-4 px-2">
-            Shared Goals
+            {t('settings.sharedGoals')}
           </h2>
           <div className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-4">
             <div className="flex items-center justify-between gap-3">
@@ -252,9 +281,9 @@ const Settings: React.FC = () => {
                   <MaterialIcon icon="person" className="text-primary text-[20px]" />
                 </div>
                 <div className="min-w-0">
-                  <p className="font-body-md text-body-md text-on-surface">Your name in rooms</p>
+                  <p className="font-body-md text-body-md text-on-surface">{t('settings.roomName')}</p>
                   <p className="font-caption text-caption text-on-surface-variant truncate">
-                    {sharedRoomStore.identity?.displayName || 'Not set'}
+                    {sharedRoomStore.identity?.displayName || t('settings.nameNotSet')}
                   </p>
                 </div>
               </div>
@@ -277,7 +306,7 @@ const Settings: React.FC = () => {
                   value={nameDraft}
                   maxLength={24}
                   onChange={(e) => setNameDraft(e.target.value)}
-                  placeholder="Your name"
+                  placeholder={t('settings.namePlaceholder')}
                   className="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-xl px-4 h-12 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
                   autoFocus
                 />
@@ -286,7 +315,7 @@ const Settings: React.FC = () => {
                     onClick={() => setNameEditing(false)}
                     className="flex-1 h-11 rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant/50 transition-colors"
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                   <button
                     onClick={async () => {
@@ -297,15 +326,14 @@ const Settings: React.FC = () => {
                     }}
                     className="flex-1 h-11 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md hover:opacity-90 transition-opacity"
                   >
-                    Save
+                    {t('common.save')}
                   </button>
                 </div>
               </div>
             )}
 
             <p className="font-caption text-caption text-on-surface-variant mt-3">
-              Shared goal rooms let you read together with others. Your personal counts stay on
-              this device — only the combined total is shared.
+              {t('settings.sharedGoalsDesc')}
             </p>
           </div>
         </section>
@@ -313,7 +341,7 @@ const Settings: React.FC = () => {
         {/* Data Management Section */}
         <section>
           <h2 className="font-label-md text-label-md text-on-surface-variant mb-4 px-2">
-            Data Management
+            {t('settings.dataManagement')}
           </h2>
           <div className="flex flex-col gap-2">
             {/* Export Data */}
@@ -327,9 +355,9 @@ const Settings: React.FC = () => {
                   <MaterialIcon icon="download" className="text-primary text-[20px]" />
                 </div>
                 <div>
-                  <p className="font-body-md text-body-md text-on-surface">Export Data</p>
+                  <p className="font-body-md text-body-md text-on-surface">{t('settings.export')}</p>
                   <p className="font-caption text-caption text-on-surface-variant">
-                    Download backup of all your data
+                    {t('settings.exportDesc')}
                   </p>
                 </div>
               </div>
@@ -347,9 +375,9 @@ const Settings: React.FC = () => {
                   <MaterialIcon icon="upload" className="text-primary text-[20px]" />
                 </div>
                 <div>
-                  <p className="font-body-md text-body-md text-on-surface">Import Data</p>
+                  <p className="font-body-md text-body-md text-on-surface">{t('settings.import')}</p>
                   <p className="font-caption text-caption text-on-surface-variant">
-                    Restore from backup file
+                    {t('settings.importDesc')}
                   </p>
                 </div>
               </div>
@@ -366,9 +394,9 @@ const Settings: React.FC = () => {
                   <MaterialIcon icon="delete_forever" className="text-error text-[20px]" />
                 </div>
                 <div>
-                  <p className="font-body-md text-body-md text-error">Clear All Data</p>
+                  <p className="font-body-md text-body-md text-error">{t('settings.clearAll')}</p>
                   <p className="font-caption text-caption text-error/70">
-                    Permanently delete all data
+                    {t('settings.clearAllDesc')}
                   </p>
                 </div>
               </div>
@@ -381,14 +409,14 @@ const Settings: React.FC = () => {
         <section>
           <div className="flex items-center justify-between mb-4 px-2">
             <h2 className="font-label-md text-label-md text-on-surface-variant">
-              Manage Zikrs
+              {t('settings.manageZikrs')}
             </h2>
             <button
               onClick={() => setIsCreateModalOpen(true)}
               className="text-primary font-label-md text-label-md flex items-center gap-1 hover:opacity-80 transition-opacity"
             >
               <MaterialIcon icon="add" className="text-[18px]" />
-              Add New
+              {t('settings.addNew')}
             </button>
           </div>
 
@@ -404,7 +432,7 @@ const Settings: React.FC = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search zikrs..."
+                  placeholder={t('settings.searchPlaceholder')}
                   className="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl pl-12 pr-4 h-touch-target-min font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
                 />
                 {searchQuery && (
@@ -419,7 +447,7 @@ const Settings: React.FC = () => {
               </div>
               {searchQuery && (
                 <p className="font-caption text-caption text-on-surface-variant mt-2 px-2">
-                  {filteredZikrs.length} {filteredZikrs.length === 1 ? 'zikr' : 'zikrs'} found
+                  {filteredZikrs.length === 1 ? t('settings.oneFound') : t('settings.found', { count: filteredZikrs.length })}
                 </p>
               )}
             </div>
@@ -430,14 +458,14 @@ const Settings: React.FC = () => {
               <div className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-8 text-center">
                 <MaterialIcon icon="spa" className="text-4xl text-tertiary-container mx-auto mb-3" />
                 <p className="font-body-md text-body-md text-on-surface-variant">
-                  No zikrs yet. Create your first zikr to get started.
+                  {t('settings.noZikrs')}
                 </p>
               </div>
             ) : searchQuery && filteredZikrs.length === 0 ? (
               <div className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-8 text-center">
                 <MaterialIcon icon="search_off" className="text-4xl text-tertiary-container mx-auto mb-3" />
                 <p className="font-body-md text-body-md text-on-surface-variant">
-                  No zikrs found matching "{searchQuery}"
+                  {t('settings.noZikrsFound', { query: searchQuery })}
                 </p>
               </div>
             ) : (
@@ -453,7 +481,7 @@ const Settings: React.FC = () => {
                     <div>
                       <p className="font-body-md text-body-md text-on-surface">{zikr.name}</p>
                       <p className="font-caption text-caption text-on-surface-variant">
-                        {zikr.custom ? 'Custom zikr' : 'Predefined zikr'}
+                        {zikr.custom ? t('settings.customZikr') : t('settings.predefined')}
                       </p>
                     </div>
                   </div>
@@ -482,7 +510,7 @@ const Settings: React.FC = () => {
         {/* About Section */}
         <section>
           <h2 className="font-label-md text-label-md text-on-surface-variant mb-4 px-2">
-            About
+            {t('settings.about')}
           </h2>
           <div className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-4">
             <div className="flex items-center gap-4 mb-4">
@@ -500,9 +528,9 @@ const Settings: React.FC = () => {
             <OrnamentDivider className="mb-4" />
 
             <div className="space-y-3 text-body-md text-on-surface-variant">
-              <p>Zikr is a Progressive Web App for Islamic dhikr practice.</p>
+              <p>{t('settings.aboutBody')}</p>
               <p className="text-sm">
-                Features: custom zikr lists, manual progress entry, goals &amp; streaks, and complete offline functionality.
+                {t('settings.featuresBody')}
               </p>
             </div>
           </div>
@@ -512,7 +540,7 @@ const Settings: React.FC = () => {
         <section className="text-center flex flex-col gap-3">
           <OrnamentDivider className="w-40 mx-auto" />
           <p className="font-caption text-caption text-on-surface-variant">
-            Built for remembrance
+            {t('settings.builtFor')}
           </p>
           <p className="font-caption text-caption text-on-surface-variant">
             © 2024 Zikr

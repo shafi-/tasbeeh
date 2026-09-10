@@ -12,10 +12,12 @@ import OrnamentDivider from '../components/decor/OrnamentDivider';
 import InputField from '../components/forms/InputField';
 import { useSharedRoomStore, sharedRoomErrorMessage } from '../../src/core/stores/sharedRoomStore';
 import { normalizeRoomCode } from '../../src/core/utils/sharedRoomUtils';
+import { useI18n } from '../../src/core/i18n';
 
 const Join: React.FC = () => {
   const { code = '' } = useParams();
   const navigate = useNavigate();
+  const { t } = useI18n();
   const { identity, configured, joinRoom, updateDisplayName } = useSharedRoomStore();
 
   const normalized = normalizeRoomCode(code);
@@ -31,7 +33,7 @@ const Join: React.FC = () => {
     setLocalError(null);
     const name = displayName.trim();
     if (!name) {
-      setLocalError('Please enter your name.');
+      setLocalError(t('joinModal.nameRequired'));
       return;
     }
     setJoining(true);
@@ -63,10 +65,10 @@ const Join: React.FC = () => {
             <MaterialIcon icon="group_add" filled className="text-4xl text-tertiary" />
           </div>
           <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-1">
-            You're invited
+            {t('join.invited')}
           </h1>
           <p className="font-caption text-caption text-on-surface-variant mb-6">
-            Join a shared dhikr goal — no account needed
+            {t('join.sub')}
           </p>
 
           <div className="w-full bg-surface-container-lowest rounded-xl border border-outline-variant/30 py-4 text-center mb-6">
@@ -77,14 +79,13 @@ const Join: React.FC = () => {
 
           {!normalized && (
             <p className="font-caption text-caption text-error mb-4" role="alert">
-              This invite link has an invalid code. Check the link or join manually from the Group
-              tab.
+              {t('join.invalidLink')}
             </p>
           )}
 
           <div className="w-full flex flex-col gap-4">
             <InputField
-              label="Your name"
+              label={t('join.yourName')}
               placeholder="e.g., Ahmed"
               value={displayName}
               onChange={(v) => setDisplayName(String(v))}
@@ -104,21 +105,21 @@ const Join: React.FC = () => {
               className="w-full h-touch-target-min bg-primary-container text-on-primary rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 hover:opacity-90 active-scale-98 transition-all disabled:opacity-50"
             >
               <MaterialIcon icon="group_add" className="text-[20px]" />
-              {joining ? 'Joining…' : 'Join Room'}
+              {joining ? t('joinModal.joining') : t('joinModal.join')}
             </button>
 
             <button
               onClick={() => navigate('/group')}
               className="h-12 rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant/50 transition-colors"
             >
-              Go to Group
+              {t('join.goToGroup')}
             </button>
           </div>
         </div>
 
         <p className="font-caption text-caption text-on-surface-variant mt-6 flex items-center gap-1.5">
           <MaterialIcon icon="lock" className="text-[14px]" />
-          Your name is all other members will ever see.
+          {t('join.privacyNote')}
         </p>
       </main>
     </div>

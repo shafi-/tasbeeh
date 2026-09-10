@@ -7,6 +7,7 @@
 import React, { useRef, useEffect } from 'react';
 import useRipple from '../hooks/useRipple';
 import useHaptic from '../hooks/useHaptic';
+import { useI18n } from '../../src/core/i18n';
 
 interface CounterCircleProps {
   count: number;
@@ -24,6 +25,7 @@ export const CounterCircle: React.FC<CounterCircleProps> = ({
   className = '',
 }) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const { t } = useI18n();
   const { createRipple } = useRipple(buttonRef, hapticsEnabled);
   const { trigger: haptic } = useHaptic(hapticsEnabled);
 
@@ -129,7 +131,7 @@ export const CounterCircle: React.FC<CounterCircleProps> = ({
           {count}
         </span>
         <span className="relative font-label-md text-label-md text-tertiary tabular-nums">
-          of {target}
+          {t('counter.ofTarget', { target })}
         </span>
       </button>
     </div>

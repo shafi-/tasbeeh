@@ -92,14 +92,14 @@ export default {
 
       // Font Families
       fontFamily: {
-        'headline-lg-mobile': ['Plus Jakarta Sans', 'sans-serif'],
-        'headline-lg': ['Plus Jakarta Sans', 'sans-serif'],
-        'headline-md': ['Plus Jakarta Sans', 'sans-serif'],
-        'body-lg': ['"Source Sans 3"', 'sans-serif'],
-        'body-md': ['"Source Sans 3"', 'sans-serif'],
-        'caption': ['"Source Sans 3"', 'sans-serif'],
+        'headline-lg-mobile': ['Plus Jakarta Sans', 'Noto Sans Bengali', 'sans-serif'],
+        'headline-lg': ['Plus Jakarta Sans', 'Noto Sans Bengali', 'sans-serif'],
+        'headline-md': ['Plus Jakarta Sans', 'Noto Sans Bengali', 'sans-serif'],
+        'body-lg': ['"Source Sans 3"', 'Noto Sans Bengali', 'sans-serif'],
+        'body-md': ['"Source Sans 3"', 'Noto Sans Bengali', 'sans-serif'],
+        'caption': ['"Source Sans 3"', 'Noto Sans Bengali', 'sans-serif'],
         'display-arabic': ['Amiri', 'Noto Serif', 'serif'],
-        'label-md': ['Plus Jakarta Sans', 'sans-serif'],
+        'label-md': ['Plus Jakarta Sans', 'Noto Sans Bengali', 'sans-serif'],
       },
 
       // Font Sizes

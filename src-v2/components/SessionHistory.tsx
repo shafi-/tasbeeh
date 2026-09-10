@@ -10,6 +10,7 @@ import { useZikrStore } from '../../src/core/stores/zikrStore';
 import { sessionService } from '../../src/core/services/sessionService';
 import { formatDate } from '../../src/core/utils/dateUtils';
 import { Session } from '../../src/core/db/types';
+import { useI18n, localeTag } from '../../src/core/i18n';
 
 const EDIT_WINDOW_DAYS = 3;
 
@@ -18,6 +19,7 @@ interface SessionHistoryProps {
 }
 
 const SessionHistory: React.FC<SessionHistoryProps> = ({ onRefresh }) => {
+  const { lang, t } = useI18n();
   const { groupedByDate, loading, sessions, loadSessions, toggleGroup } = useSessionHistoryStore();
   const zikrs = useZikrStore(state => state.zikrs);
 
@@ -46,7 +48,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ onRefresh }) => {
 
     const newCount = parseInt(editCount, 10);
     if (isNaN(newCount) || newCount < 1 || newCount > 10000) {
-      alert('Please enter a valid count between 1 and 10000');
+      alert(t('progress.validCount'));
       return;
     }
 
@@ -64,7 +66,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ onRefresh }) => {
       if (onRefresh) onRefresh();
     } catch (error) {
       console.error('Failed to update session:', error);
-      alert('Failed to update session. Please try again.');
+      alert(t('history.updateFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -77,15 +79,19 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ onRefresh }) => {
 
   const handleDelete = async (session: Session) => {
     if (!canEditSession(session)) {
-      alert('This session can no longer be edited (outside 3-day window)');
+      alert(t('history.notEditable'));
       return;
     }
 
     const zikr = zikrs.find(z => z.id === session.zikrId);
-    const zikrName = zikr?.name || 'Unknown zikr';
+    const zikrName = zikr?.name || t('history.unknownZikr');
 
     const confirmed = confirm(
-      `Delete this session?\n\n${zikrName}: ${session.count}x\n${formatDate(session.date)}\n\nThis action cannot be undone.`
+      t('history.deleteConfirm', {
+        zikr: zikrName,
+        count: session.count,
+        date: formatDate(session.date),
+      })
     );
 
     if (!confirmed) return;
@@ -98,14 +104,14 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ onRefresh }) => {
       if (onRefresh) onRefresh();
     } catch (error) {
       console.error('Failed to delete session:', error);
-      alert('Failed to delete session. Please try again.');
+      alert(t('history.deleteFailed'));
     } finally {
       setIsSaving(false);
     }
   };
 
   const formatTime = (date: Date): string => {
-    return date.toLocaleTimeString('en-US', {
+    return date.toLocaleTimeString(localeTag(lang), {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
@@ -122,16 +128,16 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ onRefresh }) => {
 
   const getSourceLabel = (source?: string): string => {
     switch (source) {
-      case 'app': return 'App';
-      case 'manual': return 'Manual';
-      default: return 'Physical';
+      case 'app': return t('history.app');
+      case 'manual': return t('history.manual');
+      default: return t('history.physical');
     }
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-on-surface-variant">Loading sessions...</div>
+        <div className="text-on-surface-variant">{t('history.loading')}</div>
       </div>
     );
   }
@@ -141,10 +147,10 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ onRefresh }) => {
       <div className="text-center py-12">
         <MaterialIcon icon="history" className="text-6xl text-surface-variant mb-4 mx-auto" />
         <h3 className="font-headline-md text-headline-md text-primary mb-2">
-          No Sessions Yet
+          {t('history.title')}
         </h3>
         <p className="font-body-md text-body-md text-on-surface-variant">
-          Complete a dhikr session to see your history here.
+          {t('history.noSessionsHint')}
         </p>
       </div>
     );
@@ -181,7 +187,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ onRefresh }) => {
               <div className="divide-y divide-outline-variant/10">
                 {group.sessions.map((session) => {
                   const zikr = zikrs.find(z => z.id === session.zikrId);
-                  const zikrName = zikr?.name || 'Unknown zikr';
+                  const zikrName = zikr?.name || t('history.unknownZikr');
                   const editable = canEditSession(session);
 
                   const isEditing = editingSession?.id === session.id;
@@ -285,7 +291,7 @@ const SessionHistory: React.FC<SessionHistoryProps> = ({ onRefresh }) => {
 
       {/* Info text */}
       <p className="font-caption text-caption text-on-surface-variant text-center">
-        Sessions can be edited for {EDIT_WINDOW_DAYS} days after creation
+        {t('history.editWindowNote', { days: EDIT_WINDOW_DAYS })}
       </p>
     </div>
   );

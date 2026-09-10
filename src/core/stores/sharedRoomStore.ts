@@ -17,6 +17,8 @@ import sharedRoomService, {
   setActiveRoom,
   SharedRoomError,
 } from '../services/sharedRoom';
+import { useSettingsStore } from './settingsStore';
+import { translate, detectLanguage, Lang } from '../i18n';
 
 interface SharedRoomState {
   initialized: boolean;
@@ -56,25 +58,21 @@ interface SharedRoomState {
   clearError: () => void;
 }
 
+function currentLang(): Lang {
+  const l = useSettingsStore.getState().settings.language;
+  return l === 'bn' || l === 'en' ? l : detectLanguage();
+}
+
+/**
+ * Store errors hold a SharedRoomErrorCode (or 'unknown'); the UI renders
+ * them via the `errors.*` i18n keys so they follow the active language.
+ */
+function errorCode(err: unknown): string {
+  return err instanceof SharedRoomError ? err.code : 'unknown';
+}
+
 function errorToMessage(err: unknown): string {
-  if (err instanceof SharedRoomError) {
-    switch (err.code) {
-      case 'room-not-found': return 'Room not found. Check the code.';
-      case 'room-closed': return 'This room has been closed.';
-      case 'room-full': return 'This room is full.';
-      case 'window-ended': return 'The time window for this goal has ended.';
-      case 'window-not-started': return 'This goal has not started yet.';
-      case 'not-a-member': return 'Join the room before contributing.';
-      case 'not-owner': return 'Only the room creator can do that.';
-      case 'invalid-delta': return 'Enter a count between 1 and 10,000.';
-      case 'invalid-input': return 'Please check your input.';
-      case 'not-configured': return 'Shared goals are not configured on this device.';
-      case 'network': return 'You appear to be offline. Your counts are saved and will sync.';
-      case 'not-authenticated': return 'Could not verify this device. Try again.';
-      default: return 'Something went wrong. Please try again.';
-    }
-  }
-  return 'Something went wrong. Please try again.';
+  return translate(currentLang(), `errors.${errorCode(err)}`);
 }
 
 /** Shared with UI components so modals can render the same messages. */
@@ -124,7 +122,7 @@ export const useSharedRoomStore = create<SharedRoomState>((set, get) => ({
   async openRoom(code) {
     const normalized = normalizeRoomCode(code);
     if (!normalized) {
-      set({ error: 'Invalid room code.' });
+      set({ error: 'invalid-input' });
       return;
     }
     set({ loading: true, error: null });
@@ -182,7 +180,7 @@ export const useSharedRoomStore = create<SharedRoomState>((set, get) => ({
     const room = get().currentRoom;
     if (!room) return;
     if (!isValidDelta(delta)) {
-      set({ error: 'Enter a count between 1 and 10,000.' });
+      set({ error: 'invalid-delta' });
       return;
     }
     set({ syncing: true, error: null });

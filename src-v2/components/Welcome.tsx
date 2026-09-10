@@ -10,36 +10,37 @@ import { useNavigate } from 'react-router-dom';
 import MaterialIcon from './MaterialIcon';
 import PatternBackdrop from './decor/PatternBackdrop';
 import OrnamentDivider from './decor/OrnamentDivider';
+import { useI18n } from '../../src/core/i18n';
 
 interface WelcomeSlide {
-  title: string;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
   icon: string;
   color: string;
 }
 
 const WELCOME_SLIDES: WelcomeSlide[] = [
   {
-    title: 'Welcome to Zikr',
-    description: 'A sanctuary for your spiritual practice. Track your dhikr with simplicity and focus.',
+    titleKey: 'welcome.s1Title',
+    descriptionKey: 'welcome.s1Desc',
     icon: 'spa',
     color: 'text-tertiary',
   },
   {
-    title: 'Counter',
-    description: 'Tap to count your dhikr with haptic feedback. Customizable targets for your practice.',
+    titleKey: 'welcome.s2Title',
+    descriptionKey: 'welcome.s2Desc',
     icon: 'touch_app',
     color: 'text-primary',
   },
   {
-    title: 'Goals & Progress',
-    description: 'Set daily, weekly, or monthly goals. Track your streaks and celebrate your consistency.',
+    titleKey: 'welcome.s3Title',
+    descriptionKey: 'welcome.s3Desc',
     icon: 'trending_up',
     color: 'text-tertiary',
   },
   {
-    title: 'Offline First',
-    description: 'Practice anywhere, anytime. Your data stays on your device with full offline support.',
+    titleKey: 'welcome.s4Title',
+    descriptionKey: 'welcome.s4Desc',
     icon: 'cloud_off',
     color: 'text-primary',
   },
@@ -47,6 +48,7 @@ const WELCOME_SLIDES: WelcomeSlide[] = [
 
 const Welcome: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
 
@@ -107,7 +109,7 @@ const Welcome: React.FC = () => {
         onClick={handleSkip}
         className="absolute top-6 right-6 z-20 text-on-surface-variant hover:text-on-surface transition-colors font-label-md text-label-md px-4 py-2"
       >
-        Skip
+        {t('welcome.skip')}
       </button>
 
       {/* Main Content */}
@@ -133,10 +135,10 @@ const Welcome: React.FC = () => {
         {/* Text Content */}
         <div className="text-center mb-12">
           <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-4">
-            {slide.title}
+            {t(slide.titleKey)}
           </h1>
           <p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
-            {slide.description}
+            {t(slide.descriptionKey)}
           </p>
         </div>
 
@@ -163,12 +165,12 @@ const Welcome: React.FC = () => {
         >
           {currentSlide < WELCOME_SLIDES.length - 1 ? (
             <>
-              Next
+              {t('welcome.next')}
               <MaterialIcon icon="arrow_forward" className="text-[20px]" />
             </>
           ) : (
             <>
-              Get Started
+              {t('welcome.getStarted')}
               <MaterialIcon icon="check_circle" className="text-[20px]" />
             </>
           )}

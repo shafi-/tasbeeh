@@ -16,9 +16,11 @@ import JoinRoomModal from '../components/JoinRoomModal';
 import { useSharedRoomStore } from '../../src/core/stores/sharedRoomStore';
 import { SharedRoom } from '../../src/core/db/types';
 import { formatTimeRemaining, getRoomPhase, progressPercent } from '../../src/core/utils/sharedRoomUtils';
+import { useI18n } from '../../src/core/i18n';
 
 const Group: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const {
     initialized,
     configured,
@@ -58,7 +60,7 @@ const Group: React.FC = () => {
           {
             icon: 'settings',
             onClick: () => navigate('/settings'),
-            ariaLabel: 'Settings',
+            ariaLabel: t('common.settings'),
           },
         ]}
       />
@@ -69,10 +71,10 @@ const Group: React.FC = () => {
         <div className="mb-8 flex flex-col gap-4">
           <div>
             <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2">
-              Shared Goals
+              {t('group.heading')}
             </h1>
             <p className="font-body-lg text-body-lg text-on-surface-variant">
-              Read together with family and friends — wherever they are.
+              {t('group.sub')}
             </p>
           </div>
           <OrnamentDivider className="w-48" />
@@ -83,11 +85,10 @@ const Group: React.FC = () => {
           <div className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-6 text-center flex flex-col items-center">
             <MaterialIcon icon="cloud_off" className="text-4xl text-tertiary mb-3" />
             <h3 className="font-headline-md text-headline-md text-primary mb-2">
-              Shared goals aren't set up
+              {t('group.notConfiguredTitle')}
             </h3>
             <p className="font-caption text-caption text-on-surface-variant">
-              This build of the app isn't connected to a sync service. Add the Supabase
-              configuration (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY) to enable rooms.
+              {t('group.notConfiguredBody')}
             </p>
           </div>
         )}
@@ -101,14 +102,14 @@ const Group: React.FC = () => {
                 className="w-full bg-primary-container text-on-primary rounded-xl h-touch-target-min flex items-center justify-center gap-2 font-label-md text-label-md hover:opacity-90 active-scale-98 duration-200 shadow-sm"
               >
                 <MaterialIcon icon="add" className="text-[20px]" />
-                New Shared Goal
+                {t('group.new')}
               </button>
               <button
                 onClick={() => setIsJoinOpen(true)}
                 className="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl h-touch-target-min flex items-center justify-center gap-2 font-label-md text-label-md text-primary hover:bg-surface-container transition-colors"
               >
                 <MaterialIcon icon="group_add" className="text-[20px]" />
-                Join with a Code
+                {t('group.join')}
               </button>
             </div>
 
@@ -117,7 +118,7 @@ const Group: React.FC = () => {
                 className="mb-6 bg-error/10 border border-error/20 rounded-xl p-4 flex items-center justify-between gap-3"
                 role="alert"
               >
-                <p className="font-caption text-caption text-error">{error}</p>
+                <p className="font-caption text-caption text-error">{error ? t(`errors.${error}`) : null}</p>
                 <button onClick={clearError} aria-label="Dismiss" className="text-error shrink-0">
                   <MaterialIcon icon="close" className="text-[18px]" />
                 </button>
@@ -127,7 +128,7 @@ const Group: React.FC = () => {
             {/* Loading */}
             {!initialized && (
               <div className="flex items-center justify-center py-12 text-on-surface-variant">
-                Loading…
+                {t('common.loading')}
               </div>
             )}
 
@@ -138,11 +139,10 @@ const Group: React.FC = () => {
                   <MaterialIcon icon="groups" filled className="text-5xl text-tertiary" />
                 </div>
                 <h3 className="font-headline-md text-headline-md text-primary mb-2">
-                  Start something together
+                  {t('group.emptyTitle')}
                 </h3>
                 <p className="font-body-md text-body-md text-on-surface-variant mb-2">
-                  Create a room for a family khatma, a weekly group dhikr, or any goal you want to
-                  reach together. Share the code — no one needs an account.
+                  {t('group.emptyBody')}
                 </p>
               </div>
             )}
@@ -151,7 +151,7 @@ const Group: React.FC = () => {
             {grouped.active.length > 0 && (
               <section className="flex flex-col gap-4 mb-10">
                 <h3 className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">
-                  {grouped.active.length} active
+                  {t('group.active', { count: grouped.active.length })}
                 </h3>
                 {grouped.active.map((room) => (
                   <RoomCard key={room.code} room={room} onClick={() => openRoom(room.code)} />
@@ -163,7 +163,7 @@ const Group: React.FC = () => {
             {grouped.ended.length > 0 && (
               <section className="flex flex-col gap-4">
                 <h3 className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">
-                  Ended
+                  {t('group.ended')}
                 </h3>
                 {grouped.ended.map((room) => (
                   <RoomCard key={room.code} room={room} onClick={() => openRoom(room.code)} />
@@ -176,8 +176,7 @@ const Group: React.FC = () => {
               <div className="mt-10 bg-surface-container-low rounded-xl border border-outline-variant/20 p-4 flex items-start gap-3">
                 <MaterialIcon icon="lock" className="text-tertiary text-[20px] mt-0.5" />
                 <p className="font-caption text-caption text-on-surface-variant">
-                  Your personal counts stay on this device. Only the combined total is shared with
-                  the room.
+                  {t('group.privacyNote')}
                 </p>
               </div>
             )}
@@ -217,6 +216,7 @@ interface RoomCardProps {
 }
 
 const RoomCard: React.FC<RoomCardProps> = ({ room, onClick }) => {
+  const { t } = useI18n();
   const phase = getRoomPhase(room);
   const percent = progressPercent(room.total, room.target);
   const timeLeft = formatTimeRemaining(room.endsAt);
@@ -250,7 +250,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onClick }) => {
           }`}
         >
           <MaterialIcon icon="schedule" className="text-[14px]" />
-          {phase === 'ended' ? 'ended' : timeLeft}
+          {phase === 'ended' ? t('group.endedLabel') : t('group.timeLeft', { time: timeLeft })}
         </span>
       </div>
 

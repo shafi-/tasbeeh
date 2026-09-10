@@ -22,9 +22,11 @@ import { useStreakStore } from '../../src/core/stores/streakStore';
 import { useZikrStore } from '../../src/core/stores/zikrStore';
 import { sessionService } from '../../src/core/services/sessionService';
 import { formatDate, getToday } from '../../src/core/utils/dateUtils';
+import { useI18n } from '../../src/core/i18n';
 
 const Progress: React.FC = () => {
   const navigate = useNavigate();
+  const { lang, t } = useI18n();
 
   // Store integrations
   const sessions = useSessionStore(state => state.sessions);
@@ -73,7 +75,7 @@ const Progress: React.FC = () => {
   }, [sessions, streaks, zikrs, selectedZikr]);
 
   const calculateWeeklyData = (sessionData: typeof sessions): WeeklyDataPoint[] => {
-    const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    const days = lang === 'bn' ? ['র', 'সো', 'ম', 'বু', 'বৃ', 'শু', 'শ'] : ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
     const today = getToday();
     const dayOfWeek = today.getDay();
 
@@ -117,7 +119,7 @@ const Progress: React.FC = () => {
   };
 
   const getEmptyWeekData = (): WeeklyDataPoint[] => {
-    const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    const days = lang === 'bn' ? ['র', 'সো', 'ম', 'বু', 'বৃ', 'শু', 'শ'] : ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
     const today = getToday();
     const dayOfWeek = today.getDay();
 
@@ -133,7 +135,7 @@ const Progress: React.FC = () => {
 
     const count = parseInt(logCount, 10);
     if (isNaN(count) || count <= 0 || count > 10000) {
-      alert('Please enter a valid count between 1 and 10000');
+      alert(t('progress.validCount'));
       return;
     }
 
@@ -158,10 +160,10 @@ const Progress: React.FC = () => {
       setLogDate(formatDate(getToday()));
 
       // Show success feedback
-      alert('Progress saved successfully!');
+      alert(t('progress.saved'));
     } catch (error) {
       console.error('Failed to save progress:', error);
-      alert('Failed to save progress. Please try again.');
+      alert(t('bulk.saveFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -171,7 +173,7 @@ const Progress: React.FC = () => {
   if (sessionsLoading) {
     return (
       <div className="min-h-screen bg-surface text-on-surface antialiased flex items-center justify-center">
-        <div className="text-on-surface-variant">Loading...</div>
+        <div className="text-on-surface-variant">{t('common.loading')}</div>
       </div>
     );
   }
@@ -185,7 +187,7 @@ const Progress: React.FC = () => {
           {
             icon: 'settings',
             onClick: () => navigate('/settings'),
-            ariaLabel: 'Settings',
+            ariaLabel: t('common.settings'),
           },
         ]}
       />
@@ -196,10 +198,10 @@ const Progress: React.FC = () => {
         <div className="text-center flex flex-col gap-4">
           <div>
             <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2">
-              Your Spiritual Journey
+              {t('progress.heading')}
             </h2>
             <p className="font-body-md text-body-md text-on-surface-variant">
-              Consistency is the key to serenity.
+              {t('progress.sub')}
             </p>
           </div>
           <OrnamentDivider className="w-48 mx-auto" />
@@ -211,10 +213,10 @@ const Progress: React.FC = () => {
           <GlassCard className="p-6 flex flex-col items-center justify-center text-center">
             <MaterialIcon icon="local_fire_department" filled className="text-tertiary mb-2 text-4xl" />
             <p className="font-headline-md text-headline-md text-primary tabular-nums">
-              {streakDays} {streakDays === 1 ? 'Day' : 'Days'}
+              {t('progress.streakDays', { count: streakDays })}
             </p>
             <p className="font-caption text-caption text-on-surface-variant mt-1">
-              Current Streak
+              {t('progress.streakLabel')}
             </p>
           </GlassCard>
 
@@ -225,14 +227,14 @@ const Progress: React.FC = () => {
               {totalDhikr.toLocaleString()}
             </p>
             <p className="font-caption text-caption text-on-surface-variant mt-1">
-              Total Dhikr
+              {t('progress.totalLabel')}
             </p>
           </GlassCard>
         </div>
 
         {/* Weekly Progress */}
         <GlassCard className="p-6" pattern>
-          <h3 className="font-label-md text-label-md text-primary mb-6">Weekly Progress</h3>
+          <h3 className="font-label-md text-label-md text-primary mb-6">{t('progress.weekly')}</h3>
           <WeeklyChart data={weeklyData} max={100} />
         </GlassCard>
 
@@ -241,7 +243,7 @@ const Progress: React.FC = () => {
           <div className="flex items-center justify-between mb-6">
             <h3 className="font-label-md text-label-md text-primary flex items-center gap-2">
               <MaterialIcon icon="edit_document" />
-              Log Offline Progress
+              {t('progress.logOffline')}
             </h3>
 
             {/* Mode Toggle */}
@@ -254,7 +256,7 @@ const Progress: React.FC = () => {
                     : 'text-on-surface-variant hover:bg-surface-variant/50'
                 }`}
               >
-                Single
+                {t('progress.single')}
               </button>
               <button
                 onClick={() => setEntryMode('bulk')}
@@ -264,7 +266,7 @@ const Progress: React.FC = () => {
                     : 'text-on-surface-variant hover:bg-surface-variant/50'
                 }`}
               >
-                Bulk
+                {t('progress.bulk')}
               </button>
             </div>
           </div>
@@ -280,14 +282,14 @@ const Progress: React.FC = () => {
             {/* Zikr Selector */}
             <div className="relative">
               <label className="block font-caption text-caption text-on-surface-variant mb-2">
-                Zikr
+                {t('progress.zikr')}
               </label>
               <select
                 value={selectedZikr || ''}
                 onChange={(e) => setSelectedZikr(Number(e.target.value))}
                 className="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-xl px-4 h-touch-target-min font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
               >
-                <option value="">Select a zikr</option>
+                <option value="">{t('progress.selectZikr')}</option>
                 {zikrs.map((zikr) => (
                   <option key={zikr.id} value={zikr.id}>
                     {zikr.name}
@@ -298,7 +300,7 @@ const Progress: React.FC = () => {
 
             {/* Date Input */}
             <InputField
-              label="Date"
+              label={t('progress.date')}
               type="date"
               value={logDate}
               onChange={(value) => setLogDate(String(value))}
@@ -307,9 +309,9 @@ const Progress: React.FC = () => {
 
             {/* Count Input */}
             <InputField
-              label="Dhikr Count"
+              label={t('progress.count')}
               type="number"
-              placeholder="e.g., 100"
+              placeholder={t('progress.countPlaceholder')}
               value={logCount}
               onChange={(value) => setLogCount(String(value))}
               icon="numbers"
@@ -329,7 +331,7 @@ const Progress: React.FC = () => {
               "
             >
               <MaterialIcon icon="add_circle" />
-              {isSaving ? 'Saving...' : 'Save Progress'}
+              {isSaving ? t('progress.saving') : t('progress.save')}
             </button>
           </form>
           )}
@@ -340,13 +342,13 @@ const Progress: React.FC = () => {
           <div className="flex items-center justify-between mb-6">
             <h3 className="font-headline-md text-headline-md text-primary flex items-center gap-2">
               <MaterialIcon icon="history" />
-              Session History
+              {t('progress.history')}
             </h3>
             <button
               onClick={() => setShowHistory(!showHistory)}
               className="text-on-surface-variant flex items-center gap-2 px-4 py-2 rounded-full hover:bg-surface-variant/50 transition-colors font-caption text-caption"
             >
-              {showHistory ? 'Hide' : 'Show'}
+              {showHistory ? t('progress.hide') : t('progress.show')}
               <MaterialIcon icon={showHistory ? 'expand_less' : 'expand_more'} className="text-[18px]" />
             </button>
           </div>

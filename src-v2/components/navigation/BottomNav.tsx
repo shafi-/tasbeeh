@@ -7,6 +7,7 @@
 import React from 'react';
 import MaterialIcon from '../MaterialIcon';
 import { NavItem } from '../../types/components';
+import { useI18n } from '../../../src/core/i18n';
 
 interface BottomNavProps {
   items: NavItem[];
@@ -21,6 +22,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   onNavigate,
   className = '',
 }) => {
+  const { t } = useI18n();
+
   return (
     <nav
       aria-label="Main navigation"
@@ -51,7 +54,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                 : 'text-on-surface-variant hover:bg-surface-variant/50'
               }
             `}
-            aria-label={item.label}
+            aria-label={t(item.label)}
             aria-current={isActive ? 'page' : undefined}
           >
             <MaterialIcon
@@ -60,7 +63,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               className={isActive ? 'text-tertiary-fixed' : ''}
             />
             <span className="font-label-md text-label-md text-[10px] leading-tight mt-0.5">
-              {item.label}
+              {t(item.label)}
             </span>
           </button>
         );

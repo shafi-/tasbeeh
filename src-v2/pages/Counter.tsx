@@ -12,6 +12,7 @@ import MaterialIcon from '../components/MaterialIcon';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
 import PatternBackdrop from '../components/decor/PatternBackdrop';
 import useHaptic from '../hooks/useHaptic';
+import { useI18n } from '../../src/core/i18n';
 import { useZikrStore } from '../../src/core/stores/zikrStore';
 import { useSessionStore } from '../../src/core/stores/sessionStore';
 import { useSettingsStore } from '../../src/core/stores/settingsStore';
@@ -21,6 +22,7 @@ import { Zikr } from '../../src/core/db/types';
 
 const Counter: React.FC = () => {
   const navigate = useNavigate();
+  const { lang, t } = useI18n();
   const [searchParams] = useSearchParams();
   const zikrIdParam = searchParams.get('zikrId');
 
@@ -81,7 +83,7 @@ const Counter: React.FC = () => {
     }
   }, [zikrs, zikrIdParam, currentSession, setCurrentSession]);
 
-  const zikrDisplayInfo = selectedZikr ? getZikrDisplayInfo(selectedZikr.name) : null;
+  const zikrDisplayInfo = selectedZikr ? getZikrDisplayInfo(selectedZikr.name, lang) : null;
   const targetCount = zikrDisplayInfo?.defaultTarget || 33;
 
   const handleIncrement = () => {
@@ -115,7 +117,7 @@ const Counter: React.FC = () => {
       }
       // Escape to reset (with confirmation)
       if (e.key === 'Escape' && localCount > 0) {
-        const confirmed = confirm('Reset counter to zero?');
+        const confirmed = confirm(t('counter.resetConfirm'));
         if (confirmed) {
           handleReset();
         }
@@ -166,7 +168,7 @@ const Counter: React.FC = () => {
   if (zikrsLoading) {
     return (
       <div className="min-h-screen bg-surface text-on-surface antialiased flex items-center justify-center">
-        <div className="text-on-surface-variant">Loading...</div>
+        <div className="text-on-surface-variant">{t('common.loading')}</div>
       </div>
     );
   }
@@ -177,16 +179,16 @@ const Counter: React.FC = () => {
       <div className="min-h-screen bg-surface text-on-surface antialiased flex flex-col items-center justify-center p-8 text-center">
         <MaterialIcon icon="error_outline" className="text-6xl text-tertiary-container mb-4" />
         <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2">
-          No Zikrs Available
+          {t('counter.noZikrs')}
         </h2>
         <p className="font-body-md text-body-md text-on-surface-variant mb-6">
-          Create a zikr to start practicing.
+          {t('counter.noZikrsHint')}
         </p>
         <button
           onClick={() => navigate('/')}
           className="bg-primary-container text-on-primary rounded-xl h-touch-target-min px-8 font-label-md"
         >
-          Go to Home
+          {t('counter.goHome')}
         </button>
       </div>
     );
@@ -208,7 +210,7 @@ const Counter: React.FC = () => {
           {
             icon: 'settings',
             onClick: () => navigate('/settings'),
-            ariaLabel: 'Settings',
+            ariaLabel: t('common.settings'),
           },
         ]}
       />
@@ -245,7 +247,7 @@ const Counter: React.FC = () => {
           className="mt-8 text-on-surface-variant flex items-center gap-2 px-4 py-2 rounded-full hover:bg-surface-variant/50 transition-colors z-10 font-caption text-caption active-scale-95"
         >
           <MaterialIcon icon="refresh" className="text-[18px]" />
-          Reset
+          {t('counter.reset')}
         </button>
       </main>
 
@@ -264,7 +266,7 @@ const Counter: React.FC = () => {
           "
         >
           <MaterialIcon icon="check_circle" className="text-[20px]" />
-          Complete Session
+          {t('counter.complete')}
         </button>
       </div>
     </div>

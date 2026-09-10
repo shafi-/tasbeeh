@@ -11,6 +11,7 @@ import { useSessionStore } from '../../src/core/stores/sessionStore';
 import { sessionService } from '../../src/core/services/sessionService';
 import { getZikrDisplayInfo } from '../utils/zikrMapping';
 import { formatDate, getToday } from '../../src/core/utils/dateUtils';
+import { useI18n } from '../../src/core/i18n';
 
 interface ZikrEntry {
   zikrId: number;
@@ -26,6 +27,7 @@ interface BulkEntryFormProps {
 }
 
 const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess, onCancel }) => {
+  const { lang, t } = useI18n();
   const zikrs = useZikrStore(state => state.zikrs);
   const sessions = useSessionStore(state => state.sessions);
 
@@ -51,7 +53,7 @@ const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess, onCancel }) =>
 
     // Create entries with smart defaults
     const initialEntries: ZikrEntry[] = zikrs.map(zikr => {
-      const displayInfo = getZikrDisplayInfo(zikr.name);
+      const displayInfo = getZikrDisplayInfo(zikr.name, lang);
       const lastCount = lastCounts.get(zikr.id!) || 0;
 
       return {
@@ -64,7 +66,7 @@ const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess, onCancel }) =>
     });
 
     setEntries(initialEntries);
-  }, [zikrs, sessions]);
+  }, [zikrs, sessions, lang]);
 
   const handleCountChange = (zikrId: number, value: string) => {
     setEntries(prev => prev.map(entry =>
@@ -90,7 +92,7 @@ const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess, onCancel }) =>
       if (entry.count && entry.count.trim()) {
         const count = parseInt(entry.count, 10);
         if (isNaN(count) || count < 1 || count > 10000) {
-          newErrors[entry.zikrId] = 'Count must be between 1 and 10000';
+          newErrors[entry.zikrId] = t('bulk.invalidCount');
         }
       }
     });
@@ -118,7 +120,7 @@ const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess, onCancel }) =>
     const entriesWithCounts = entries.filter(e => e.count && parseInt(e.count, 10) > 0);
 
     if (entriesWithCounts.length === 0) {
-      alert('Please enter at least one zikr count');
+      alert(t('bulk.noneSelected'));
       return;
     }
 
@@ -147,12 +149,12 @@ const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess, onCancel }) =>
       setEntries(prev => prev.map(entry => ({ ...entry, count: '' })));
 
       // Show success
-      alert(`Successfully logged ${entriesWithCounts.length} zikr${entriesWithCounts.length > 1 ? 's' : ''}!`);
+      alert(t('bulk.saved', { count: entriesWithCounts.length }));
 
       if (onSuccess) onSuccess();
     } catch (error) {
       console.error('Failed to save bulk entries:', error);
-      alert('Failed to save progress. Please try again.');
+      alert(t('bulk.saveFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -163,10 +165,10 @@ const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess, onCancel }) =>
       <div className="text-center py-12">
         <MaterialIcon icon="error_outline" className="text-6xl text-tertiary-container mb-4 mx-auto" />
         <h3 className="font-headline-md text-headline-md text-primary mb-2">
-          No Zikrs Available
+          {t('bulk.noZikrs')}
         </h3>
         <p className="font-body-md text-body-md text-on-surface-variant">
-          Create zikrs first to use bulk entry.
+          {t('bulk.noZikrsHint')}
         </p>
       </div>
     );
@@ -180,7 +182,7 @@ const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess, onCancel }) =>
       {/* Date Selector */}
       <div>
         <label className="block font-label-md text-label-md text-on-surface mb-2">
-          Practice Date
+          {t('bulk.date')}
         </label>
         <input
           type="date"
@@ -194,7 +196,7 @@ const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess, onCancel }) =>
       {/* Zikr Entries */}
       <div className="flex flex-col gap-3">
         <p className="font-label-md text-label-md text-on-surface-variant">
-          Enter counts for each zikr (leave blank if not practiced)
+          {t('bulk.hint')}
         </p>
 
         {entries.map((entry) => {
@@ -259,10 +261,12 @@ const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess, onCancel }) =>
               <MaterialIcon icon="summarize" className="text-primary text-[20px]" />
               <div>
                 <p className="font-body-md text-body-md text-on-surface">
-                  {entriesWithCounts.length} zikr{entriesWithCounts.length > 1 ? 's' : ''} to log
+                  {entriesWithCounts.length === 1
+                    ? t('bulk.toLog', { count: entriesWithCounts.length })
+                    : t('bulk.toLogPlural', { count: entriesWithCounts.length })}
                 </p>
                 <p className="font-caption text-caption text-on-surface-variant">
-                  Total: {totalCount} dhikr
+                  {t('bulk.total', { count: totalCount })}
                 </p>
               </div>
             </div>
@@ -279,7 +283,7 @@ const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess, onCancel }) =>
             className="flex-1 h-touch-target-min rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             <MaterialIcon icon="refresh" className="text-[18px]" />
-            Clear All
+            {t('bulk.clearAll')}
           </button>
           {onCancel && (
             <button
@@ -287,7 +291,7 @@ const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess, onCancel }) =>
               disabled={isSaving}
               className="flex-1 h-touch-target-min rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant/50 transition-colors disabled:opacity-50"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
           )}
         </div>
@@ -297,7 +301,11 @@ const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess, onCancel }) =>
           className="w-full h-touch-target-min rounded-xl font-label-md text-label-md bg-primary-container text-on-primary hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           <MaterialIcon icon="save" className="text-[18px]" />
-          {isSaving ? 'Saving...' : `Save ${entriesWithCounts.length} Session${entriesWithCounts.length > 1 ? 's' : ''}`}
+          {isSaving
+            ? t('progress.saving')
+            : entriesWithCounts.length === 1
+              ? t('bulk.saveOne')
+              : t('bulk.saveMany', { count: entriesWithCounts.length })}
         </button>
       </div>
 
@@ -307,10 +315,10 @@ const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess, onCancel }) =>
           <MaterialIcon icon="info" className="text-primary text-[20px] mt-0.5" />
           <div className="flex-1">
             <p className="font-body-md text-body-md text-on-surface">
-              Quick entry for logging complete practice sessions
+              {t('bulk.quickEntryTitle')}
             </p>
             <p className="font-caption text-caption text-on-surface-variant mt-1">
-              Last used counts are pre-filled. Sessions are marked as "manual" source.
+              {t('bulk.quickEntryBody')}
             </p>
           </div>
         </div>

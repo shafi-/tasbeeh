@@ -18,29 +18,23 @@ import { NAV_ITEMS } from '../components/navigation/navItems';
 import { useZikrStore } from '../../src/core/stores/zikrStore';
 import { useSessionStore } from '../../src/core/stores/sessionStore';
 import { useGoalStore } from '../../src/core/stores/goalStore';
+import { useI18n } from '../../src/core/i18n';
 import { getZikrDisplayInfo } from '../utils/zikrMapping';
 import { formatDate, getToday } from '../../src/core/utils/dateUtils';
 import { Zikr } from '../../src/core/db/types';
 
-/** Rotating hero phrases — one per day, rooted in dhikr itself. */
-const DAILY_PHRASES: Array<{ text: string; source?: string }> = [
-  { text: 'Remember Me, and I will remember you', source: "Qur'an 2:152" },
-  { text: 'Hearts find rest in remembrance', source: "Qur'an 13:28" },
-  { text: 'Truly, remembrance is the greatest', source: "Qur'an 29:45" },
-  { text: 'Keep your tongue moist with remembrance', source: 'Hadith' },
-  { text: 'In stillness, the heart remembers' },
-];
-
-const getPhraseOfDay = () => {
-  const now = new Date();
-  const startOfYear = new Date(now.getFullYear(), 0, 0);
-  const day = Math.floor((now.getTime() - startOfYear.getTime()) / 86400_000);
-  return DAILY_PHRASES[day % DAILY_PHRASES.length];
-};
+/** Rotating hero phrases — one per day, rooted in dhikr itself (i18n keys). */
+const DAILY_PHRASE_KEYS = [1, 2, 3, 4, 5];
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const phrase = useMemo(() => getPhraseOfDay(), []);
+  const { lang, t } = useI18n();
+  const phraseKey = useMemo(() => {
+    const now = new Date();
+    const startOfYear = new Date(now.getFullYear(), 0, 0);
+    const day = Math.floor((now.getTime() - startOfYear.getTime()) / 86400_000);
+    return DAILY_PHRASE_KEYS[day % DAILY_PHRASE_KEYS.length];
+  }, []);
 
   // Store integrations
   const zikrs = useZikrStore(state => state.zikrs);
@@ -141,7 +135,7 @@ const Home: React.FC = () => {
   if (zikrsLoading || sessionsLoading) {
     return (
       <div className="min-h-screen bg-surface text-on-surface antialiased flex items-center justify-center">
-        <div className="text-on-surface-variant">Loading...</div>
+        <div className="text-on-surface-variant">{t('common.loading')}</div>
       </div>
     );
   }
@@ -156,16 +150,16 @@ const Home: React.FC = () => {
             <MaterialIcon icon="spa" className="text-5xl text-tertiary" />
           </div>
           <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2">
-            Begin Your Journey
+            {t('home.beginJourney')}
           </h2>
           <p className="font-body-md text-body-md text-on-surface-variant mb-6">
-            Create your first zikr to start practicing.
+            {t('home.beginJourneyHint')}
           </p>
           <button
             onClick={() => setIsCreateModalOpen(true)}
             className="bg-primary-container text-on-primary rounded-xl h-touch-target-min px-8 font-label-md"
           >
-            Create Zikr
+            {t('home.createZikr')}
           </button>
         </div>
         <ZikrFormModal
@@ -200,21 +194,21 @@ const Home: React.FC = () => {
           {streakDays > 0 && (
             <div className="relative inline-flex items-center gap-2 bg-tertiary-container/10 text-tertiary border border-tertiary-container/30 px-4 py-1.5 rounded-full font-label-md text-label-md">
               <MaterialIcon icon="local_fire_department" filled className="text-[20px]" />
-              <span className="tabular-nums">{streakDays} Day Streak</span>
+              <span className="tabular-nums">{t('home.streak', { count: streakDays })}</span>
             </div>
           )}
           <h2 className="relative font-headline-lg-mobile text-headline-lg-mobile text-primary mt-2">
-            {streakDays > 0 ? 'Keep it going!' : phrase.text}
+            {streakDays > 0 ? t('home.keepGoing') : t(`home.phrase${phraseKey}`)}
           </h2>
           <p className="relative font-body-md text-body-md text-on-surface-variant">
             {todayTotal > 0
-              ? `You've done ${todayTotal} dhikr today`
-              : 'Begin your practice of remembrance.'
+              ? t('home.doneToday', { count: todayTotal })
+              : t('home.beginPractice')
             }
           </p>
-          {streakDays === 0 && phrase.source && (
+          {streakDays === 0 && t(`home.phrase${phraseKey}Source`) && (
             <p className="relative font-caption text-caption text-tertiary">
-              — {phrase.source}
+              — {t(`home.phrase${phraseKey}Source`)}
             </p>
           )}
         </section>
@@ -231,7 +225,7 @@ const Home: React.FC = () => {
                     {dailyGoalProgress}%
                   </span>
                   <span className="font-caption text-caption text-on-surface-variant mt-1">
-                    Daily Goal
+                    {t('home.dailyGoal')}
                   </span>
                 </div>
               </CircularProgress>
@@ -243,10 +237,10 @@ const Home: React.FC = () => {
         {/* Quick Start Dhikr List */}
         {recentZikrs.length > 0 && (
           <section className="flex flex-col gap-4 -mx-container-padding-mobile px-container-padding-mobile">
-            <h3 className="font-headline-md text-headline-md text-primary">Quick Start</h3>
+            <h3 className="font-headline-md text-headline-md text-primary">{t('home.quickStart')}</h3>
             <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-2 hide-scrollbar">
               {recentZikrs.map((zikr) => {
-                const displayInfo = getZikrDisplayInfo(zikr.name);
+                const displayInfo = getZikrDisplayInfo(zikr.name, lang);
                 // Check if practiced today
                 const practicedToday = sessions.some(
                   s => s.zikrId === zikr.id && formatDate(s.date) === formatDate(getToday())
@@ -279,7 +273,7 @@ const Home: React.FC = () => {
             className="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl h-touch-target-min flex items-center justify-center gap-2 font-label-md text-label-md text-primary hover:bg-surface-container transition-colors"
           >
             <MaterialIcon icon="add" className="text-[20px]" />
-            Add More Zikrs
+            {t('home.addMore')}
           </button>
         )}
       </main>

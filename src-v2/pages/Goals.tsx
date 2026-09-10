@@ -19,6 +19,7 @@ import { useZikrStore } from '../../src/core/stores/zikrStore';
 import { getZikrDisplayInfo } from '../utils/zikrMapping';
 import { Goal } from '../../src/core/db/types';
 import { goalService } from '../../src/core/services/goalService';
+import { useI18n } from '../../src/core/i18n';
 
 interface GoalWithDisplay extends Goal {
   zikrName: string;
@@ -30,6 +31,7 @@ interface GoalWithDisplay extends Goal {
 
 const Goals: React.FC = () => {
   const navigate = useNavigate();
+  const { lang, t } = useI18n();
 
   // Store integrations
   const goals = useGoalStore(state => state.goals);
@@ -53,8 +55,8 @@ const Goals: React.FC = () => {
 
     const enhanced = goals.map(goal => {
       const zikr = zikrs.find(z => z.id === goal.zikrId);
-      const zikrName = zikr?.name || 'Unknown Zikr';
-      const displayInfo = getZikrDisplayInfo(zikrName);
+      const zikrName = zikr?.name || t('history.unknownZikr');
+      const displayInfo = getZikrDisplayInfo(zikrName, lang);
 
       return {
         ...goal,
@@ -67,7 +69,7 @@ const Goals: React.FC = () => {
     });
 
     setEnhancedGoals(enhanced);
-  }, [goals, zikrs]);
+  }, [goals, zikrs, lang, t]);
 
   const handleToggle = async (goalId: number, newActiveState: boolean) => {
     setIsUpdating(goalId.toString());
@@ -123,10 +125,10 @@ const Goals: React.FC = () => {
   // Format period for display
   const formatPeriod = (period: Goal['period']) => {
     switch (period) {
-      case 'daily': return 'Daily Practice';
-      case 'weekly': return 'Weekly';
-      case 'monthly': return 'Monthly';
-      case 'custom': return 'Custom';
+      case 'daily': return t('goals.dailyPractice');
+      case 'weekly': return t('goals.weekly');
+      case 'monthly': return t('goals.monthly');
+      case 'custom': return t('goals.custom');
     }
   };
 
@@ -138,14 +140,14 @@ const Goals: React.FC = () => {
     if (goal.period === 'daily') {
       return '06:00 AM'; // Default for daily, can be enhanced
     }
-    return 'Custom';
+    return t('goals.custom');
   };
 
   // Loading state
   if (goalsLoading) {
     return (
       <div className="min-h-screen bg-surface text-on-surface antialiased flex items-center justify-center">
-        <div className="text-on-surface-variant">Loading...</div>
+        <div className="text-on-surface-variant">{t('common.loading')}</div>
       </div>
     );
   }
@@ -159,7 +161,7 @@ const Goals: React.FC = () => {
           {
             icon: 'settings',
             onClick: () => navigate('/settings'),
-            ariaLabel: 'Settings',
+            ariaLabel: t('common.settings'),
           },
         ]}
       />
@@ -170,10 +172,10 @@ const Goals: React.FC = () => {
         <div className="mb-10 flex flex-col gap-4">
           <div>
             <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2">
-              Intentions &amp; Reminders
+              {t('goals.heading')}
             </h1>
             <p className="font-body-lg text-body-lg text-on-surface-variant">
-              Cultivate your daily practice through gentle nudges.
+              {t('goals.sub')}
             </p>
           </div>
           <OrnamentDivider className="w-48" />
@@ -185,10 +187,10 @@ const Goals: React.FC = () => {
             <div className="text-center py-12">
               <MaterialIcon icon="flag" className="text-6xl text-surface-variant mb-4" />
               <h3 className="font-headline-md text-headline-md text-primary mb-2">
-                No Goals Yet
+                {t('goals.noGoals')}
               </h3>
               <p className="font-body-md text-body-md text-on-surface-variant mb-6">
-                Create your first goal to start tracking your progress.
+                {t('goals.noGoalsHint')}
               </p>
             </div>
           ) : (
@@ -272,7 +274,7 @@ const Goals: React.FC = () => {
             "
           >
             <MaterialIcon icon="add" className="text-[20px]" />
-            Create New Intention
+            {t('goals.create')}
           </button>
         </div>
       </main>

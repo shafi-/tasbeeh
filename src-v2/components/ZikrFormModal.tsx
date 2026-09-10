@@ -8,6 +8,7 @@ import MaterialIcon from './MaterialIcon';
 import { zikrService } from '../../src/core/services/zikrService';
 import { Zikr } from '../../src/core/db/types';
 import { getZikrDisplayInfo, getPredefinedZikrNames } from '../utils/zikrMapping';
+import { useI18n } from '../../src/core/i18n';
 
 interface ZikrFormModalProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
   onSave,
   editZikr,
 }) => {
+  const { lang, t } = useI18n();
   const [isCustom, setIsCustom] = useState(!editZikr || editZikr.custom);
   const [selectedPredefined, setSelectedPredefined] = useState('');
   const [customName, setCustomName] = useState('');
@@ -44,7 +46,7 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
         setIsCustom(editZikr.custom);
         if (editZikr.custom) {
           setCustomName(editZikr.name);
-          const displayInfo = getZikrDisplayInfo(editZikr.name);
+          const displayInfo = getZikrDisplayInfo(editZikr.name, lang);
           setCustomTranslation(displayInfo.translation);
           setCustomArabic(displayInfo.arabicText);
         } else {
@@ -59,7 +61,7 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
       }
       setErrors({});
     }
-  }, [isOpen, editZikr]);
+  }, [isOpen, editZikr, lang]);
 
   // Handle Escape key to close modal
   useEffect(() => {
@@ -80,21 +82,21 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
 
     if (isCustom) {
       if (!customName.trim()) {
-        newErrors.name = 'Zikr name is required';
+        newErrors.name = t('zikrForm.nameRequired');
       } else if (customName.length > 50) {
-        newErrors.name = 'Name must be 50 characters or less';
+        newErrors.name = t('zikrForm.nameTooLong');
       } else if (!/^[a-zA-Z\s\-]+$/.test(customName)) {
-        newErrors.name = 'Name can only contain letters, spaces, and hyphens';
+        newErrors.name = t('zikrForm.nameInvalidChars');
       }
 
       if (!customTranslation.trim()) {
-        newErrors.translation = 'Translation is required';
+        newErrors.translation = t('zikrForm.translationRequired');
       } else if (customTranslation.length > 100) {
-        newErrors.translation = 'Translation must be 100 characters or less';
+        newErrors.translation = t('zikrForm.translationTooLong');
       }
     } else {
       if (!selectedPredefined) {
-        newErrors.name = 'Please select a zikr';
+        newErrors.name = t('zikrForm.select');
       }
     }
 
@@ -132,7 +134,7 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
       onClose();
     } catch (error) {
       console.error('Failed to save zikr:', error);
-      alert('Failed to save zikr. Please try again.');
+      alert(t('zikrForm.saveFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -156,7 +158,7 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-headline-lg text-headline-lg text-primary">
-            {editZikr ? 'Edit Zikr' : 'Create New Zikr'}
+            {editZikr ? t('zikrForm.editTitle') : t('zikrForm.createTitle')}
           </h2>
           <button
             onClick={onClose}
@@ -174,10 +176,10 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
               <MaterialIcon icon="info" className="text-error text-[20px] mt-0.5" />
               <div>
                 <p className="font-body-md text-body-md text-error font-medium mb-1">
-                  Predefined Zikr
+                  {t('zikrForm.predefinedWarningTitle')}
                 </p>
                 <p className="font-caption text-caption text-error/80">
-                  This is a predefined zikr. You can only edit its display order, not its content.
+                  {t('zikrForm.predefinedWarningBody')}
                 </p>
               </div>
             </div>
@@ -198,7 +200,7 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
                     : 'text-on-surface-variant hover:bg-surface-variant/50'
                 }`}
               >
-                Predefined
+                {t('zikrForm.predefined')}
               </button>
               <button
                 type="button"
@@ -209,7 +211,7 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
                     : 'text-on-surface-variant hover:bg-surface-variant/50'
                 }`}
               >
-                Custom
+                {t('zikrForm.custom')}
               </button>
             </div>
           )}
@@ -218,11 +220,11 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
           {!isCustom && (
             <div>
               <label className="block font-label-md text-label-md text-on-surface mb-2">
-                Select Zikr
+                {t('zikrForm.selectLabel')}
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {PREDEFINED_ZIKR_OPTIONS.map((name) => {
-                  const displayInfo = getZikrDisplayInfo(name);
+                  const displayInfo = getZikrDisplayInfo(name, lang);
                   return (
                     <button
                       key={name}
@@ -259,13 +261,13 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
               {/* Zikr Name */}
               <div>
                 <label className="block font-label-md text-label-md text-on-surface mb-2">
-                  Zikr Name *
+                  {t('zikrForm.name')} *
                 </label>
                 <input
                   type="text"
                   value={customName}
                   onChange={(e) => setCustomName(e.target.value)}
-                  placeholder="e.g., SubhanAllah"
+                  placeholder={t('zikrForm.namePlaceholder')}
                   maxLength={50}
                   className={`w-full bg-surface-container-low border ${
                     errors.name ? 'border-error' : 'border-outline-variant/50'
@@ -280,31 +282,31 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
               {/* Arabic Text (Optional) */}
               <div>
                 <label className="block font-label-md text-label-md text-on-surface mb-2">
-                  Arabic Text (Optional)
+                  {t('zikrForm.arabicLabel')}
                 </label>
                 <input
                   type="text"
                   value={customArabic}
                   onChange={(e) => setCustomArabic(e.target.value)}
-                  placeholder="e.g., سُبْحَانَ ٱللَّٰهِ"
+                  placeholder={t('zikrForm.arabicPlaceholder')}
                   className="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 h-touch-target-min font-display-arabic text-display-arabic text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors text-right dir=rtl"
                   disabled={isSaving}
                 />
                 <p className="font-caption text-caption text-on-surface-variant mt-2">
-                  Optional: Add the Arabic text for this zikr
+                  {t('zikrForm.arabicHint')}
                 </p>
               </div>
 
               {/* Translation */}
               <div>
                 <label className="block font-label-md text-label-md text-on-surface mb-2">
-                  Translation / Meaning *
+                  {t('zikrForm.translation')} *
                 </label>
                 <input
                   type="text"
                   value={customTranslation}
                   onChange={(e) => setCustomTranslation(e.target.value)}
-                  placeholder="e.g., Glory be to Allah"
+                  placeholder={t('zikrForm.translationPlaceholder')}
                   maxLength={100}
                   className={`w-full bg-surface-container-low border ${
                     errors.translation ? 'border-error' : 'border-outline-variant/50'
@@ -322,10 +324,10 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
                   <MaterialIcon icon="info" className="text-primary text-[20px]" />
                   <div>
                     <p className="font-body-md text-body-md text-on-surface">
-                      Target count is set per goal
+                      {t('zikrForm.targetInfoTitle')}
                     </p>
                     <p className="font-caption text-caption text-on-surface-variant">
-                      You can set daily, weekly, or monthly goals for this zikr in the Goals section.
+                      {t('zikrForm.targetInfoBody')}
                     </p>
                   </div>
                 </div>
@@ -341,7 +343,7 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
               className="flex-1 h-touch-target-min rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant/50 transition-colors"
               disabled={isSaving}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
@@ -349,7 +351,7 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
               disabled={isSaving}
             >
               <MaterialIcon icon={editZikr ? 'save' : 'add_circle'} className="text-[18px]" />
-              {isSaving ? 'Saving...' : editZikr ? 'Save Changes' : 'Create Zikr'}
+              {isSaving ? t('progress.saving') : editZikr ? t('zikrForm.saveChanges') : t('zikrForm.create')}
             </button>
           </div>
         </form>

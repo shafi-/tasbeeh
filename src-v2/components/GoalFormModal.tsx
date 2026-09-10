@@ -9,6 +9,7 @@ import { goalService } from '../../src/core/services/goalService';
 import { Goal } from '../../src/core/db/types';
 import { useZikrStore } from '../../src/core/stores/zikrStore';
 import { getZikrDisplayInfo } from '../utils/zikrMapping';
+import { useI18n } from '../../src/core/i18n';
 
 interface GoalFormModalProps {
   isOpen: boolean;
@@ -24,10 +25,10 @@ interface FormErrors {
 }
 
 const PERIOD_OPTIONS = [
-  { value: 'daily', label: 'Daily', description: 'Every day' },
-  { value: 'weekly', label: 'Weekly', description: 'Once per week' },
-  { value: 'monthly', label: 'Monthly', description: 'Once per month' },
-  { value: 'custom', label: 'Custom', description: 'Set your own schedule' },
+  { value: 'daily', labelKey: 'goalForm.periodDaily', descriptionKey: 'goalForm.periodDailyDesc' },
+  { value: 'weekly', labelKey: 'goalForm.periodWeekly', descriptionKey: 'goalForm.periodWeeklyDesc' },
+  { value: 'monthly', labelKey: 'goalForm.periodMonthly', descriptionKey: 'goalForm.periodMonthlyDesc' },
+  { value: 'custom', labelKey: 'goalForm.periodCustom', descriptionKey: 'goalForm.periodCustomDesc' },
 ] as const;
 
 const GoalFormModal: React.FC<GoalFormModalProps> = ({
@@ -36,6 +37,7 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
   onSave,
   editGoal,
 }) => {
+  const { lang, t } = useI18n();
   const zikrs = useZikrStore(state => state.zikrs);
 
   const [selectedZikrId, setSelectedZikrId] = useState<number | null>(null);
@@ -91,15 +93,15 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
     const newErrors: FormErrors = {};
 
     if (!selectedZikrId) {
-      newErrors.zikrId = 'Please select a zikr';
+      newErrors.zikrId = t('zikrForm.select');
     }
 
     if (!target.trim()) {
-      newErrors.target = 'Target count is required';
+      newErrors.target = t('goalForm.targetRequired');
     } else {
       const targetNum = parseInt(target, 10);
       if (isNaN(targetNum) || targetNum < 1 || targetNum > 10000) {
-        newErrors.target = 'Target must be between 1 and 10000';
+        newErrors.target = t('goalForm.targetRange');
       }
     }
 
@@ -108,7 +110,7 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
       const start = new Date(startDate);
       const end = new Date(endDate);
       if (start > end) {
-        newErrors.period = 'Start date must be before end date';
+        newErrors.period = t('goalForm.dateOrder');
       }
     }
 
@@ -149,7 +151,7 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
       onClose();
     } catch (error) {
       console.error('Failed to save goal:', error);
-      alert('Failed to save goal. Please try again.');
+      alert(t('goalForm.saveFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -173,7 +175,7 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-headline-lg text-headline-lg text-primary">
-            {editGoal ? 'Edit Goal' : 'Create New Goal'}
+            {editGoal ? t('goalForm.editTitle') : t('goalForm.createTitle')}
           </h2>
           <button
             onClick={onClose}
@@ -189,7 +191,7 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
           {/* Zikr Selection */}
           <div>
             <label className="block font-label-md text-label-md text-on-surface mb-2">
-              Select Zikr *
+              {t('goalForm.selectZikr')}
             </label>
             <select
               value={selectedZikrId || ''}
@@ -199,9 +201,9 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
               } rounded-xl px-4 h-touch-target-min font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors`}
               disabled={isSaving}
             >
-              <option value="">Select a zikr</option>
+              <option value="">{t('progress.selectZikr')}</option>
               {zikrs.map((zikr) => {
-                const displayInfo = getZikrDisplayInfo(zikr.name);
+                const displayInfo = getZikrDisplayInfo(zikr.name, lang);
                 return (
                   <option key={zikr.id} value={zikr.id}>
                     {zikr.name} - {displayInfo.translation}
@@ -217,13 +219,13 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
           {/* Target Count */}
           <div>
             <label className="block font-label-md text-label-md text-on-surface mb-2">
-              Target Count *
+              {t('goalForm.targetCount')}
             </label>
             <input
               type="number"
               value={target}
               onChange={(e) => setTarget(e.target.value)}
-              placeholder="e.g., 33"
+              placeholder={t('goalForm.targetPlaceholder')}
               min={1}
               max={10000}
               className={`w-full bg-surface-container-low border ${
@@ -235,14 +237,14 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
               <p className="font-caption text-caption text-error mt-2">{errors.target}</p>
             )}
             <p className="font-caption text-caption text-on-surface-variant mt-2">
-              Recommended: 33, 100, or custom count
+              {t('goalForm.targetHint')}
             </p>
           </div>
 
           {/* Period Selection */}
           <div>
             <label className="block font-label-md text-label-md text-on-surface mb-2">
-              Frequency *
+              {t('goalForm.frequency')}
             </label>
             <div className="grid grid-cols-2 gap-2">
               {PERIOD_OPTIONS.map((option) => (
@@ -257,10 +259,10 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
                   }`}
                 >
                   <p className="font-label-md text-label-md text-on-surface">
-                    {option.label}
+                    {t(option.labelKey)}
                   </p>
                   <p className="font-caption text-caption text-on-surface-variant">
-                    {option.description}
+                    {t(option.descriptionKey)}
                   </p>
                 </button>
               ))}
@@ -273,12 +275,12 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
           {/* Optional Date Range */}
           <div className="bg-surface-container-low rounded-xl p-4">
             <p className="font-label-md text-label-md text-on-surface mb-4">
-              Optional Date Range
+              {t('goalForm.dateRange')}
             </p>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block font-caption text-caption text-on-surface-variant mb-2">
-                  Start Date
+                  {t('goalForm.startDate')}
                 </label>
                 <input
                   type="date"
@@ -290,7 +292,7 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
               </div>
               <div>
                 <label className="block font-caption text-caption text-on-surface-variant mb-2">
-                  End Date
+                  {t('goalForm.endDate')}
                 </label>
                 <input
                   type="date"
@@ -309,10 +311,10 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
               <MaterialIcon icon="info" className="text-primary text-[20px] mt-0.5" />
               <div>
                 <p className="font-body-md text-body-md text-on-surface">
-                  Progress is tracked from completed dhikr sessions
+                  {t('goalForm.infoTitle')}
                 </p>
                 <p className="font-caption text-caption text-on-surface-variant mt-1">
-                  Toggle goals on/off to pause tracking without losing your settings.
+                  {t('goalForm.infoBody')}
                 </p>
               </div>
             </div>
@@ -326,7 +328,7 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
               className="flex-1 h-touch-target-min rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant/50 transition-colors"
               disabled={isSaving}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
@@ -334,7 +336,7 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
               disabled={isSaving}
             >
               <MaterialIcon icon={editGoal ? 'save' : 'add_circle'} className="text-[18px]" />
-              {isSaving ? 'Saving...' : editGoal ? 'Save Changes' : 'Create Goal'}
+              {isSaving ? t('progress.saving') : editGoal ? t('zikrForm.saveChanges') : t('goalForm.create')}
             </button>
           </div>
         </form>

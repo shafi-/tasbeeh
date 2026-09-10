@@ -11,6 +11,7 @@ import OrnamentDivider from './decor/OrnamentDivider';
 import { useSharedRoomStore, sharedRoomErrorMessage } from '../../src/core/stores/sharedRoomStore';
 import { SharedRoom } from '../../src/core/db/types';
 import { normalizeRoomCode } from '../../src/core/utils/sharedRoomUtils';
+import { useI18n } from '../../src/core/i18n';
 
 interface JoinRoomModalProps {
   isOpen: boolean;
@@ -20,6 +21,7 @@ interface JoinRoomModalProps {
 }
 
 const JoinRoomModal: React.FC<JoinRoomModalProps> = ({ isOpen, initialCode = '', onClose, onJoined }) => {
+  const { t } = useI18n();
   const { identity, joinRoom, updateDisplayName } = useSharedRoomStore();
 
   const [code, setCode] = useState(initialCode);
@@ -43,12 +45,12 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({ isOpen, initialCode = '',
 
     const normalized = normalizeRoomCode(code);
     if (!normalized) {
-      setLocalError('Enter the 6-character room code.');
+      setLocalError(t('joinModal.codeRequired'));
       return;
     }
     const name = displayName.trim();
     if (!name) {
-      setLocalError('Please enter your name.');
+      setLocalError(t('joinModal.nameRequired'));
       return;
     }
 
@@ -75,7 +77,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({ isOpen, initialCode = '',
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-2">
-          <h2 className="font-headline-lg text-headline-lg text-primary">Join a Room</h2>
+          <h2 className="font-headline-lg text-headline-lg text-primary">{t('joinModal.title')}</h2>
           <button
             onClick={onClose}
             className="text-on-surface-variant hover:text-on-surface transition-colors p-1"
@@ -85,14 +87,14 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({ isOpen, initialCode = '',
           </button>
         </div>
         <p className="font-caption text-caption text-on-surface-variant mb-4">
-          Enter the code you received to join the shared goal.
+          {t('joinModal.sub')}
         </p>
         <OrnamentDivider className="mb-6" />
 
         <div className="flex flex-col gap-6">
           <InputField
-            label="Room code"
-            placeholder="e.g., ABC234"
+            label={t('joinModal.code')}
+            placeholder={t('joinModal.codePlaceholder')}
             value={code}
             onChange={(v) => setCode(String(v).toUpperCase())}
             icon="vpn_key"
@@ -100,8 +102,8 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({ isOpen, initialCode = '',
           />
 
           <InputField
-            label="Your name"
-            placeholder="e.g., Ahmed"
+            label={t('joinModal.yourName')}
+            placeholder={t('joinModal.namePlaceholder')}
             value={displayName}
             onChange={(v) => setDisplayName(String(v))}
             icon="person"
@@ -111,8 +113,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({ isOpen, initialCode = '',
           <div className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-4 flex items-start gap-3">
             <MaterialIcon icon="lock" className="text-tertiary text-[20px] mt-0.5" />
             <p className="font-caption text-caption text-on-surface-variant">
-              No account needed. Your name is all other members will ever see — your personal
-              counts stay on this device.
+              {t('joinModal.privacyNote')}
             </p>
           </div>
 
@@ -128,7 +129,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({ isOpen, initialCode = '',
             className="w-full h-touch-target-min bg-primary-container text-on-primary rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 hover:opacity-90 active-scale-98 transition-all disabled:opacity-50"
           >
             <MaterialIcon icon="group_add" className="text-[20px]" />
-            {joining ? 'Joining…' : 'Join Room'}
+            {joining ? t('joinModal.joining') : t('joinModal.join')}
           </button>
         </div>
       </div>

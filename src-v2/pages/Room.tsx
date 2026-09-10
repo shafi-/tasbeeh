@@ -23,12 +23,14 @@ import {
   progressPercent,
   isValidDelta,
 } from '../../src/core/utils/sharedRoomUtils';
+import { useI18n } from '../../src/core/i18n';
 
 const QUICK_AMOUNTS = [10, 33, 100];
 
 const Room: React.FC = () => {
   const { code = '' } = useParams();
   const navigate = useNavigate();
+  const { t } = useI18n();
   const {
     initialized,
     configured,
@@ -81,7 +83,7 @@ const Room: React.FC = () => {
       void useSharedRoomStore.getState().track('room_shared', { kind });
       setTimeout(() => setCopied(null), 1500);
     } catch {
-      setActionError('Could not copy — please copy it manually.');
+      setActionError(t('createRoom.copyFailed'));
     }
   };
 
@@ -97,7 +99,7 @@ const Room: React.FC = () => {
   const handleCustomSubmit = async () => {
     const delta = parseInt(customDelta, 10);
     if (!isValidDelta(delta)) {
-      setActionError('Enter a count between 1 and 10,000.');
+      setActionError(t('errors.invalid-delta'));
       return;
     }
     setActionError(null);
@@ -125,7 +127,7 @@ const Room: React.FC = () => {
           {
             icon: 'settings',
             onClick: () => navigate('/settings'),
-            ariaLabel: 'Settings',
+            ariaLabel: t('common.settings'),
           },
         ]}
       />
@@ -134,19 +136,19 @@ const Room: React.FC = () => {
       <main className="flex-1 w-full px-container-padding-mobile py-6 flex flex-col gap-6">
         {loading && !room && (
           <div className="flex items-center justify-center py-16 text-on-surface-variant">
-            Opening room…
+            {t('room.opening')}
           </div>
         )}
 
         {error && !room && (
           <div className="bg-error/10 border border-error/20 rounded-xl p-6 text-center">
             <MaterialIcon icon="search_off" className="text-4xl text-error mx-auto mb-3" />
-            <p className="font-body-md text-body-md text-error mb-4">{error}</p>
+            <p className="font-body-md text-body-md text-error mb-4">{error ? t(`errors.${error}`) : null}</p>
             <button
               onClick={() => navigate('/group')}
               className="h-touch-target-min px-8 bg-primary-container text-on-primary rounded-xl font-label-md text-label-md"
             >
-              Back to Group
+              {t('room.backToGroup')}
             </button>
           </div>
         )}
@@ -166,7 +168,7 @@ const Room: React.FC = () => {
                       {room.total.toLocaleString()}
                     </span>
                     <span className="font-caption text-caption text-on-surface-variant tabular-nums">
-                      of {room.target.toLocaleString()}
+                      {t('counter.ofTarget', { target: room.target.toLocaleString() })}
                     </span>
                     <span className="font-label-md text-label-md text-tertiary font-bold tabular-nums mt-1">
                       {progressPercent(room.total, room.target)}%
@@ -196,7 +198,7 @@ const Room: React.FC = () => {
                     }`}
                   >
                     <MaterialIcon icon="schedule" className="text-[14px]" />
-                    {phase === 'active' ? `${formatTimeRemaining(room.endsAt)} left` : 'ended'}
+                    {phase === 'active' ? t('group.timeLeft', { time: formatTimeRemaining(room.endsAt) }) : t('group.endedLabel')}
                   </span>
                   {room.status === 'closed' && (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-caption text-caption bg-surface-container-high text-on-surface-variant">
@@ -214,7 +216,7 @@ const Room: React.FC = () => {
                 className="bg-error/10 border border-error/20 rounded-xl p-4 flex items-center justify-between gap-3"
                 role="alert"
               >
-                <p className="font-caption text-caption text-error">{actionError || error}</p>
+                <p className="font-caption text-caption text-error">{actionError || (error ? t(`errors.${error}`) : null)}</p>
                 <button
                   onClick={() => {
                     clearError();
@@ -233,7 +235,7 @@ const Room: React.FC = () => {
               <GlassCardLike>
                 <h3 className="font-label-md text-label-md text-primary mb-4 flex items-center gap-2">
                   <MaterialIcon icon="add_circle" className="text-[20px]" />
-                  Add your count
+                  {t('room.addCount')}
                 </h3>
                 <div className="flex gap-2 mb-3">
                   {QUICK_AMOUNTS.map((amount) => (
@@ -250,7 +252,7 @@ const Room: React.FC = () => {
                 {customOpen ? (
                   <div className="flex flex-col gap-3">
                     <InputField
-                      label="Custom count"
+                      label={t('room.customAmount')}
                       type="number"
                       placeholder="e.g., 300"
                       value={customDelta}
@@ -264,14 +266,14 @@ const Room: React.FC = () => {
                         }}
                         className="flex-1 h-12 rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant/50 transition-colors"
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </button>
                       <button
                         onClick={handleCustomSubmit}
                         disabled={syncing}
                         className="flex-1 h-12 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md hover:opacity-90 active-scale-95 transition-all disabled:opacity-50"
                       >
-                        Add
+                        {t('common.add')}
                       </button>
                     </div>
                   </div>
@@ -281,7 +283,7 @@ const Room: React.FC = () => {
                     className="w-full h-12 rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant/50 transition-colors flex items-center justify-center gap-2"
                   >
                     <MaterialIcon icon="edit" className="text-[18px]" />
-                    Custom amount
+                    {t('room.customAmount')}
                   </button>
                 )}
 
@@ -290,18 +292,17 @@ const Room: React.FC = () => {
                   {syncing ? (
                     <>
                       <MaterialIcon icon="cloud_upload" className="text-[16px] text-tertiary" />
-                      Syncing…
+                      {t('room.syncing')}
                     </>
                   ) : pendingCount > 0 ? (
                     <>
                       <MaterialIcon icon="cloud_upload" className="text-[16px] text-tertiary" />
-                      {pendingCount} {pendingCount === 1 ? 'entry' : 'entries'} queued — will sync
-                      automatically
+                      {t('room.queued', { count: pendingCount })}
                     </>
                   ) : (
                     <>
                       <MaterialIcon icon="cloud_done" className="text-[16px] text-primary" />
-                      All counts synced
+                      {t('room.allSynced')}
                     </>
                   )}
                 </p>
@@ -312,7 +313,7 @@ const Room: React.FC = () => {
             {phase === 'active' && !isMember && initialized && (
               <GlassCardLike>
                 <p className="font-body-md text-body-md text-on-surface-variant mb-4">
-                  You're viewing this room. Join it to add your counts.
+                  {t('room.viewingRoom')}
                 </p>
                 <button
                   onClick={async () => {
@@ -326,7 +327,7 @@ const Room: React.FC = () => {
                   disabled={!configured}
                   className="w-full h-touch-target-min bg-primary-container text-on-primary rounded-xl font-label-md text-label-md disabled:opacity-50"
                 >
-                  Join this Room
+                  {t('room.joinThisRoom')}
                 </button>
               </GlassCardLike>
             )}
@@ -341,11 +342,14 @@ const Room: React.FC = () => {
                     className={`text-4xl ${room.total >= room.target ? 'text-tertiary' : 'text-on-surface-variant'}`}
                   />
                   <p className="font-headline-md text-headline-md text-primary">
-                    {room.total >= room.target ? 'Goal reached!' : 'Time is up'}
+                    {room.total >= room.target ? t('room.goalReached') : t('room.timeUp')}
                   </p>
                   <p className="font-caption text-caption text-on-surface-variant tabular-nums">
-                    The group read {room.total.toLocaleString()} of{' '}
-                    {room.target.toLocaleString()} ({progressPercent(room.total, room.target)}%)
+                    {t('room.endedSummary', {
+                      total: room.total.toLocaleString(),
+                      target: room.target.toLocaleString(),
+                      percent: progressPercent(room.total, room.target),
+                    })}
                   </p>
                 </div>
               </GlassCardLike>
@@ -355,11 +359,11 @@ const Room: React.FC = () => {
             <GlassCardLike>
               <h3 className="font-label-md text-label-md text-primary mb-4 flex items-center gap-2">
                 <MaterialIcon icon="history" className="text-[20px]" />
-                My contribution
+                {t('room.myContribution')}
               </h3>
               {mySubmissions.length === 0 ? (
                 <p className="font-caption text-caption text-on-surface-variant">
-                  Nothing yet. Your counts will appear here.
+                  {t('room.nothingYet')}
                 </p>
               ) : (
                 <ul className="flex flex-col divide-y divide-outline-variant/10 -mx-1">
@@ -370,8 +374,7 @@ const Room: React.FC = () => {
               )}
               <p className="font-caption text-caption text-on-surface-variant/70 mt-4 flex items-start gap-1.5">
                 <MaterialIcon icon="lock" className="text-[14px] mt-0.5 shrink-0" />
-                This history lives only on this device — the room only ever sees the combined
-                total.
+                {t('room.localNote')}
               </p>
             </GlassCardLike>
 
@@ -379,7 +382,7 @@ const Room: React.FC = () => {
             <GlassCardLike>
               <h3 className="font-label-md text-label-md text-primary mb-4 flex items-center gap-2">
                 <MaterialIcon icon="groups" className="text-[20px]" />
-                Members ({currentMembers.length})
+                {t('room.members', { count: currentMembers.length })}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {currentMembers.map((m, idx) => {
@@ -394,7 +397,7 @@ const Room: React.FC = () => {
                       {isOwner && !isSelf && m.userId && (
                         <button
                           onClick={() => {
-                            if (confirm(`Remove ${m.name} from this room?`)) {
+                            if (confirm(t('room.removeConfirm', { name: m.name }))) {
                               void removeMember(room.code, m.userId!);
                             }
                           }}
@@ -409,7 +412,7 @@ const Room: React.FC = () => {
                 })}
               </div>
               <p className="font-caption text-caption text-on-surface-variant mt-3">
-                Names only — the room never sees anyone's individual counts.
+                {t('room.membersNote')}
               </p>
             </GlassCardLike>
 
@@ -417,7 +420,7 @@ const Room: React.FC = () => {
             <GlassCardLike>
               <h3 className="font-label-md text-label-md text-primary mb-4 flex items-center gap-2">
                 <MaterialIcon icon="share" className="text-[20px]" />
-                Invite others
+                {t('room.invite')}
               </h3>
               <div className="flex items-center gap-3">
                 <div className="flex-1 bg-surface-container-lowest border border-tertiary-container/30 rounded-xl py-3 text-center">
@@ -441,7 +444,7 @@ const Room: React.FC = () => {
                 </button>
               </div>
               {(copied === 'code' || copied === 'link') && (
-                <p className="font-caption text-caption text-tertiary mt-2">Copied!</p>
+                <p className="font-caption text-caption text-tertiary mt-2">{t('room.copied')}</p>
               )}
             </GlassCardLike>
 
@@ -449,27 +452,27 @@ const Room: React.FC = () => {
             {isOwner && phase === 'active' && (
               <button
                 onClick={() => {
-                  if (confirm('Close this room? It becomes read-only for everyone.')) {
+                  if (confirm(t('room.closeConfirm'))) {
                     void closeRoom(room.code);
                   }
                 }}
                 className="w-full h-14 rounded-xl bg-error/5 border border-error/20 text-error font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-error/10 transition-colors"
               >
                 <MaterialIcon icon="lock" className="text-[20px]" />
-                Close Room
+                {t('room.closeRoom')}
               </button>
             )}
             {!isOwner && (
               <button
                 onClick={() => {
-                  if (confirm('Leave this room? Your past counts stay in the total.')) {
+                  if (confirm(t('room.leaveConfirm'))) {
                     void leaveRoom(room.code).then(() => navigate('/group'));
                   }
                 }}
                 className="w-full h-14 rounded-xl text-on-surface-variant font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-surface-variant/50 transition-colors"
               >
                 <MaterialIcon icon="logout" className="text-[20px]" />
-                Leave Room
+                {t('room.leaveRoom')}
               </button>
             )}
           </>
