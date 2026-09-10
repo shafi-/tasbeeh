@@ -1,0 +1,131 @@
+/**
+ * Supabase adapter for the SharedRoomBackend contract.
+ *
+ * This is the ONLY file in the codebase that knows Supabase exists:
+ * supabase-js is imported dynamically here so it lands in an on-demand
+ * chunk and never touches the initial bundle. Replacing the backend means
+ * writing another adapter — nothing else changes.
+ */
+
+import { SharedRoomError } from './contract';
+import type {
+  CreateRoomInput,
+  RoomStatePayload,
+  SharedRoomBackend,
+} from './contract';
+
+let clientPromise: Promise<any> | null = null;
+
+function isSupabaseConfigured(): boolean {
+  return Boolean(
+    import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY
+  );
+}
+
+async function getClient(): Promise<any> {
+  if (!isSupabaseConfigured()) {
+    throw new SharedRoomError('not-configured');
+  }
+  if (!clientPromise) {
+    clientPromise = import('@supabase/supabase-js').then(({ createClient }) =>
+      createClient(
+        import.meta.env.VITE_SUPABASE_URL,
+        import.meta.env.VITE_SUPABASE_ANON_KEY,
+        { auth: { persistSession: true, autoRefreshToken: true } }
+      )
+    );
+  }
+  return clientPromise;
+}
+
+/** Map Postgres RPC error messages (our `raise exception` codes) to app codes. */
+function mapServerError(rawMessage: string): SharedRoomError {
+  const msg = (rawMessage || '').toLowerCase();
+  if (msg.includes('room_not_found')) return new SharedRoomError('room-not-found');
+  if (msg.includes('window_ended') || msg.includes('window_already_ended'))
+    return new SharedRoomError('window-ended');
+  if (msg.includes('window_not_started')) return new SharedRoomError('window-not-started');
+  if (msg.includes('room_closed')) return new SharedRoomError('room-closed');
+  if (msg.includes('room_full')) return new SharedRoomError('room-full');
+  if (msg.includes('not_a_member')) return new SharedRoomError('not-a-member');
+  if (msg.includes('not_owner')) return new SharedRoomError('not-owner');
+  if (msg.includes('invalid_delta')) return new SharedRoomError('invalid-delta');
+  if (msg.includes('not_authenticated')) return new SharedRoomError('not-authenticated');
+  if (msg.includes('invalid_')) return new SharedRoomError('invalid-input');
+  return new SharedRoomError('unknown', rawMessage);
+}
+
+async function rpc<T>(fn: string, params: Record<string, unknown>): Promise<T> {
+  try {
+    const sb = await getClient();
+    const { data, error } = await sb.rpc(fn, params);
+    if (error) throw mapServerError(error.message);
+    return data as T;
+  } catch (err) {
+    if (err instanceof SharedRoomError) throw err;
+    // fetch failures land here
+    throw new SharedRoomError('network', (err as Error)?.message);
+  }
+}
+
+export class SupabaseSharedRoomBackend implements SharedRoomBackend {
+  readonly name = 'supabase';
+
+  isConfigured(): boolean {
+    return isSupabaseConfigured();
+  }
+
+  async ensureUserId(): Promise<string> {
+    const sb = await getClient();
+
+    const { data: sessionData } = await sb.auth.getSession();
+    const userId = sessionData?.session?.user?.id;
+    if (userId) return userId;
+
+    const { data, error } = await sb.auth.signInAnonymously();
+    if (error || !data?.user?.id) {
+      throw new SharedRoomError('not-authenticated', error?.message);
+    }
+    return data.user.id;
+  }
+
+  createRoom(input: CreateRoomInput): Promise<RoomStatePayload> {
+    return rpc<RoomStatePayload>('create_room', {
+      p_title: input.title,
+      p_zikr_name: input.zikrName,
+      p_zikr_arabic: input.zikrArabic || null,
+      p_target: input.target,
+      p_starts_at: input.startsAt.toISOString(),
+      p_ends_at: input.endsAt.toISOString(),
+      p_name: input.displayName,
+    });
+  }
+
+  joinRoom(code: string, displayName: string): Promise<RoomStatePayload> {
+    return rpc<RoomStatePayload>('join_room', { p_code: code, p_name: displayName });
+  }
+
+  contribute(code: string, delta: number, eventId: string): Promise<{ total: number }> {
+    return rpc<{ total: number }>('contribute', {
+      p_code: code,
+      p_delta: delta,
+      p_event_id: eventId,
+    });
+  }
+
+  getRoomState(code: string): Promise<RoomStatePayload> {
+    return rpc<RoomStatePayload>('get_room_state', { p_code: code });
+  }
+
+  removeMember(code: string, userId: string): Promise<void> {
+    return rpc('remove_member', { p_code: code, p_user_id: userId });
+  }
+
+  leaveRoom(code: string): Promise<void> {
+    return rpc('leave_room', { p_code: code });
+  }
+
+  closeRoom(code: string): Promise<void> {
+    return rpc('close_room', { p_code: code });
+  }
+}

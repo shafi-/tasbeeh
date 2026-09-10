@@ -1,0 +1,515 @@
+/**
+ * Room Screen (V2) — one shared goal.
+ * Combined progress ring, contribution, member chips, share code,
+ * owner management. My contribution history is device-local only.
+ * Noor design system; INTEGRATED WITH sharedRoomStore.
+ */
+
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import MaterialIcon from '../components/MaterialIcon';
+import TopAppBar from '../components/navigation/TopAppBar';
+import BottomNav from '../components/navigation/BottomNav';
+import { NAV_ITEMS } from '../components/navigation/navItems';
+import CircularProgress from '../components/progress/CircularProgress';
+import PatternBackdrop from '../components/decor/PatternBackdrop';
+import OrnamentDivider from '../components/decor/OrnamentDivider';
+import InputField from '../components/forms/InputField';
+import { useSharedRoomStore, sharedRoomErrorMessage } from '../../src/core/stores/sharedRoomStore';
+import { SharedSubmission } from '../../src/core/db/types';
+import {
+  formatTimeRemaining,
+  getRoomPhase,
+  progressPercent,
+  isValidDelta,
+} from '../../src/core/utils/sharedRoomUtils';
+
+const QUICK_AMOUNTS = [10, 33, 100];
+
+const Room: React.FC = () => {
+  const { code = '' } = useParams();
+  const navigate = useNavigate();
+  const {
+    initialized,
+    configured,
+    identity,
+    currentRoom,
+    currentMembers,
+    isMember,
+    mySubmissions,
+    syncing,
+    loading,
+    error,
+    openRoom,
+    closeCurrentRoom,
+    refreshCurrentRoom,
+    submit,
+    leaveRoom,
+    closeRoom,
+    removeMember,
+    clearError,
+  } = useSharedRoomStore();
+
+  const [customDelta, setCustomDelta] = useState('');
+  const [customOpen, setCustomOpen] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [copied, setCopied] = useState<'code' | 'link' | null>(null);
+
+  useEffect(() => {
+    void init_once();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function init_once() {
+    if (!useSharedRoomStore.getState().initialized) {
+      await useSharedRoomStore.getState().init();
+    }
+    if (code) await openRoom(code);
+  }
+
+  useEffect(() => () => closeCurrentRoom(), [closeCurrentRoom]);
+
+  const room = currentRoom;
+  const phase = useMemo(() => (room ? getRoomPhase(room) : 'active'), [room]);
+
+  const shareLink = room
+    ? `${window.location.origin}${window.location.pathname}#/join/${room.code}`
+    : '';
+
+  const copy = async (kind: 'code' | 'link', value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(kind);
+      setTimeout(() => setCopied(null), 1500);
+    } catch {
+      setActionError('Could not copy — please copy it manually.');
+    }
+  };
+
+  const handleQuickSubmit = async (delta: number) => {
+    setActionError(null);
+    try {
+      await submit(delta);
+    } catch (err) {
+      setActionError(sharedRoomErrorMessage(err));
+    }
+  };
+
+  const handleCustomSubmit = async () => {
+    const delta = parseInt(customDelta, 10);
+    if (!isValidDelta(delta)) {
+      setActionError('Enter a count between 1 and 10,000.');
+      return;
+    }
+    setActionError(null);
+    try {
+      await submit(delta);
+      setCustomDelta('');
+      setCustomOpen(false);
+    } catch (err) {
+      setActionError(sharedRoomErrorMessage(err));
+    }
+  };
+
+  const isOwner = Boolean(room && identity && room.ownerId === identity.userId);
+
+  const pendingCount = mySubmissions.filter((s) => s.syncState === 'pending').length;
+
+  return (
+    <div className="min-h-screen bg-surface text-on-surface antialiased flex flex-col pt-16 pb-24 max-w-md mx-auto">
+      {/* Top App Bar */}
+      <TopAppBar
+        title={room ? room.title : 'Room'}
+        showBack
+        onBack={() => navigate('/group')}
+      />
+
+      {/* Main Content */}
+      <main className="flex-1 w-full px-container-padding-mobile py-6 flex flex-col gap-6">
+        {loading && !room && (
+          <div className="flex items-center justify-center py-16 text-on-surface-variant">
+            Opening room…
+          </div>
+        )}
+
+        {error && !room && (
+          <div className="bg-error/10 border border-error/20 rounded-xl p-6 text-center">
+            <MaterialIcon icon="search_off" className="text-4xl text-error mx-auto mb-3" />
+            <p className="font-body-md text-body-md text-error mb-4">{error}</p>
+            <button
+              onClick={() => navigate('/group')}
+              className="h-touch-target-min px-8 bg-primary-container text-on-primary rounded-xl font-label-md text-label-md"
+            >
+              Back to Group
+            </button>
+          </div>
+        )}
+
+        {room && (
+          <>
+            {/* Hero: combined progress in a mihrab arch */}
+            <section className="relative rounded-t-full rounded-b-2xl border border-tertiary-container/30 bg-surface-container-low shadow-card px-6 pt-16 pb-8 overflow-hidden flex flex-col items-center">
+              <PatternBackdrop className="absolute inset-0" />
+              <div className="relative flex flex-col items-center gap-4 w-full">
+                <CircularProgress
+                  progress={progressPercent(room.total, room.target)}
+                  size={180}
+                >
+                  <div className="flex flex-col items-center justify-center text-center">
+                    <span className="font-headline-lg-mobile text-[40px] leading-[48px] font-bold text-primary tabular-nums">
+                      {room.total.toLocaleString()}
+                    </span>
+                    <span className="font-caption text-caption text-on-surface-variant tabular-nums">
+                      of {room.target.toLocaleString()}
+                    </span>
+                    <span className="font-label-md text-label-md text-tertiary font-bold tabular-nums mt-1">
+                      {progressPercent(room.total, room.target)}%
+                    </span>
+                  </div>
+                </CircularProgress>
+
+                {room.zikrArabic && (
+                  <p
+                    className="font-display-arabic text-[28px] leading-[40px] text-tertiary text-center"
+                    lang="ar"
+                    dir="rtl"
+                  >
+                    {room.zikrArabic}
+                  </p>
+                )}
+                <p className="font-label-md text-label-md text-on-surface-variant text-center">
+                  {room.zikrName}
+                </p>
+
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-caption text-caption border ${
+                      phase === 'active'
+                        ? 'bg-tertiary-container/10 text-tertiary border-tertiary-container/30'
+                        : 'bg-surface-container-high text-on-surface-variant border-transparent'
+                    }`}
+                  >
+                    <MaterialIcon icon="schedule" className="text-[14px]" />
+                    {phase === 'active' ? `${formatTimeRemaining(room.endsAt)} left` : 'ended'}
+                  </span>
+                  {room.status === 'closed' && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-caption text-caption bg-surface-container-high text-on-surface-variant">
+                      <MaterialIcon icon="lock" className="text-[14px]" />
+                      closed
+                    </span>
+                  )}
+                </div>
+                <OrnamentDivider className="w-32" />
+              </div>
+            </section>
+
+            {(error || actionError) && (
+              <div
+                className="bg-error/10 border border-error/20 rounded-xl p-4 flex items-center justify-between gap-3"
+                role="alert"
+              >
+                <p className="font-caption text-caption text-error">{actionError || error}</p>
+                <button
+                  onClick={() => {
+                    clearError();
+                    setActionError(null);
+                  }}
+                  aria-label="Dismiss"
+                  className="text-error shrink-0"
+                >
+                  <MaterialIcon icon="close" className="text-[18px]" />
+                </button>
+              </div>
+            )}
+
+            {/* Contribute */}
+            {phase === 'active' && isMember && (
+              <GlassCardLike>
+                <h3 className="font-label-md text-label-md text-primary mb-4 flex items-center gap-2">
+                  <MaterialIcon icon="add_circle" className="text-[20px]" />
+                  Add your count
+                </h3>
+                <div className="flex gap-2 mb-3">
+                  {QUICK_AMOUNTS.map((amount) => (
+                    <button
+                      key={amount}
+                      onClick={() => handleQuickSubmit(amount)}
+                      disabled={syncing}
+                      className="flex-1 h-12 rounded-xl bg-surface-container-high text-primary font-label-md text-label-md border border-outline-variant/30 active-scale-95 transition-transform disabled:opacity-50 tabular-nums"
+                    >
+                      +{amount}
+                    </button>
+                  ))}
+                </div>
+                {customOpen ? (
+                  <div className="flex flex-col gap-3">
+                    <InputField
+                      label="Custom count"
+                      type="number"
+                      placeholder="e.g., 300"
+                      value={customDelta}
+                      onChange={(v) => setCustomDelta(String(v))}
+                    />
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => {
+                          setCustomOpen(false);
+                          setCustomDelta('');
+                        }}
+                        className="flex-1 h-12 rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant/50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleCustomSubmit}
+                        disabled={syncing}
+                        className="flex-1 h-12 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md hover:opacity-90 active-scale-95 transition-all disabled:opacity-50"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setCustomOpen(true)}
+                    className="w-full h-12 rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant/50 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <MaterialIcon icon="edit" className="text-[18px]" />
+                    Custom amount
+                  </button>
+                )}
+
+                {/* Sync status */}
+                <p className="font-caption text-caption text-on-surface-variant mt-3 flex items-center gap-1.5">
+                  {syncing ? (
+                    <>
+                      <MaterialIcon icon="cloud_upload" className="text-[16px] text-tertiary" />
+                      Syncing…
+                    </>
+                  ) : pendingCount > 0 ? (
+                    <>
+                      <MaterialIcon icon="cloud_upload" className="text-[16px] text-tertiary" />
+                      {pendingCount} {pendingCount === 1 ? 'entry' : 'entries'} queued — will sync
+                      automatically
+                    </>
+                  ) : (
+                    <>
+                      <MaterialIcon icon="cloud_done" className="text-[16px] text-primary" />
+                      All counts synced
+                    </>
+                  )}
+                </p>
+              </GlassCardLike>
+            )}
+
+            {/* Not a member (preview via deep link) */}
+            {phase === 'active' && !isMember && initialized && (
+              <GlassCardLike>
+                <p className="font-body-md text-body-md text-on-surface-variant mb-4">
+                  You're viewing this room. Join it to add your counts.
+                </p>
+                <button
+                  onClick={async () => {
+                    try {
+                      await useSharedRoomStore.getState().joinRoom(room.code);
+                      await refreshCurrentRoom();
+                    } catch (err) {
+                      setActionError(sharedRoomErrorMessage(err));
+                    }
+                  }}
+                  disabled={!configured}
+                  className="w-full h-touch-target-min bg-primary-container text-on-primary rounded-xl font-label-md text-label-md disabled:opacity-50"
+                >
+                  Join this Room
+                </button>
+              </GlassCardLike>
+            )}
+
+            {/* Ended summary */}
+            {phase === 'ended' && (
+              <GlassCardLike>
+                <div className="text-center flex flex-col items-center gap-2">
+                  <MaterialIcon
+                    icon={room.total >= room.target ? 'celebration' : 'flag'}
+                    filled
+                    className={`text-4xl ${room.total >= room.target ? 'text-tertiary' : 'text-on-surface-variant'}`}
+                  />
+                  <p className="font-headline-md text-headline-md text-primary">
+                    {room.total >= room.target ? 'Goal reached!' : 'Time is up'}
+                  </p>
+                  <p className="font-caption text-caption text-on-surface-variant tabular-nums">
+                    The group read {room.total.toLocaleString()} of{' '}
+                    {room.target.toLocaleString()} ({progressPercent(room.total, room.target)}%)
+                  </p>
+                </div>
+              </GlassCardLike>
+            )}
+
+            {/* My contribution (local only) */}
+            <GlassCardLike>
+              <h3 className="font-label-md text-label-md text-primary mb-4 flex items-center gap-2">
+                <MaterialIcon icon="history" className="text-[20px]" />
+                My contribution
+              </h3>
+              {mySubmissions.length === 0 ? (
+                <p className="font-caption text-caption text-on-surface-variant">
+                  Nothing yet. Your counts will appear here.
+                </p>
+              ) : (
+                <ul className="flex flex-col divide-y divide-outline-variant/10 -mx-1">
+                  {mySubmissions.slice(0, 20).map((s) => (
+                    <SubmissionRow key={s.eventId} submission={s} />
+                  ))}
+                </ul>
+              )}
+              <p className="font-caption text-caption text-on-surface-variant/70 mt-4 flex items-start gap-1.5">
+                <MaterialIcon icon="lock" className="text-[14px] mt-0.5 shrink-0" />
+                This history lives only on this device — the room only ever sees the combined
+                total.
+              </p>
+            </GlassCardLike>
+
+            {/* Members */}
+            <GlassCardLike>
+              <h3 className="font-label-md text-label-md text-primary mb-4 flex items-center gap-2">
+                <MaterialIcon icon="groups" className="text-[20px]" />
+                Members ({currentMembers.length})
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {currentMembers.map((m, idx) => {
+                  const isSelf = m.name === identity?.displayName;
+                  return (
+                    <span
+                      key={`${m.name}-${idx}`}
+                      className="inline-flex items-center gap-1.5 bg-surface-container-high text-on-surface px-3 py-1.5 rounded-full font-caption text-caption"
+                    >
+                      {m.name}
+                      {isSelf && <span className="text-tertiary font-semibold">(you)</span>}
+                      {isOwner && !isSelf && m.userId && (
+                        <button
+                          onClick={() => {
+                            if (confirm(`Remove ${m.name} from this room?`)) {
+                              void removeMember(room.code, m.userId!);
+                            }
+                          }}
+                          className="text-on-surface-variant hover:text-error transition-colors -mr-1"
+                          aria-label={`Remove ${m.name}`}
+                        >
+                          <MaterialIcon icon="close" className="text-[14px]" />
+                        </button>
+                      )}
+                    </span>
+                  );
+                })}
+              </div>
+              <p className="font-caption text-caption text-on-surface-variant mt-3">
+                Names only — the room never sees anyone's individual counts.
+              </p>
+            </GlassCardLike>
+
+            {/* Share */}
+            <GlassCardLike>
+              <h3 className="font-label-md text-label-md text-primary mb-4 flex items-center gap-2">
+                <MaterialIcon icon="share" className="text-[20px]" />
+                Invite others
+              </h3>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 bg-surface-container-lowest border border-tertiary-container/30 rounded-xl py-3 text-center">
+                  <span className="font-label-md text-label-md text-[20px] tracking-[0.25em] text-primary tabular-nums">
+                    {room.code}
+                  </span>
+                </div>
+                <button
+                  onClick={() => copy('code', room.code)}
+                  aria-label="Copy code"
+                  className="w-12 h-12 rounded-xl border border-outline-variant/40 text-primary flex items-center justify-center hover:bg-surface-variant/40 transition-colors"
+                >
+                  <MaterialIcon icon="content_copy" className="text-[20px]" />
+                </button>
+                <button
+                  onClick={() => copy('link', shareLink)}
+                  aria-label="Copy invite link"
+                  className="w-12 h-12 rounded-xl border border-outline-variant/40 text-primary flex items-center justify-center hover:bg-surface-variant/40 transition-colors"
+                >
+                  <MaterialIcon icon="link" className="text-[20px]" />
+                </button>
+              </div>
+              {(copied === 'code' || copied === 'link') && (
+                <p className="font-caption text-caption text-tertiary mt-2">Copied!</p>
+              )}
+            </GlassCardLike>
+
+            {/* Owner / member management */}
+            {isOwner && phase === 'active' && (
+              <button
+                onClick={() => {
+                  if (confirm('Close this room? It becomes read-only for everyone.')) {
+                    void closeRoom(room.code);
+                  }
+                }}
+                className="w-full h-14 rounded-xl bg-error/5 border border-error/20 text-error font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-error/10 transition-colors"
+              >
+                <MaterialIcon icon="lock" className="text-[20px]" />
+                Close Room
+              </button>
+            )}
+            {!isOwner && (
+              <button
+                onClick={() => {
+                  if (confirm('Leave this room? Your past counts stay in the total.')) {
+                    void leaveRoom(room.code).then(() => navigate('/group'));
+                  }
+                }}
+                className="w-full h-14 rounded-xl text-on-surface-variant font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-surface-variant/50 transition-colors"
+              >
+                <MaterialIcon icon="logout" className="text-[20px]" />
+                Leave Room
+              </button>
+            )}
+          </>
+        )}
+      </main>
+
+      {/* Bottom Navigation */}
+      <BottomNav items={NAV_ITEMS} activeId="group" onNavigate={(path) => navigate(path)} />
+    </div>
+  );
+};
+
+/** Simple card container matching the Noor look. */
+const GlassCardLike: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <section className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-5">
+    {children}
+  </section>
+);
+
+const SubmissionRow: React.FC<{ submission: SharedSubmission }> = ({ submission }) => {
+  const time = new Date(submission.submittedAt).toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+  return (
+    <li className="flex items-center justify-between py-2.5 px-1">
+      <div className="flex items-center gap-3">
+        <MaterialIcon
+          icon={submission.syncState === 'synced' ? 'cloud_done' : submission.syncState === 'pending' ? 'cloud_upload' : 'cloud_off'}
+          className={`text-[18px] ${
+            submission.syncState === 'failed'
+              ? 'text-error'
+              : submission.syncState === 'pending'
+                ? 'text-tertiary'
+                : 'text-primary'
+          }`}
+        />
+        <span className="font-label-md text-label-md text-primary tabular-nums">
+          +{submission.delta.toLocaleString()}
+        </span>
+      </div>
+      <span className="font-caption text-caption text-on-surface-variant">{time}</span>
+    </li>
+  );
+};
+
+export default Room;

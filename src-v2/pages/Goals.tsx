@@ -11,20 +11,13 @@ import ToggleSwitch from '../components/forms/ToggleSwitch';
 import MaterialIcon from '../components/MaterialIcon';
 import GoalFormModal from '../components/GoalFormModal';
 import BottomNav from '../components/navigation/BottomNav';
+import { NAV_ITEMS } from '../components/navigation/navItems';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
-import { NavItem } from '../types/components';
 import { useGoalStore } from '../../src/core/stores/goalStore';
 import { useZikrStore } from '../../src/core/stores/zikrStore';
 import { getZikrDisplayInfo } from '../utils/zikrMapping';
 import { Goal } from '../../src/core/db/types';
 import { goalService } from '../../src/core/services/goalService';
-
-const NAV_ITEMS: NavItem[] = [
-  { id: 'home', label: 'Home', icon: 'home', path: '/' },
-  { id: 'goals', label: 'Goals', icon: 'target', path: '/goals' },
-  { id: 'progress', label: 'Progress', icon: 'trending_up', path: '/progress' },
-  { id: 'settings', label: 'Settings', icon: 'settings', path: '/settings' },
-];
 
 interface GoalWithDisplay extends Goal {
   zikrName: string;

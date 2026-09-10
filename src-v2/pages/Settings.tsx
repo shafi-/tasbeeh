@@ -9,21 +9,15 @@ import ToggleSwitch from '../components/forms/ToggleSwitch';
 import MaterialIcon from '../components/MaterialIcon';
 import ZikrFormModal from '../components/ZikrFormModal';
 import BottomNav from '../components/navigation/BottomNav';
+import { NAV_ITEMS } from '../components/navigation/navItems';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
-import { NavItem } from '../types/components';
 import { useSettingsStore } from '../../src/core/stores/settingsStore';
 import { useZikrStore } from '../../src/core/stores/zikrStore';
 import { exportService } from '../../src/core/services/exportService';
 import { zikrService } from '../../src/core/services/zikrService';
 import { db } from '../../src/core/db/db';
 import { Zikr } from '../../src/core/db/types';
-
-const NAV_ITEMS: NavItem[] = [
-  { id: 'home', label: 'Home', icon: 'home', path: '/' },
-  { id: 'goals', label: 'Goals', icon: 'target', path: '/goals' },
-  { id: 'progress', label: 'Progress', icon: 'trending_up', path: '/progress' },
-  { id: 'settings', label: 'Settings', icon: 'settings', path: '/settings' },
-];
+import { useSharedRoomStore } from '../../src/core/stores/sharedRoomStore';
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();
@@ -40,6 +34,9 @@ const Settings: React.FC = () => {
     () => window.matchMedia('(prefers-color-scheme: dark)').matches
   );
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
+  const [nameEditing, setNameEditing] = useState(false);
+  const [nameDraft, setNameDraft] = useState('');
+  const sharedRoomStore = useSharedRoomStore();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -242,6 +239,76 @@ const Settings: React.FC = () => {
               </div>
               <ToggleSwitch checked={hapticsEnabled} onChange={handleHapticsToggle} />
             </div>
+          </div>
+        </section>
+
+        {/* Shared Goals Section */}
+        <section>
+          <h2 className="font-label-md text-label-md text-on-surface-variant mb-4 px-2">
+            Shared Goals
+          </h2>
+          <div className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-4 min-w-0">
+                <div className="bg-surface-container-high p-2 rounded-lg shrink-0">
+                  <MaterialIcon icon="person" className="text-primary text-[20px]" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-body-md text-body-md text-on-surface">Your name in rooms</p>
+                  <p className="font-caption text-caption text-on-surface-variant truncate">
+                    {sharedRoomStore.identity?.displayName || 'Not set'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setNameDraft(sharedRoomStore.identity?.displayName || '');
+                  setNameEditing(true);
+                }}
+                className="text-primary p-2 hover:bg-primary-container/20 rounded-lg transition-colors shrink-0"
+                aria-label="Edit display name"
+              >
+                <MaterialIcon icon="edit" className="text-[20px]" />
+              </button>
+            </div>
+
+            {nameEditing && (
+              <div className="mt-4 flex flex-col gap-3">
+                <input
+                  type="text"
+                  value={nameDraft}
+                  maxLength={24}
+                  onChange={(e) => setNameDraft(e.target.value)}
+                  placeholder="Your name"
+                  className="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-xl px-4 h-12 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+                  autoFocus
+                />
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setNameEditing(false)}
+                    className="flex-1 h-11 rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant/50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const name = nameDraft.trim();
+                      if (!name) return;
+                      await sharedRoomStore.updateDisplayName(name);
+                      setNameEditing(false);
+                    }}
+                    className="flex-1 h-11 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md hover:opacity-90 transition-opacity"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <p className="font-caption text-caption text-on-surface-variant mt-3">
+              Shared goal rooms let you read together with others. Your personal counts stay on
+              this device — only the combined total is shared.
+            </p>
           </div>
         </section>
 

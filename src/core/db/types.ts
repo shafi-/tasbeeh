@@ -1,5 +1,6 @@
 // Database: zikr-db
-// Stores: zikrs, sessions, goals, streaks, settings, sessionFormState, zikrLastCount
+// Stores: zikrs, sessions, goals, streaks, settings, sessionFormState, zikrLastCount,
+//         sharedRooms, sharedSubmissions, syncOutbox, identity
 
 export interface Zikr {
   id?: number;
@@ -96,4 +97,63 @@ export interface ZikrLastCount {
   zikrId: number;                   // Zikr ID (primary key)
   count: number;                    // Last used count for this zikr
   updatedAt: Date;                  // Last update timestamp
+}
+
+// ============================================================
+// NEW (v3): Shared goals (rooms)
+// Privacy model: the backend stores only the goal definition, the
+// combined total, and names-only membership. `sharedSubmissions`
+// below is the member's private history and NEVER leaves the device.
+// See docs/SharedGoals-Design.md
+// ============================================================
+
+export interface SharedRoom {
+  code: string;                     // 6-char room code (local primary key)
+  id: string;                       // server uuid
+  title: string;
+  zikrName: string;
+  zikrArabic?: string | null;
+  target: number;
+  total: number;                    // combined contribution (authoritative from server)
+  startsAt: Date;
+  endsAt: Date;
+  ownerId: string;
+  status: 'active' | 'closed';
+  joinedAt: Date;                   // when I created/joined (local)
+  fetchedAt: Date;                  // last successful server sync
+}
+
+export interface SharedMember {
+  name: string;
+  joinedAt: Date;
+  /** Server auth uid — needed for owner removal; carries no contribution data. */
+  userId?: string;
+}
+
+export type SharedSubmissionSyncState = 'pending' | 'synced' | 'failed';
+
+export interface SharedSubmission {
+  id?: number;
+  roomCode: string;
+  delta: number;
+  submittedAt: Date;                // when the user made it
+  eventId: string;                  // UUID sent to the server (idempotency)
+  syncState: SharedSubmissionSyncState; // pending → synced, or failed (window ended etc.)
+  note?: string;                    // why a submission failed, for local display
+}
+
+export interface SyncOutboxItem {
+  id?: number;
+  eventId: string;                  // matches the SharedSubmission event
+  roomCode: string;
+  delta: number;
+  attempts: number;
+  nextAttemptAt: Date;
+  createdAt: Date;
+}
+
+export interface SharedIdentity {
+  userId: string;                   // Supabase anonymous auth uid (primary key)
+  displayName: string;
+  createdAt: Date;
 }

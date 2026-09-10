@@ -31,6 +31,16 @@ export default defineConfig({
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
             options: { cacheName: 'google-fonts-cache' }
+          },
+          {
+            // Shared-goals sync API: serve stale data offline, refresh online.
+            urlPattern: /^https:\/\/[a-z0-9-]+\.supabase\.co\/rest\/v1\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'shared-room-cache',
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 50, maxAgeSeconds: 86400 }
+            }
           }
         ]
       }

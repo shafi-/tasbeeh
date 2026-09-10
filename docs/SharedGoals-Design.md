@@ -91,8 +91,20 @@ GroupTab UI ──► sharedRoomStore (Zustand) ──► sharedRoomService
                                                 ▼
               syncOutbox ◄──► syncService (flush on start/online/write + 60s poll while open)
                                                 │
-                                          sharedRoomApi  ← the only module importing supabase-js
+                                     SharedRoomBackend contract (port)
+                                       ├── SupabaseSharedRoomBackend  (production)
+                                       └── MockSharedRoomBackend      (tests / offline demo)
 ```
+
+All shared-room code lives in `src/core/services/sharedRoom/`:
+
+- **`contract.ts`** — the port: `SharedRoomBackend` interface, payload shapes, error taxonomy. The rest of the app knows nothing beyond this file.
+- **`supabaseBackend.ts`** — the production adapter; the only file in the codebase importing `supabase-js` (dynamically, on-demand chunk).
+- **`mockBackend.ts`** — a dumb in-memory backend implementing the same rules (window checks, idempotent increments, membership, owner checks). Used by unit tests, and by the running UI via `VITE_SHARED_ROOMS_BACKEND=mock` — the Group tab works end-to-end with no Supabase at all.
+- **`backendFactory.ts`** — names the active backend (the single seam).
+- **`service.ts`** — local-first orchestration: identity, create/join/submit, outbox flush. Takes any `SharedRoomBackend` (dependency-injectable for tests).
+- **`syncService.ts`** — background flush + 60s room poll.
+- **`instance.ts` / `index.ts`** — the configured singleton and public surface.
 
 - **Offline-first**: every write lands in Dexie first; the outbox retries with backoff. Failed/paused fetches degrade to "stale but readable" — nothing is ever lost or double-counted.
 - **Idempotency**: each submit creates a client-side UUID event; a retried flush cannot double-apply.

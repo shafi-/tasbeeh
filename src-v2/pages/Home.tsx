@@ -14,20 +14,13 @@ import MaterialIcon from '../components/MaterialIcon';
 import ZikrFormModal from '../components/ZikrFormModal';
 import PatternBackdrop from '../components/decor/PatternBackdrop';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
-import { NavItem } from '../types/components';
+import { NAV_ITEMS } from '../components/navigation/navItems';
 import { useZikrStore } from '../../src/core/stores/zikrStore';
 import { useSessionStore } from '../../src/core/stores/sessionStore';
 import { useGoalStore } from '../../src/core/stores/goalStore';
 import { getZikrDisplayInfo } from '../utils/zikrMapping';
 import { formatDate, getToday } from '../../src/core/utils/dateUtils';
 import { Zikr } from '../../src/core/db/types';
-
-const NAV_ITEMS: NavItem[] = [
-  { id: 'home', label: 'Home', icon: 'home', path: '/' },
-  { id: 'goals', label: 'Goals', icon: 'target', path: '/goals' },
-  { id: 'progress', label: 'Progress', icon: 'trending_up', path: '/progress' },
-  { id: 'settings', label: 'Settings', icon: 'settings', path: '/settings' },
-];
 
 const getGreeting = (): string => {
   const hour = new Date().getHours();

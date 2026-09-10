@@ -14,19 +14,13 @@ import SessionHistory from '../components/SessionHistory';
 import BulkEntryForm from '../components/BulkEntryForm';
 import BottomNav from '../components/navigation/BottomNav';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
-import { NavItem, WeeklyDataPoint } from '../types/components';
+import { NAV_ITEMS } from '../components/navigation/navItems';
+import { WeeklyDataPoint } from '../types/components';
 import { useSessionStore } from '../../src/core/stores/sessionStore';
 import { useStreakStore } from '../../src/core/stores/streakStore';
 import { useZikrStore } from '../../src/core/stores/zikrStore';
 import { sessionService } from '../../src/core/services/sessionService';
 import { formatDate, getToday } from '../../src/core/utils/dateUtils';
-
-const NAV_ITEMS: NavItem[] = [
-  { id: 'home', label: 'Home', icon: 'home', path: '/' },
-  { id: 'goals', label: 'Goals', icon: 'target', path: '/goals' },
-  { id: 'progress', label: 'Progress', icon: 'trending_up', path: '/progress' },
-  { id: 'settings', label: 'Settings', icon: 'settings', path: '/settings' },
-];
 
 const Progress: React.FC = () => {
   const navigate = useNavigate();

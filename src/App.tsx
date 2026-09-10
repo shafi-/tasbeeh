@@ -16,6 +16,9 @@ import CounterV2 from '../src-v2/pages/Counter';
 import GoalsV2 from '../src-v2/pages/Goals';
 import ProgressV2 from '../src-v2/pages/Progress';
 import SettingsV2 from '../src-v2/pages/Settings';
+import GroupV2 from '../src-v2/pages/Group';
+import RoomV2 from '../src-v2/pages/Room';
+import JoinV2 from '../src-v2/pages/Join';
 
 // Gate the dashboard on onboarding completion. The flag must be read inside a
 // component (keyed by location) so navigation after Welcome sees the fresh value.
@@ -112,6 +115,9 @@ function App() {
             <Route path="/goals" element={<GoalsV2 />} />
             <Route path="/progress" element={<ProgressV2 />} />
             <Route path="/settings" element={<SettingsV2 />} />
+            <Route path="/group" element={<GroupV2 />} />
+            <Route path="/group/:code" element={<RoomV2 />} />
+            <Route path="/join/:code" element={<JoinV2 />} />
           </Routes>
         </div>
       </HashRouter>

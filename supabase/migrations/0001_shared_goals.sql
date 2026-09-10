@@ -259,7 +259,10 @@ begin
     ),
     'members', (
       select coalesce(
-        json_agg(json_build_object('name', m.name, 'joinedAt', m.joined_at) order by m.joined_at),
+        json_agg(
+          json_build_object('name', m.name, 'joinedAt', m.joined_at, 'userId', m.user_id)
+          order by m.joined_at
+        ),
         '[]'::json
       )
       from public.members m
