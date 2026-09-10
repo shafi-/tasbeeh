@@ -14,6 +14,7 @@ describe('MockSharedRoomBackend', () => {
 
   beforeEach(async () => {
     backend = new MockSharedRoomBackend();
+    backend.reset(); // clear localStorage-persisted state from prior tests
     await backend.ensureUserId(); // the device identity (service does this in the real flow)
     const payload = await backend.createRoom({
       title: 'Family Khatma',
@@ -102,9 +103,18 @@ describe('MockSharedRoomBackend', () => {
     const events = backend.getTrackedEvents();
     expect(events.map((e) => e.name)).toEqual(['app_opened', 'room_created']);
     expect(events[1].properties).toEqual({ window: 'week' });
+  });
 
-    backend.reset();
-    const freshToken = await backend.ensureDeviceToken();
-    expect(freshToken).not.toBe(token); // reset simulates a fresh device
+  it('persists rooms and totals across instances (reload survival)', async () => {
+    await backend.contribute(roomCode, 10, 'persist-e1');
+    const firstToken = await backend.ensureDeviceToken(); // issued + persisted
+
+    // A brand-new instance (simulating an app reload) sees the same state.
+    const second = new MockSharedRoomBackend();
+    await second.ensureUserId(); // service re-establishes identity on boot
+    const state = await second.getRoomState(roomCode);
+    expect(state.room.total).toBe(10);
+    expect(state.isMember).toBe(true);
+    expect(await second.ensureDeviceToken()).toBe(firstToken);
   });
 });

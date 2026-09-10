@@ -1,12 +1,13 @@
 /**
- * Dumb in-memory backend for Shared Rooms.
+ * Dumb backend for Shared Rooms.
  *
  * Two uses:
- *  1. Unit tests — deterministic, no network, inspectable state.
+ *  1. Unit tests — deterministic, inspectable state.
  *  2. Running the UI with no Supabase at all: set
- *     VITE_SHARED_ROOMS_BACKEND=mock and the Group tab works end-to-end
- *     against this class (data lives in memory and resets on reload).
+ *     VITE_SHARED_ROOMS_BACKEND=mock and the Group tab works end-to-end.
  *
+ * State persists to localStorage so rooms survive page reloads (joined once =
+ * stays joined, exactly like the real backend). Call reset() for a clean slate.
  * It implements the same rules as the production adapter (window checks,
  * idempotent increments, membership, owner checks) so tests exercise the
  * real contract.
@@ -22,6 +23,7 @@ import type {
 } from './contract';
 
 const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const STORAGE_KEY = 'zikr-mock-backend-v1';
 
 interface MockMember {
   userId: string;
@@ -35,6 +37,15 @@ interface MockRoom {
   members: Map<string, MockMember>;
 }
 
+interface PersistedState {
+  rooms: Array<{ room: RoomSummary; members: MockMember[] }>;
+  appliedEventIds: string[];
+  deviceToken: string | null;
+  currentUserId: string | null;
+  userCounter: number;
+  roomCounter: number;
+}
+
 export class MockSharedRoomBackend implements SharedRoomBackend {
   readonly name = 'mock';
 
@@ -45,13 +56,57 @@ export class MockSharedRoomBackend implements SharedRoomBackend {
   private currentUserId: string | null = null;
   private userCounter = 0;
   private roomCounter = 0;
+  private loaded = false;
+
+  /** Lazily restore state from localStorage (no-op in non-browser tests). */
+  private ensureLoaded(): void {
+    if (this.loaded || typeof localStorage === 'undefined') return;
+    this.loaded = true;
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as PersistedState;
+      for (const { room, members } of parsed.rooms) {
+        this.rooms.set(room.code, { room, members: new Map(members.map((m) => [m.userId, m])) });
+      }
+      for (const id of parsed.appliedEventIds) this.appliedEventIds.add(id);
+      this.deviceToken = parsed.deviceToken;
+      this.currentUserId = parsed.currentUserId;
+      this.userCounter = parsed.userCounter;
+      this.roomCounter = parsed.roomCounter;
+    } catch {
+      // corrupted state — start fresh
+    }
+  }
+
+  private persist(): void {
+    if (typeof localStorage === 'undefined') return;
+    try {
+      const data: PersistedState = {
+        rooms: [...this.rooms.values()].map((r) => ({
+          room: r.room,
+          members: [...r.members.values()],
+        })),
+        appliedEventIds: [...this.appliedEventIds],
+        deviceToken: this.deviceToken,
+        currentUserId: this.currentUserId,
+        userCounter: this.userCounter,
+        roomCounter: this.roomCounter,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch {
+      // storage full/unavailable — mock keeps working in memory
+    }
+  }
 
   /** Simulate a different device/member (tests only). */
   actAs(userId: string): void {
+    this.ensureLoaded();
     this.currentUserId = userId;
   }
 
   reset(): void {
+    this.ensureLoaded();
     this.rooms.clear();
     this.appliedEventIds.clear();
     this.events = [];
@@ -59,10 +114,14 @@ export class MockSharedRoomBackend implements SharedRoomBackend {
     this.currentUserId = null;
     this.userCounter = 0;
     this.roomCounter = 0;
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(STORAGE_KEY);
+    }
   }
 
   /** Test accessor: every tracked usage event, in order. */
   getTrackedEvents(): Array<{ name: string; properties: Record<string, unknown> }> {
+    this.ensureLoaded();
     return this.events.map((e) => ({ name: e.name, properties: e.properties }));
   }
 
@@ -71,11 +130,13 @@ export class MockSharedRoomBackend implements SharedRoomBackend {
   }
 
   async ensureDeviceToken(): Promise<string> {
+    this.ensureLoaded();
     if (!this.deviceToken) {
       this.deviceToken = Array.from(
         { length: 12 },
         () => CODE_ALPHABET[Math.floor(Math.random() * CODE_ALPHABET.length)]
       ).join('');
+      this.persist();
     }
     return this.deviceToken;
   }
@@ -85,8 +146,10 @@ export class MockSharedRoomBackend implements SharedRoomBackend {
   }
 
   async ensureUserId(): Promise<string> {
+    this.ensureLoaded();
     if (!this.currentUserId) {
       this.currentUserId = `mock-user-${++this.userCounter}`;
+      this.persist();
     }
     return this.currentUserId;
   }
@@ -156,10 +219,12 @@ export class MockSharedRoomBackend implements SharedRoomBackend {
     });
 
     this.rooms.set(code, mock);
+    this.persist();
     return this.toPayload(mock);
   }
 
   async joinRoom(code: string, displayName: string): Promise<RoomStatePayload> {
+    this.ensureLoaded();
     const userId = this.requireUser();
     const mock = this.findRoom(code);
     if (mock.room.status !== 'active') throw new SharedRoomError('room-closed');
@@ -178,10 +243,12 @@ export class MockSharedRoomBackend implements SharedRoomBackend {
         removed: false,
       });
     }
+    this.persist();
     return this.toPayload(mock);
   }
 
   async contribute(code: string, delta: number, eventId: string): Promise<{ total: number }> {
+    this.ensureLoaded();
     const userId = this.requireUser();
     if (!Number.isInteger(delta) || delta < 1 || delta > 10000)
       throw new SharedRoomError('invalid-delta');
@@ -202,32 +269,40 @@ export class MockSharedRoomBackend implements SharedRoomBackend {
     }
     this.appliedEventIds.add(eventId);
     mock.room.total += delta;
+    this.persist();
     return { total: mock.room.total };
   }
 
   async getRoomState(code: string): Promise<RoomStatePayload> {
+    this.ensureLoaded();
     return this.toPayload(this.findRoom(code));
   }
 
   async removeMember(code: string, userId: string): Promise<void> {
+    this.ensureLoaded();
     const me = this.requireUser();
     const mock = this.findRoom(code);
     if (mock.room.ownerId !== me) throw new SharedRoomError('not-owner');
     const member = mock.members.get(userId);
     if (member) member.removed = true;
+    this.persist();
   }
 
   async leaveRoom(code: string): Promise<void> {
+    this.ensureLoaded();
     const userId = this.requireUser();
     const mock = this.findRoom(code);
     const member = mock.members.get(userId);
     if (member) member.removed = true;
+    this.persist();
   }
 
   async closeRoom(code: string): Promise<void> {
+    this.ensureLoaded();
     const me = this.requireUser();
     const mock = this.findRoom(code);
     if (mock.room.ownerId !== me) throw new SharedRoomError('not-owner');
     mock.room.status = 'closed';
+    this.persist();
   }
 }

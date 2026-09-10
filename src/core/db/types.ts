@@ -120,6 +120,8 @@ export interface SharedRoom {
   ownerId: string;
   status: 'active' | 'closed';
   joinedAt: Date;                   // when I created/joined (local)
+  /** Device identity that joined — lets the app silently rejoin after an identity reset. */
+  joinedWithUserId?: string;
   fetchedAt: Date;                  // last successful server sync
 }
 

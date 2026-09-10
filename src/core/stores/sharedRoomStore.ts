@@ -145,7 +145,7 @@ export const useSharedRoomStore = create<SharedRoomState>((set, get) => ({
       });
       void sharedRoomService.track('room_opened');
     } catch (err) {
-      set({ error: errorToMessage(err) });
+      set({ error: errorCode(err) });
     } finally {
       set({ loading: false });
     }
@@ -172,7 +172,7 @@ export const useSharedRoomStore = create<SharedRoomState>((set, get) => ({
         mySubmissions: await sharedRoomService.getMySubmissions(code),
       });
     } catch (err) {
-      set({ error: errorToMessage(err) });
+      set({ error: errorCode(err) });
     }
   },
 
@@ -190,7 +190,7 @@ export const useSharedRoomStore = create<SharedRoomState>((set, get) => ({
       // Deliver immediately when online; the poll covers the offline case.
       await get().flush();
     } catch (err) {
-      set({ error: errorToMessage(err) });
+      set({ error: errorCode(err) });
     } finally {
       set({ syncing: false });
     }
@@ -221,7 +221,7 @@ export const useSharedRoomStore = create<SharedRoomState>((set, get) => ({
       set({ rooms: [...get().rooms, room] });
       return room;
     } catch (err) {
-      set({ error: errorToMessage(err) });
+      set({ error: errorCode(err) });
       throw err;
     } finally {
       set({ loading: false });
@@ -242,7 +242,7 @@ export const useSharedRoomStore = create<SharedRoomState>((set, get) => ({
       });
       return room;
     } catch (err) {
-      set({ error: errorToMessage(err) });
+      set({ error: errorCode(err) });
       throw err;
     } finally {
       set({ loading: false });
@@ -257,7 +257,7 @@ export const useSharedRoomStore = create<SharedRoomState>((set, get) => ({
         currentRoom: get().currentRoom?.code === code ? null : get().currentRoom,
       });
     } catch (err) {
-      set({ error: errorToMessage(err) });
+      set({ error: errorCode(err) });
     }
   },
 
@@ -269,7 +269,7 @@ export const useSharedRoomStore = create<SharedRoomState>((set, get) => ({
         await get().refreshCurrentRoom();
       }
     } catch (err) {
-      set({ error: errorToMessage(err) });
+      set({ error: errorCode(err) });
     }
   },
 
@@ -278,7 +278,7 @@ export const useSharedRoomStore = create<SharedRoomState>((set, get) => ({
       await sharedRoomService.removeMember(code, userId);
       await get().refreshCurrentRoom();
     } catch (err) {
-      set({ error: errorToMessage(err) });
+      set({ error: errorCode(err) });
     }
   },
 
@@ -287,7 +287,7 @@ export const useSharedRoomStore = create<SharedRoomState>((set, get) => ({
       const identity = await sharedRoomService.ensureIdentity(name);
       set({ identity });
     } catch (err) {
-      set({ error: errorToMessage(err) });
+      set({ error: errorCode(err) });
     }
   },
 

@@ -52,7 +52,11 @@ export function createSharedRoomService(backend: SharedRoomBackend) {
   let flushPromise: Promise<FlushResult> | null = null;
   let appOpenTracked = false;
 
-  async function saveRoomState(payload: RoomStatePayload, joinedAt?: Date): Promise<SharedRoom> {
+  async function saveRoomState(
+    payload: RoomStatePayload,
+    joinedAt?: Date,
+    joinedWithUserId?: string
+  ): Promise<SharedRoom> {
     const existing = await db.sharedRooms.get(payload.room.code);
     const r = payload.room;
     const room: SharedRoom = {
@@ -68,6 +72,7 @@ export function createSharedRoomService(backend: SharedRoomBackend) {
       ownerId: r.ownerId,
       status: r.status,
       joinedAt: joinedAt ?? existing?.joinedAt ?? new Date(),
+      joinedWithUserId: joinedWithUserId ?? existing?.joinedWithUserId,
       fetchedAt: new Date(),
     };
     await db.sharedRooms.put(room);
@@ -147,7 +152,7 @@ export function createSharedRoomService(backend: SharedRoomBackend) {
       identity: SharedIdentity
     ): Promise<SharedRoom> {
       const payload = await backend.createRoom({ ...input, displayName: identity.displayName });
-      const room = await saveRoomState(payload, new Date());
+      const room = await saveRoomState(payload, new Date(), identity.userId);
       await this.track('room_created', { window: input.windowType || 'custom' });
       return room;
     },
@@ -157,7 +162,7 @@ export function createSharedRoomService(backend: SharedRoomBackend) {
       const normalized = normalizeRoomCode(code);
       if (!normalized) throw new SharedRoomError('invalid-input', 'Invalid room code');
       const payload = await backend.joinRoom(normalized, identity.displayName);
-      const room = await saveRoomState(payload, new Date());
+      const room = await saveRoomState(payload, new Date(), identity.userId);
       await this.track('room_joined');
       return room;
     },
@@ -191,8 +196,31 @@ export function createSharedRoomService(backend: SharedRoomBackend) {
       members: SharedMember[];
       isMember: boolean;
     }> {
-      const payload = await backend.getRoomState(code);
-      const room = await saveRoomState(payload);
+      const identity = await this.ensureIdentity();
+      let payload: RoomStatePayload;
+      try {
+        payload = await backend.getRoomState(code);
+      } catch (err) {
+        // Room gone server-side (purged/deleted) — drop the stale local mirror
+        // so it disappears from the list instead of erroring forever.
+        if (err instanceof SharedRoomError && err.code === 'room-not-found') {
+          await db.sharedRooms.delete(code);
+        }
+        throw err;
+      }
+
+      // Silent rejoin: this room is in the device's list (joined before), so
+      // this device is a member — whatever the backend's current books say.
+      // Rejoin with the saved name instead of nagging the user to join again.
+      if (!payload.isMember && payload.room.status === 'active') {
+        const cached = await db.sharedRooms.get(payload.room.code);
+        const windowOpen = new Date(payload.room.endsAt) > new Date();
+        if (cached && windowOpen) {
+          payload = await backend.joinRoom(payload.room.code, identity.displayName);
+        }
+      }
+
+      const room = await saveRoomState(payload, undefined, identity.userId);
       const members: SharedMember[] = payload.members.map((m) => ({
         name: m.name,
         joinedAt: new Date(m.joinedAt),

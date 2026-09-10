@@ -260,6 +260,85 @@ describe('sharedRoomService — local-first contribution flow', () => {
   });
 });
 
+describe('sharedRoomService — never re-ask joined members', () => {
+  it('silently rejoins a previously-joined room when the device identity changed', async () => {
+    const mock = makeMockBackend({ total: 100 });
+    let joinCalls = 0;
+    mock.backend.getRoomState = async () => {
+      const payload = makeRoomState({ total: 100 });
+      return { ...payload, isMember: false }; // server no longer knows this device
+    };
+    mock.backend.joinRoom = async () => {
+      joinCalls++;
+      return makeRoomState({ total: 100 });
+    };
+    // Room was joined with a PREVIOUS device identity
+    await seedRoom({ joinedWithUserId: 'old-device-uid' });
+
+    const service = createSharedRoomService(mock.backend);
+    const { isMember } = await service.fetchRoomState(ROOM_CODE);
+
+    expect(joinCalls).toBe(1);
+    expect(isMember).toBe(true);
+  });
+
+  it('silently rejoins a room from my list even when the backend dropped my membership', async () => {
+    const mock = makeMockBackend({ total: 100 });
+    let joinCalls = 0;
+    mock.backend.getRoomState = async () => {
+      const payload = makeRoomState({ total: 100 });
+      return { ...payload, isMember: false };
+    };
+    mock.backend.joinRoom = async () => {
+      joinCalls++;
+      return makeRoomState({ total: 100 });
+    };
+    // Same identity — but membership was lost server-side (backend reset,
+    // data loss). The room is in my list, so I am a member: rejoin silently.
+    await seedRoom({ joinedWithUserId: 'uid-1' });
+
+    const service = createSharedRoomService(mock.backend);
+    const { isMember } = await service.fetchRoomState(ROOM_CODE);
+
+    expect(joinCalls).toBe(1);
+    expect(isMember).toBe(true);
+  });
+
+  it('does not auto-rejoin a room this device never joined', async () => {
+    const mock = makeMockBackend({ total: 100 });
+    let joinCalls = 0;
+    mock.backend.getRoomState = async () => {
+      const payload = makeRoomState({ total: 100 });
+      return { ...payload, isMember: false };
+    };
+    mock.backend.joinRoom = async () => {
+      joinCalls++;
+      return makeRoomState({ total: 100 });
+    };
+    // No cached mirror at all (cold deep link) — nothing marks this as "mine".
+
+    const service = createSharedRoomService(mock.backend);
+    const { isMember } = await service.fetchRoomState(ROOM_CODE);
+    expect(joinCalls).toBe(0);
+    expect(isMember).toBe(false);
+  });
+
+  it('drops the local mirror when the room no longer exists server-side', async () => {
+    const mock = makeMockBackend({ total: 100 });
+    mock.backend.getRoomState = async () => {
+      throw new SharedRoomError('room-not-found');
+    };
+    const service = createSharedRoomService(mock.backend);
+    await seedRoom();
+
+    await expect(service.fetchRoomState(ROOM_CODE)).rejects.toMatchObject({
+      code: 'room-not-found',
+    });
+    // Stale mirror cleaned up — the room leaves the list instead of erroring forever.
+    expect(await db.sharedRooms.get(ROOM_CODE)).toBeUndefined();
+  });
+});
+
 describe('sharedRoomService — rooms', () => {
   it('joins a room and mirrors its state locally', async () => {
     const mock = makeMockBackend({ total: 100 });
@@ -270,6 +349,7 @@ describe('sharedRoomService — rooms', () => {
 
     expect(room.code).toBe(ROOM_CODE);
     expect(room.title).toBe('Family Khatma');
+    expect(room.joinedWithUserId).toBe('uid-1');
     expect((await service.listRooms())).toHaveLength(1);
   });
 
