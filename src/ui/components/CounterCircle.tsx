@@ -122,7 +122,7 @@ export const CounterCircle: React.FC<CounterCircleProps> = ({
           hover:scale-[1.02] active:scale-95
           ${className}
         `}
-        aria-label={`Tap to increment count. Current: ${count}, Target: ${target}`}
+        aria-label={`Tap to count. ${count} of ${target}`}
       >
         {/* Subtle khatam pattern inside the circle */}
         <div className="islamic-pattern absolute inset-0 rounded-full" aria-hidden="true" />

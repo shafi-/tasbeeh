@@ -180,7 +180,7 @@ const Welcome: React.FC = () => {
       {/* Version Info */}
       <footer className="text-center py-6 relative z-10">
         <p className="font-caption text-caption text-on-surface-variant">
-          Zikr PWA • Version 1.0.0
+          Zikr • Version 1.0.0
         </p>
       </footer>
 
