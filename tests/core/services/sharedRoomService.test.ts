@@ -38,6 +38,7 @@ function makeRoomState(overrides: Partial<RoomStatePayload['room']> = {}): RoomS
 function makeMockBackend(state: { total: number }) {
   const callLog: Array<{ eventId: string; delta: number }> = [];
   const appliedEvents: Array<{ eventId: string; delta: number }> = [];
+  const trackedEvents: Array<{ name: string; properties: Record<string, unknown> }> = [];
   let contributeBehavior: (eventId: string, delta: number) => Promise<{ total: number }> = async (
     eventId,
     delta
@@ -54,6 +55,10 @@ function makeMockBackend(state: { total: number }) {
     name: 'test-double',
     isConfigured: () => true,
     ensureUserId: async () => 'uid-1',
+    ensureDeviceToken: async () => 'MOCKTOKEN12',
+    trackEvent: async (name, properties) => {
+      trackedEvents.push({ name, properties: properties || {} });
+    },
     createRoom: async () => makeRoomState(),
     joinRoom: async () => makeRoomState(),
     getRoomState: async () => makeRoomState({ total: state.total }),
@@ -70,6 +75,7 @@ function makeMockBackend(state: { total: number }) {
     backend,
     callLog,
     appliedEvents,
+    trackedEvents,
     setBehavior(fn: (eventId: string, delta: number) => Promise<{ total: number }>) {
       contributeBehavior = fn;
     },
@@ -218,6 +224,39 @@ describe('sharedRoomService — local-first contribution flow', () => {
     });
     expect(await db.sharedSubmissions.count()).toBe(0);
     expect(await db.syncOutbox.count()).toBe(0);
+  });
+
+  it('issues and persists a server-generated device token via ensureIdentity', async () => {
+    const mock = makeMockBackend({ total: 100 });
+    const service = createSharedRoomService(mock.backend);
+
+    const identity = await service.ensureIdentity('Ahmed');
+    expect(identity.token).toBe('MOCKTOKEN12');
+
+    // Stable across calls — issued once, reused afterwards.
+    const again = await service.ensureIdentity();
+    expect(again.token).toBe('MOCKTOKEN12');
+    expect(again.displayName).toBe('Ahmed');
+  });
+
+  it('tracks usage events without ever recording the contribution amount', async () => {
+    const mock = makeMockBackend({ total: 100 });
+    const service = createSharedRoomService(mock.backend);
+    await seedRoom();
+
+    await service.submitContribution(ROOM_CODE, 33, { autoFlush: false });
+    await service.joinRoom(ROOM_CODE, { userId: 'uid-1', displayName: 'Ahmed', createdAt: new Date() });
+
+    const names = mock.trackedEvents.map((e) => e.name);
+    expect(names).toContain('contribution_submitted');
+    expect(names).toContain('room_joined');
+
+    // Privacy: the submission event carries NO amount.
+    const submissionEvent = mock.trackedEvents.find((e) => e.name === 'contribution_submitted');
+    expect(submissionEvent).toBeDefined();
+    expect(Object.values(submissionEvent!.properties)).not.toContain(33);
+    expect(submissionEvent!.properties).not.toHaveProperty('delta');
+    expect(submissionEvent!.properties).not.toHaveProperty('amount');
   });
 });
 

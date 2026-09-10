@@ -44,12 +44,14 @@ interface SharedRoomState {
     target: number;
     startsAt: Date;
     endsAt: Date;
+    windowType?: string;
   }) => Promise<SharedRoom>;
   joinRoom: (code: string) => Promise<SharedRoom>;
   leaveRoom: (code: string) => Promise<void>;
   closeRoom: (code: string) => Promise<void>;
   removeMember: (code: string, userId: string) => Promise<void>;
   updateDisplayName: (name: string) => Promise<void>;
+  track: (name: string, properties?: Record<string, unknown>) => Promise<void>;
   flush: () => Promise<void>;
   clearError: () => void;
 }
@@ -143,6 +145,7 @@ export const useSharedRoomStore = create<SharedRoomState>((set, get) => ({
           : [...rooms, room],
         mySubmissions: await sharedRoomService.getMySubmissions(normalized),
       });
+      void sharedRoomService.track('room_opened');
     } catch (err) {
       set({ error: errorToMessage(err) });
     } finally {
@@ -288,6 +291,11 @@ export const useSharedRoomStore = create<SharedRoomState>((set, get) => ({
     } catch (err) {
       set({ error: errorToMessage(err) });
     }
+  },
+
+  async track(name, properties) {
+    // Best-effort by contract — never blocks or throws into the UI.
+    await sharedRoomService.track(name, properties);
   },
 
   clearError() {

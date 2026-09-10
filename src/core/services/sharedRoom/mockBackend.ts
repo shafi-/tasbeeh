@@ -40,6 +40,8 @@ export class MockSharedRoomBackend implements SharedRoomBackend {
 
   private rooms = new Map<string, MockRoom>();
   private appliedEventIds = new Set<string>();
+  private events: Array<{ name: string; properties: Record<string, unknown>; at: Date }> = [];
+  private deviceToken: string | null = null;
   private currentUserId: string | null = null;
   private userCounter = 0;
   private roomCounter = 0;
@@ -52,13 +54,34 @@ export class MockSharedRoomBackend implements SharedRoomBackend {
   reset(): void {
     this.rooms.clear();
     this.appliedEventIds.clear();
+    this.events = [];
+    this.deviceToken = null;
     this.currentUserId = null;
     this.userCounter = 0;
     this.roomCounter = 0;
   }
 
+  /** Test accessor: every tracked usage event, in order. */
+  getTrackedEvents(): Array<{ name: string; properties: Record<string, unknown> }> {
+    return this.events.map((e) => ({ name: e.name, properties: e.properties }));
+  }
+
   isConfigured(): boolean {
     return true;
+  }
+
+  async ensureDeviceToken(): Promise<string> {
+    if (!this.deviceToken) {
+      this.deviceToken = Array.from(
+        { length: 12 },
+        () => CODE_ALPHABET[Math.floor(Math.random() * CODE_ALPHABET.length)]
+      ).join('');
+    }
+    return this.deviceToken;
+  }
+
+  async trackEvent(name: string, properties: Record<string, unknown> = {}): Promise<void> {
+    this.events.push({ name, properties, at: new Date() });
   }
 
   async ensureUserId(): Promise<string> {

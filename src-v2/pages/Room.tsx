@@ -80,6 +80,7 @@ const Room: React.FC = () => {
     try {
       await navigator.clipboard.writeText(value);
       setCopied(kind);
+      void useSharedRoomStore.getState().track('room_shared', { kind });
       setTimeout(() => setCopied(null), 1500);
     } catch {
       setActionError('Could not copy — please copy it manually.');

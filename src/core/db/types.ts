@@ -155,5 +155,7 @@ export interface SyncOutboxItem {
 export interface SharedIdentity {
   userId: string;                   // Supabase anonymous auth uid (primary key)
   displayName: string;
+  /** Server-generated 12-char device token — the usage-metrics key. */
+  token?: string;
   createdAt: Date;
 }

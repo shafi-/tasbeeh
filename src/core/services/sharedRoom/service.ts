@@ -50,6 +50,7 @@ export interface FlushResult {
 
 export function createSharedRoomService(backend: SharedRoomBackend) {
   let flushPromise: Promise<FlushResult> | null = null;
+  let appOpenTracked = false;
 
   async function saveRoomState(payload: RoomStatePayload, joinedAt?: Date): Promise<SharedRoom> {
     const existing = await db.sharedRooms.get(payload.room.code);
@@ -83,15 +84,22 @@ export function createSharedRoomService(backend: SharedRoomBackend) {
 
     /**
      * Get or create the local identity, aligned with the backend's
-     * no-login user. `displayName` updates the stored name when provided.
+     * no-login user, including the server-generated 12-char device token
+     * used as the usage-metrics key. `displayName` updates the stored name
+     * when provided.
      */
     async ensureIdentity(displayName?: string): Promise<SharedIdentity> {
       const userId = await backend.ensureUserId();
       const existing = (await db.identity.toArray())[0] || null;
 
+      let token = existing?.token;
+      if (!token) {
+        token = await backend.ensureDeviceToken();
+      }
+
       if (existing && existing.userId === userId) {
-        if (displayName && displayName !== existing.displayName) {
-          const updated: SharedIdentity = { ...existing, displayName };
+        if ((displayName && displayName !== existing.displayName) || token !== existing.token) {
+          const updated: SharedIdentity = { ...existing, displayName: displayName ?? existing.displayName, token };
           await db.identity.put(updated);
           return updated;
         }
@@ -101,19 +109,47 @@ export function createSharedRoomService(backend: SharedRoomBackend) {
       const identity: SharedIdentity = {
         userId,
         displayName: displayName || existing?.displayName || 'Guest',
+        token,
         createdAt: existing?.createdAt || new Date(),
       };
       await db.identity.put(identity);
       return identity;
     },
 
+    /**
+     * Best-effort usage event. Never throws, never blocks — metrics are
+     * allowed to fail (offline, unconfigured, backend hiccup).
+     * Privacy: usage shape only; never contribution amounts.
+     */
+    async track(name: string, properties?: Record<string, unknown>): Promise<void> {
+      try {
+        if (!backend.isConfigured()) return;
+        let identity = (await db.identity.toArray())[0];
+        if (!identity?.token) {
+          identity = await this.ensureIdentity();
+        }
+        await backend.trackEvent(name, properties);
+      } catch {
+        // intentionally ignored — see contract docs
+      }
+    },
+
+    /** Fire once per app session. */
+    async trackAppOpen(): Promise<void> {
+      if (appOpenTracked) return;
+      appOpenTracked = true;
+      await this.track('app_opened');
+    },
+
     /** Create a room; creator becomes the first member. */
     async createRoom(
-      input: Omit<CreateRoomInput, 'displayName'>,
+      input: Omit<CreateRoomInput, 'displayName'> & { windowType?: string },
       identity: SharedIdentity
     ): Promise<SharedRoom> {
       const payload = await backend.createRoom({ ...input, displayName: identity.displayName });
-      return saveRoomState(payload, new Date());
+      const room = await saveRoomState(payload, new Date());
+      await this.track('room_created', { window: input.windowType || 'custom' });
+      return room;
     },
 
     /** Join (or rejoin) a room by code with a display name. */
@@ -121,21 +157,26 @@ export function createSharedRoomService(backend: SharedRoomBackend) {
       const normalized = normalizeRoomCode(code);
       if (!normalized) throw new SharedRoomError('invalid-input', 'Invalid room code');
       const payload = await backend.joinRoom(normalized, identity.displayName);
-      return saveRoomState(payload, new Date());
+      const room = await saveRoomState(payload, new Date());
+      await this.track('room_joined');
+      return room;
     },
 
     async leaveRoom(code: string): Promise<void> {
       await backend.leaveRoom(code);
       await db.sharedRooms.delete(normalizeRoomCode(code) || code);
+      await this.track('room_left');
     },
 
     async closeRoom(code: string): Promise<void> {
       await backend.closeRoom(code);
       await db.sharedRooms.update(code, { status: 'closed', fetchedAt: new Date() });
+      await this.track('room_closed');
     },
 
     async removeMember(code: string, userId: string): Promise<void> {
       await backend.removeMember(code, userId);
+      await this.track('member_removed');
     },
 
     /** Fetch fresh goal/total from the server into the local mirror. */
@@ -209,6 +250,9 @@ export function createSharedRoomService(backend: SharedRoomBackend) {
         await db.sharedSubmissions.add(submission);
         await db.syncOutbox.add(item);
       });
+
+      // Usage event — deliberately WITHOUT the amount (privacy model).
+      await this.track('contribution_submitted');
 
       if (options.autoFlush !== false) {
         // Fire-and-forget: the UI observes results via the store/poll.

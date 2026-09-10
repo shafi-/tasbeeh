@@ -82,7 +82,25 @@ export interface CreateRoomInput {
 
 // ---------- The port ----------
 
-export interface SharedRoomBackend {
+/**
+ * Usage-metrics capability. Implementations should treat tracking as
+ * best-effort: metrics must never break the app or block a write.
+ *
+ * Privacy rule (docs/SharedGoals-Design.md): events describe USAGE, never
+ * contributions — no dhikr amounts, nothing per-member.
+ */
+export interface SharedRoomUsageTracker {
+  /**
+   * Return this device's stable server-generated token (issued once,
+   * then stored client-side in IndexedDB). Also refreshes last-seen.
+   */
+  ensureDeviceToken(): Promise<string>;
+
+  /** Fire-and-forget usage event. Implementations must never throw. */
+  trackEvent(name: string, properties?: Record<string, unknown>): Promise<void>;
+}
+
+export interface SharedRoomBackend extends SharedRoomUsageTracker {
   /** Human-readable backend name (diagnostics). */
   readonly name: string;
 

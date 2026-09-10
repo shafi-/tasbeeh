@@ -90,4 +90,21 @@ describe('MockSharedRoomBackend', () => {
   it('produces SharedRoomError instances (not raw errors)', async () => {
     await expect(backend.getRoomState('ZZZ999')).rejects.toBeInstanceOf(SharedRoomError);
   });
+
+  it('issues a stable 12-char device token and records usage events', async () => {
+    const token = await backend.ensureDeviceToken();
+    expect(token).toHaveLength(12);
+    expect(await backend.ensureDeviceToken()).toBe(token); // stable
+
+    await backend.trackEvent('app_opened');
+    await backend.trackEvent('room_created', { window: 'week' });
+
+    const events = backend.getTrackedEvents();
+    expect(events.map((e) => e.name)).toEqual(['app_opened', 'room_created']);
+    expect(events[1].properties).toEqual({ window: 'week' });
+
+    backend.reset();
+    const freshToken = await backend.ensureDeviceToken();
+    expect(freshToken).not.toBe(token); // reset simulates a fresh device
+  });
 });

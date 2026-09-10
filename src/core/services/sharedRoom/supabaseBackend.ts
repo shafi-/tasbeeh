@@ -128,4 +128,18 @@ export class SupabaseSharedRoomBackend implements SharedRoomBackend {
   closeRoom(code: string): Promise<void> {
     return rpc('close_room', { p_code: code });
   }
+
+  // ---------- Usage metrics (best-effort; see contract) ----------
+
+  async ensureDeviceToken(): Promise<string> {
+    return rpc<string>('get_or_create_device_token', {});
+  }
+
+  async trackEvent(name: string, properties: Record<string, unknown> = {}): Promise<void> {
+    try {
+      await rpc('track_event', { p_name: name, p_properties: properties });
+    } catch {
+      // Metrics are best-effort by contract — swallow everything.
+    }
+  }
 }

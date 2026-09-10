@@ -7,6 +7,7 @@ import { useStreakStore } from './core/stores/streakStore';
 import { useSettingsStore } from './core/stores/settingsStore';
 import { db } from './core/db/db';
 import { seedZikrs } from './core/db/seed';
+import { sharedRoomService } from './core/services/sharedRoom';
 import { useEffect, useState } from 'react';
 
 // Noor UI (V2)
@@ -85,6 +86,10 @@ function App() {
     mediaQuery.addEventListener('change', handleSystemPrefChange);
 
     setStoresInitialized(true);
+
+    // Usage metrics: best-effort device heartbeat + session open event.
+    // Never blocks startup and silently no-ops when unconfigured/offline.
+    void sharedRoomService.trackAppOpen();
 
     return () => {
       zikrUnsubscribe();

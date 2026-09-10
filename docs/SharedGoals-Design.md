@@ -134,6 +134,36 @@ New **5th bottom tab "Group"** (Home, Goals, Group, Progress, Settings):
 - Keep-alive must be monitored; downtime degrades to stale + queued, never data loss.
 - No built-in rate limiting on free tier (delta cap + code entropy + window checks cover v1; an Edge Function limiter can come later).
 
+## Usage metrics (privacy-preserving)
+
+Since the backend never sees individual progress, usage analytics are built on
+a **device token**, not people:
+
+- On first use the backend issues a **server-generated 12-character token**
+  (same unambiguous alphabet as room codes) via the
+  `get_or_create_device_token()` RPC. The client stores it in IndexedDB
+  (`identity.token`); the Supabase anonymous-auth JWT remains the transport
+  credential — the token is only the analytics key.
+- Best-effort events land in `analytics_events (device_token, name,
+  properties, created_at)` via a never-throwing `track_event` RPC. **No
+  client can read events** (no RLS policies; definer RPCs only), and raw
+  events purge after **90 days**.
+
+Tracked events (usage shape only):
+
+| Event | Properties |
+|-------|------------|
+| `app_opened` | — (once per session) |
+| `room_created` | `{ window: 'today' \| 'week' \| 'custom' }` |
+| `room_joined` / `room_opened` / `room_shared` | `room_shared: { kind: 'code' \| 'link' }` |
+| `contribution_submitted` | **none — deliberately no amount** |
+| `room_closed` / `room_left` / `member_removed` | — |
+
+Deliberately not tracked: dhikr amounts, per-member anything, timings beyond
+the event timestamp. The capability is part of the backend contract
+(`SharedRoomUsageTracker`), so the mock backend fakes it for tests and any
+future backend must provide it too.
+
 ## Implementation phases
 
 1. **Supabase**: migration SQL (schema, RLS, RPCs) in `supabase/migrations/` — run on the project via the Supabase dashboard/CLI.

@@ -115,6 +115,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({ isOpen, onClose, onCr
         target: targetNum,
         startsAt,
         endsAt,
+        windowType: preset,
       });
       setCreated(room);
       setStep('share');
