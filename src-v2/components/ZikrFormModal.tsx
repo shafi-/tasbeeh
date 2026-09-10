@@ -1,0 +1,361 @@
+/**
+ * ZikrFormModal Component (V2)
+ * Modal for creating and editing zikrs
+ */
+
+import React, { useState, useEffect } from 'react';
+import MaterialIcon from './MaterialIcon';
+import { zikrService } from '../../src/core/services/zikrService';
+import { Zikr } from '../../src/core/db/types';
+import { getZikrDisplayInfo, getPredefinedZikrNames } from '../utils/zikrMapping';
+
+interface ZikrFormModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: () => void;
+  editZikr?: Zikr | null;
+}
+
+interface FormErrors {
+  name?: string;
+  translation?: string;
+}
+
+const PREDEFINED_ZIKR_OPTIONS = getPredefinedZikrNames();
+
+const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
+  isOpen,
+  onClose,
+  onSave,
+  editZikr,
+}) => {
+  const [isCustom, setIsCustom] = useState(!editZikr || editZikr.custom);
+  const [selectedPredefined, setSelectedPredefined] = useState('');
+  const [customName, setCustomName] = useState('');
+  const [customTranslation, setCustomTranslation] = useState('');
+  const [customArabic, setCustomArabic] = useState('');
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Reset form when modal opens or editZikr changes
+  useEffect(() => {
+    if (isOpen) {
+      if (editZikr) {
+        setIsCustom(editZikr.custom);
+        if (editZikr.custom) {
+          setCustomName(editZikr.name);
+          const displayInfo = getZikrDisplayInfo(editZikr.name);
+          setCustomTranslation(displayInfo.translation);
+          setCustomArabic(displayInfo.arabicText);
+        } else {
+          setSelectedPredefined(editZikr.name);
+        }
+      } else {
+        setIsCustom(false);
+        setSelectedPredefined('');
+        setCustomName('');
+        setCustomTranslation('');
+        setCustomArabic('');
+      }
+      setErrors({});
+    }
+  }, [isOpen, editZikr]);
+
+  // Handle Escape key to close modal
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isSaving) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose, isSaving]);
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    if (isCustom) {
+      if (!customName.trim()) {
+        newErrors.name = 'Zikr name is required';
+      } else if (customName.length > 50) {
+        newErrors.name = 'Name must be 50 characters or less';
+      } else if (!/^[a-zA-Z\s\-]+$/.test(customName)) {
+        newErrors.name = 'Name can only contain letters, spaces, and hyphens';
+      }
+
+      if (!customTranslation.trim()) {
+        newErrors.translation = 'Translation is required';
+      } else if (customTranslation.length > 100) {
+        newErrors.translation = 'Translation must be 100 characters or less';
+      }
+    } else {
+      if (!selectedPredefined) {
+        newErrors.name = 'Please select a zikr';
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) return;
+
+    setIsSaving(true);
+
+    try {
+      const zikrName = isCustom ? customName.trim() : selectedPredefined;
+
+      if (editZikr) {
+        // Update existing zikr
+        await zikrService.update(editZikr.id!, {
+          name: zikrName,
+          custom: isCustom,
+        });
+      } else {
+        // Create new zikr
+        await zikrService.add({
+          name: zikrName,
+          custom: isCustom,
+          createdAt: new Date(),
+        });
+      }
+
+      // Close modal and refresh
+      onSave();
+      onClose();
+    } catch (error) {
+      console.error('Failed to save zikr:', error);
+      alert('Failed to save zikr. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+
+      {/* Modal */}
+      <div
+        className="relative bg-surface rounded-2xl shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-headline-lg text-headline-lg text-primary">
+            {editZikr ? 'Edit Zikr' : 'Create New Zikr'}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-on-surface-variant hover:text-on-surface transition-colors p-1"
+            aria-label="Close"
+          >
+            <MaterialIcon icon="close" className="text-[24px]" />
+          </button>
+        </div>
+
+        {/* Warning for predefined zikrs */}
+        {editZikr && !editZikr.custom && (
+          <div className="bg-error/10 border border-error/20 rounded-xl p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <MaterialIcon icon="info" className="text-error text-[20px] mt-0.5" />
+              <div>
+                <p className="font-body-md text-body-md text-error font-medium mb-1">
+                  Predefined Zikr
+                </p>
+                <p className="font-caption text-caption text-error/80">
+                  This is a predefined zikr. You can only edit its display order, not its content.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          {/* Zikr Type Toggle */}
+          {!editZikr && (
+            <div className="flex gap-2 bg-surface-container-low p-1 rounded-xl">
+              <button
+                type="button"
+                onClick={() => setIsCustom(false)}
+                className={`flex-1 py-3 px-4 rounded-lg font-label-md text-label-md transition-all ${
+                  !isCustom
+                    ? 'bg-surface text-on-surface shadow-sm'
+                    : 'text-on-surface-variant hover:bg-surface-variant/50'
+                }`}
+              >
+                Predefined
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsCustom(true)}
+                className={`flex-1 py-3 px-4 rounded-lg font-label-md text-label-md transition-all ${
+                  isCustom
+                    ? 'bg-surface text-on-surface shadow-sm'
+                    : 'text-on-surface-variant hover:bg-surface-variant/50'
+                }`}
+              >
+                Custom
+              </button>
+            </div>
+          )}
+
+          {/* Predefined Zikr Selection */}
+          {!isCustom && (
+            <div>
+              <label className="block font-label-md text-label-md text-on-surface mb-2">
+                Select Zikr
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {PREDEFINED_ZIKR_OPTIONS.map((name) => {
+                  const displayInfo = getZikrDisplayInfo(name);
+                  return (
+                    <button
+                      key={name}
+                      type="button"
+                      onClick={() => setSelectedPredefined(name)}
+                      className={`p-4 rounded-xl border-2 transition-all text-left ${
+                        selectedPredefined === name
+                          ? 'border-primary bg-primary-container/20'
+                          : 'border-outline-variant/30 hover:border-outline-variant'
+                      }`}
+                    >
+                      <p className="font-display-arabic text-display-arabic text-primary text-sm mb-1">
+                        {displayInfo.arabicText}
+                      </p>
+                      <p className="font-label-md text-label-md text-on-surface">
+                        {name}
+                      </p>
+                      <p className="font-caption text-caption text-on-surface-variant">
+                        {displayInfo.defaultTarget}x
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+              {errors.name && (
+                <p className="font-caption text-caption text-error mt-2">{errors.name}</p>
+              )}
+            </div>
+          )}
+
+          {/* Custom Zikr Form */}
+          {isCustom && (
+            <>
+              {/* Zikr Name */}
+              <div>
+                <label className="block font-label-md text-label-md text-on-surface mb-2">
+                  Zikr Name *
+                </label>
+                <input
+                  type="text"
+                  value={customName}
+                  onChange={(e) => setCustomName(e.target.value)}
+                  placeholder="e.g., SubhanAllah"
+                  maxLength={50}
+                  className={`w-full bg-surface-container-low border ${
+                    errors.name ? 'border-error' : 'border-outline-variant/50'
+                  } rounded-xl px-4 h-touch-target-min font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors`}
+                  disabled={isSaving}
+                />
+                {errors.name && (
+                  <p className="font-caption text-caption text-error mt-2">{errors.name}</p>
+                )}
+              </div>
+
+              {/* Arabic Text (Optional) */}
+              <div>
+                <label className="block font-label-md text-label-md text-on-surface mb-2">
+                  Arabic Text (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={customArabic}
+                  onChange={(e) => setCustomArabic(e.target.value)}
+                  placeholder="e.g., سُبْحَانَ ٱللَّٰهِ"
+                  className="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 h-touch-target-min font-display-arabic text-display-arabic text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors text-right dir=rtl"
+                  disabled={isSaving}
+                />
+                <p className="font-caption text-caption text-on-surface-variant mt-2">
+                  Optional: Add the Arabic text for this zikr
+                </p>
+              </div>
+
+              {/* Translation */}
+              <div>
+                <label className="block font-label-md text-label-md text-on-surface mb-2">
+                  Translation / Meaning *
+                </label>
+                <input
+                  type="text"
+                  value={customTranslation}
+                  onChange={(e) => setCustomTranslation(e.target.value)}
+                  placeholder="e.g., Glory be to Allah"
+                  maxLength={100}
+                  className={`w-full bg-surface-container-low border ${
+                    errors.translation ? 'border-error' : 'border-outline-variant/50'
+                  } rounded-xl px-4 h-touch-target-min font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors`}
+                  disabled={isSaving}
+                />
+                {errors.translation && (
+                  <p className="font-caption text-caption text-error mt-2">{errors.translation}</p>
+                )}
+              </div>
+
+              {/* Target Count Info */}
+              <div className="bg-surface-container-low rounded-xl p-4">
+                <div className="flex items-center gap-3">
+                  <MaterialIcon icon="info" className="text-primary text-[20px]" />
+                  <div>
+                    <p className="font-body-md text-body-md text-on-surface">
+                      Target count is set per goal
+                    </p>
+                    <p className="font-caption text-caption text-on-surface-variant">
+                      You can set daily, weekly, or monthly goals for this zikr in the Goals section.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 h-touch-target-min rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant/50 transition-colors"
+              disabled={isSaving}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 h-touch-target-min rounded-xl font-label-md text-label-md bg-primary text-on-primary hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+              disabled={isSaving}
+            >
+              <MaterialIcon icon={editZikr ? 'save' : 'add_circle'} className="text-[18px]" />
+              {isSaving ? 'Saving...' : editZikr ? 'Save Changes' : 'Create Zikr'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default ZikrFormModal;

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+
+    <title>Dhikr Sanctuary - Counter</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;family=Source+Sans+3:wght@400;600&amp;family=Noto+Serif:wght@500&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#ffe088",
+                        "primary-container": "#1b4332",
+                        "on-tertiary-container": "#4e3d00",
+                        "on-tertiary-fixed": "#241a00",
+                        "surface-bright": "#fcf9f8",
+                        "on-surface": "#1b1c1c",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#a5d0b9",
+                        "tertiary-fixed-dim": "#e9c349",
+                        "secondary": "#5e5f56",
+                        "on-secondary-container": "#64655c",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-primary-container": "#86af99",
+                        "on-secondary-fixed": "#1b1c15",
+                        "surface": "#fcf9f8",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#574500",
+                        "on-primary-fixed": "#002114",
+                        "on-surface-variant": "#414844",
+                        "on-primary-fixed-variant": "#274e3d",
+                        "inverse-on-surface": "#f3f0f0",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#e4e3d7",
+                        "on-secondary-fixed-variant": "#46473f",
+                        "tertiary": "#735c00",
+                        "surface-container": "#f0eded",
+                        "outline": "#717973",
+                        "secondary-container": "#e4e3d7",
+                        "background": "#fcf9f8",
+                        "surface-variant": "#e4e2e1",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#3f6653",
+                        "surface-dim": "#dcd9d9",
+                        "inverse-surface": "#303030",
+                        "outline-variant": "#c1c8c2",
+                        "primary": "#012d1d",
+                        "surface-container-high": "#eae7e7",
+                        "primary-fixed-dim": "#a5d0b9",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#c1ecd4",
+                        "secondary-fixed-dim": "#c7c7bc",
+                        "on-background": "#1b1c1c",
+                        "tertiary-container": "#cba72f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding-desktop": "64px",
+                        "unit": "8px",
+                        "touch-target-min": "56px",
+                        "container-padding-mobile": "24px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-lg": ["\"Source Sans 3\""],
+                        "display-arabic": ["Noto Serif"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "body-md": ["\"Source Sans 3\""],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "caption": ["\"Source Sans 3\""]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-lg": ["20px", { "lineHeight": "30px", "fontWeight": "400" }],
+                        "display-arabic": ["48px", { "lineHeight": "72px", "fontWeight": "500" }],
+                        "label-md": ["16px", { "lineHeight": "24px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "body-md": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "caption": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            background-color: rgba(165, 208, 185, 0.4);
+            /* inverse-primary with opacity */
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        #counter-circle {
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #counter-circle:active {
+            transform: scale(0.95);
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col overflow-hidden relative">
+    <!-- TopAppBar: Transactional state, so no global nav, but acts as a header -->
+    <header
+        class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 flex justify-between items-center h-16 px-container-padding-mobile">
+        <button aria-label="Close"
+            class="text-on-surface-variant hover:opacity-80 active:scale-95 transition-all w-touch-target-min h-touch-target-min flex items-center justify-center -ml-4"
+            id="close-btn">
+            <span class="material-symbols-outlined" data-icon="close">close</span>
+        </button>
+        <div class="font-headline-md text-headline-md text-primary">SubhanAllah</div>
+        <button aria-label="Toggle Haptics"
+            class="text-primary hover:opacity-80 active:scale-95 transition-all w-touch-target-min h-touch-target-min flex items-center justify-center -mr-4"
+            id="haptics-toggle">
+            <span class="material-symbols-outlined" data-icon="vibration" data-weight="fill"
+                style="font-variation-settings: 'FILL' 1;">vibration</span>
+        </button>
+    </header>
+    <!-- Main Content Canvas -->
+    <main class="flex-1 flex flex-col items-center justify-center pt-16 pb-32 px-container-padding-mobile relative">
+        <!-- Subtle background texture/pattern -->
+        <div class="absolute inset-0 opacity-[0.03] pointer-events-none"
+            style="background-image: radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0); background-size: 24px 24px;">
+        </div>
+        <!-- Dhikr Info -->
+        <div class="text-center mb-12 z-10 flex flex-col gap-4">
+            <h1 class="font-display-arabic text-display-arabic text-primary">سُبْحَانَ ٱللَّٰهِ</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">Glory be to Allah</p>
+        </div>
+        <!-- Main Counter Area -->
+        <div class="relative flex items-center justify-center z-10 w-full max-w-[320px] aspect-square">
+            <!-- Progress Ring Background -->
+            <svg class="absolute inset-0 w-full h-full transform -rotate-90 pointer-events-none" viewbox="0 0 100 100">
+                <circle class="stroke-surface-container-high" cx="50" cy="50" fill="none" r="48" stroke-width="2">
+                </circle>
+                <circle class="stroke-tertiary-container transition-all duration-300 ease-out" cx="50" cy="50"
+                    fill="none" id="progress-ring" r="48" stroke-dasharray="301.59" stroke-dashoffset="301.59"
+                    stroke-linecap="round" stroke-width="2"></circle>
+            </svg>
+            <!-- Interactive Counter Button -->
+            <button
+                class="relative w-[85%] h-[85%] rounded-full bg-surface-bright border border-tertiary-fixed shadow-[0_4px_20px_rgba(27,28,28,0.05)] flex flex-col items-center justify-center overflow-hidden touch-manipulation outline-none focus:ring-2 focus:ring-primary focus:ring-offset-4 focus:ring-offset-surface"
+                id="counter-circle">
+                <span class="font-headline-lg-mobile text-[64px] leading-none font-bold text-primary mb-2"
+                    id="count-display">0</span>
+                <span class="font-label-md text-label-md text-on-surface-variant opacity-70">of 33</span>
+            </button>
+        </div>
+        <!-- Reset/Edit subtly placed -->
+        <button
+            class="mt-8 text-on-surface-variant flex items-center gap-2 px-4 py-2 rounded-full hover:bg-surface-variant/50 transition-colors z-10 font-caption text-caption"
+            id="reset-btn">
+            <span class="material-symbols-outlined text-[18px]" data-icon="refresh">refresh</span>
+            Reset
+        </button>
+    </main>
+    <!-- Bottom Action Area -->
+    <div
+        class="fixed bottom-0 left-0 w-full p-container-padding-mobile pb-[calc(env(safe-area-inset-bottom)+24px)] bg-gradient-to-t from-surface via-surface/90 to-transparent z-40">
+        <button
+            class="w-full h-touch-target-min bg-primary-container text-on-primary rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-sm">
+            <span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+            Complete Session
+        </button>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const counterBtn = document.getElementById('counter-circle');
+            const countDisplay = document.getElementById('count-display');
+            const progressRing = document.getElementById('progress-ring');
+            const resetBtn = document.getElementById('reset-btn');
+            const hapticsToggle = document.getElementById('haptics-toggle');
+
+            let count = 0;
+            const target = 33;
+            const circumference = 2 * Math.PI * 48; // r=48
+            let hapticsEnabled = true;
+
+            function updateDisplay() {
+                countDisplay.textContent = count;
+
+                // Update progress ring
+                const progress = Math.min(count / target, 1);
+                const offset = circumference - (progress * circumference);
+                progressRing.style.strokeDashoffset = offset;
+            }
+
+            function triggerHaptic() {
+                if (hapticsEnabled && navigator.vibrate) {
+                    if (count === target) {
+                        navigator.vibrate([50, 50, 50]); // distinct pattern for completion
+                    } else if (count % 11 === 0) {
+                        navigator.vibrate(30); // milestone
+                    } else {
+                        navigator.vibrate(10); // regular tap
+                    }
+                }
+            }
+
+            function createRipple(event) {
+                const button = event.currentTarget;
+                const circle = document.createElement('span');
+                const diameter = Math.max(button.clientWidth, button.clientHeight);
+                const radius = diameter / 2;
+
+                const rect = button.getBoundingClientRect();
+
+                // Handle both mouse and touch events
+                let clientX, clientY;
+                if (event.type === 'touchstart') {
+                    clientX = event.touches[0].clientX;
+                    clientY = event.touches[0].clientY;
+                } else {
+                    clientX = event.clientX;
+                    clientY = event.clientY;
+                }
+
+                circle.style.width = circle.style.height = `${diameter}px`;
+                circle.style.left = `${clientX - rect.left - radius}px`;
+                circle.style.top = `${clientY - rect.top - radius}px`;
+                circle.classList.add('ripple');
+
+                const existingRipple = button.querySelector('.ripple');
+                if (existingRipple) {
+                    existingRipple.remove();
+                }
+
+                button.appendChild(circle);
+            }
+
+            // Interaction Event Listeners
+            const handleInteract = (e) => {
+                if (e.type !== 'touchstart') {
+                    // Prevent double firing if both touch and click are supported, but usually touchstart is better for mobile
+                    // e.preventDefault(); 
+                }
+
+                count++;
+                updateDisplay();
+                triggerHaptic();
+                createRipple(e);
+            };
+
+            counterBtn.addEventListener('touchstart', handleInteract, { passive: true });
+            counterBtn.addEventListener('mousedown', (e) => {
+                // Ignore right clicks
+                if (e.button !== 0) return;
+                handleInteract(e);
+            });
+
+            resetBtn.addEventListener('click', () => {
+                count = 0;
+                updateDisplay();
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(20);
+            });
+
+            hapticsToggle.addEventListener('click', () => {
+                hapticsEnabled = !hapticsEnabled;
+                const icon = hapticsToggle.querySelector('span');
+                if (hapticsEnabled) {
+                    icon.textContent = 'vibration';
+                    icon.style.fontVariationSettings = "'FILL' 1";
+                    icon.classList.remove('text-on-surface-variant');
+                    icon.classList.add('text-primary');
+                    if (navigator.vibrate) navigator.vibrate(20);
+                } else {
+                    icon.textContent = 'smartphone';
+                    icon.style.fontVariationSettings = "'FILL' 0";
+                    icon.classList.add('text-on-surface-variant');
+                    icon.classList.remove('text-primary');
+                }
+            });
+
+            // Init
+            updateDisplay();
+
+            // Prevent default zooming/scrolling on the counter area to ensure clean taps
+            counterBtn.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+            }, { passive: false });
+        });
+    </script>
+</body>
+
+</html>

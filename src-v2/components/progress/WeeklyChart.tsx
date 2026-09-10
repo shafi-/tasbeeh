@@ -1,0 +1,57 @@
+/**
+ * Weekly Chart Component
+ * Soft rounded bar chart for weekly progress display
+ */
+
+import React from 'react';
+import { WeeklyChartProps } from '../../types/components';
+
+export const WeeklyChart: React.FC<WeeklyChartProps> = ({
+  data,
+  max = 100,
+}) => {
+  // Calculate max value from data if not provided
+  const chartMax = max || Math.max(...data.map((d) => d.value), 1);
+
+  return (
+    <div className="flex justify-between items-end h-32 px-2 gap-2">
+      {data.map((point, index) => {
+        const height = (point.value / chartMax) * 100;
+        const isToday = point.isToday;
+
+        return (
+          <div key={index} className="flex flex-col items-center gap-2 flex-1">
+            {/* Bar */}
+            <div
+              className={`
+                w-8 rounded-full transition-all duration-500
+                ${isToday
+                  ? 'bg-tertiary-container'
+                  : point.value > 0
+                    ? 'bg-tertiary-fixed'
+                    : 'bg-surface-variant'
+                }
+              `}
+              style={{
+                height: `${Math.max(height, 8)}%`, // Min height for visibility
+                opacity: isToday ? 1 : point.value > 0 ? 0.4 + (point.value / chartMax) * 0.4 : 0.3,
+              }}
+            />
+
+            {/* Day label */}
+            <span
+              className={`
+                font-caption text-caption
+                ${isToday ? 'text-primary font-bold' : 'text-on-surface-variant'}
+              `}
+            >
+              {point.day}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default WeeklyChart;

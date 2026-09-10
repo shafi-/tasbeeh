@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <title>Dhikr Sanctuary - Goals and Reminders</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;family=Source+Sans+3:wght@400;600&amp;family=Noto+Serif:wght@500&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#ffe088",
+                        "primary-container": "#1b4332",
+                        "on-tertiary-container": "#4e3d00",
+                        "on-tertiary-fixed": "#241a00",
+                        "surface-bright": "#fcf9f8",
+                        "on-surface": "#1b1c1c",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#a5d0b9",
+                        "tertiary-fixed-dim": "#e9c349",
+                        "secondary": "#5e5f56",
+                        "on-secondary-container": "#64655c",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-primary-container": "#86af99",
+                        "on-secondary-fixed": "#1b1c15",
+                        "surface": "#fcf9f8",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#574500",
+                        "on-primary-fixed": "#002114",
+                        "on-surface-variant": "#414844",
+                        "on-primary-fixed-variant": "#274e3d",
+                        "inverse-on-surface": "#f3f0f0",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#e4e3d7",
+                        "on-secondary-fixed-variant": "#46473f",
+                        "tertiary": "#735c00",
+                        "surface-container": "#f0eded",
+                        "outline": "#717973",
+                        "secondary-container": "#e4e3d7",
+                        "background": "#fcf9f8",
+                        "surface-variant": "#e4e2e1",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#3f6653",
+                        "surface-dim": "#dcd9d9",
+                        "inverse-surface": "#303030",
+                        "outline-variant": "#c1c8c2",
+                        "primary": "#012d1d",
+                        "surface-container-high": "#eae7e7",
+                        "primary-fixed-dim": "#a5d0b9",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#c1ecd4",
+                        "secondary-fixed-dim": "#c7c7bc",
+                        "on-background": "#1b1c1c",
+                        "tertiary-container": "#cba72f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding-desktop": "64px",
+                        "unit": "8px",
+                        "touch-target-min": "56px",
+                        "container-padding-mobile": "24px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": [
+                            "Plus Jakarta Sans"
+                        ],
+                        "headline-lg": [
+                            "Plus Jakarta Sans"
+                        ],
+                        "body-lg": [
+                            "\"Source Sans 3\""
+                        ],
+                        "display-arabic": [
+                            "Noto Serif"
+                        ],
+                        "label-md": [
+                            "Plus Jakarta Sans"
+                        ],
+                        "body-md": [
+                            "\"Source Sans 3\""
+                        ],
+                        "headline-md": [
+                            "Plus Jakarta Sans"
+                        ],
+                        "caption": [
+                            "\"Source Sans 3\""
+                        ]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": [
+                            "28px",
+                            {
+                                "lineHeight": "36px",
+                                "fontWeight": "700"
+                            }
+                        ],
+                        "headline-lg": [
+                            "32px",
+                            {
+                                "lineHeight": "40px",
+                                "fontWeight": "700"
+                            }
+                        ],
+                        "body-lg": [
+                            "20px",
+                            {
+                                "lineHeight": "30px",
+                                "fontWeight": "400"
+                            }
+                        ],
+                        "display-arabic": [
+                            "48px",
+                            {
+                                "lineHeight": "72px",
+                                "fontWeight": "500"
+                            }
+                        ],
+                        "label-md": [
+                            "16px",
+                            {
+                                "lineHeight": "24px",
+                                "letterSpacing": "0.02em",
+                                "fontWeight": "600"
+                            }
+                        ],
+                        "body-md": [
+                            "18px",
+                            {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                            }
+                        ],
+                        "headline-md": [
+                            "24px",
+                            {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                            }
+                        ],
+                        "caption": [
+                            "14px",
+                            {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                            }
+                        ]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .icon-filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Custom toggle switch styles to match the organic, minimal aesthetic */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #012d1d;
+        }
+
+        .toggle-checkbox:checked+.toggle-label {
+            background-color: #a5d0b9;
+            /* inverse-primary / sage green */
+        }
+
+        .toggle-checkbox:checked+.toggle-label:after {
+            transform: translateX(100%);
+            border-color: white;
+            background-color: #012d1d;
+            /* primary / forest green */
+        }
+
+        .toggle-label {
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .toggle-label:after {
+            transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Glassmorphism utilities */
+        .glass-card {
+            background: rgba(252, 249, 248, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(229, 224, 201, 0.5);
+            /* subtle gold/cream border */
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-surface text-on-surface antialiased min-h-screen flex flex-col pt-16 pb-24 md:flex-row md:pt-0 md:pb-0 font-body-md text-body-md">
+    <!-- TopAppBar (Mobile Only) -->
+    <header
+        class="bg-surface/80 backdrop-blur-md fixed top-0 w-full z-50 border-b border-outline-variant/30 md:hidden flex justify-between items-center h-16 px-container-padding-mobile max-w-screen-md mx-auto">
+        <div class="font-headline-md text-headline-md text-primary font-bold">
+            Dhikr Sanctuary
+        </div>
+        <div class="flex items-center gap-4">
+            <button aria-label="Profile"
+                class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-200 w-touch-target-min h-touch-target-min flex items-center justify-center rounded-full">
+                <span class="material-symbols-outlined text-2xl" data-icon="account_circle">account_circle</span>
+            </button>
+        </div>
+    </header>
+    <!-- SideNavBar (Desktop Only) -->
+    <nav
+        class="hidden md:flex flex-col py-6 gap-2 bg-surface text-primary font-body-md text-body-md h-screen w-72 border-r border-outline-variant/30 sticky top-0 shrink-0">
+        <div class="px-6 mb-8">
+            <div class="font-headline-lg text-headline-lg text-primary mb-6">Dhikr Sanctuary</div>
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-full bg-surface-variant overflow-hidden border border-outline-variant/30">
+                    <img alt="User Profile" class="w-full h-full object-cover"
+                        data-alt="A serene, high-quality portrait of a person in soft, natural morning light, exuding tranquility. The color palette is muted, featuring earthy greens and warm creams, perfectly aligning with a minimalist, spiritual light-mode aesthetic."
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwJnOjZhrcgPejdpEK6ha04ny8hj4G_wny4ACz_kAmM4ieOxgPmf2qGGqieofPZbpY3Nmt6XyDxPovEahDCpc34tpzsRl3UERN0FhIPHTQwWgKUWa5Dj5d-BJ16d1eWRDUZEipRPLBNegD6HSw-QOgI05siNW2cVCQXL1OF7eZ4OWf9LYYpogLqv-3yCHMtcgJc1uJoXl8o8zMfNxxxgwox6NIeUTCafWAaC_QNYVKQE-hqh8xavbD62jUF_eO_I8pUHD981_Lc4A" />
+                </div>
+                <div>
+                    <div class="font-label-md text-label-md text-on-surface">Your Journey</div>
+                    <div class="font-caption text-caption text-on-surface-variant">Spiritual Sanctuary</div>
+                </div>
+            </div>
+            <button
+                class="w-full bg-primary text-on-primary rounded-xl h-touch-target-min flex items-center justify-center font-label-md text-label-md hover:opacity-90 transition-opacity mt-4 shadow-sm">
+                Add Dhikr
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto px-4 space-y-1">
+            <a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant mx-2 hover:bg-surface-container-highest transition-colors duration-200 rounded-lg group"
+                href="#">
+                <span class="material-symbols-outlined group-hover:text-primary transition-colors"
+                    data-icon="home">home</span>
+                <span class="font-label-md text-label-md">Home</span>
+            </a>
+            <a class="flex items-center gap-4 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg mx-2 transition-colors duration-200 group"
+                href="#">
+                <span class="material-symbols-outlined icon-filled" data-icon="target">target</span>
+                <span class="font-label-md text-label-md font-bold">Goals</span>
+            </a>
+            <a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant mx-2 hover:bg-surface-container-highest transition-colors duration-200 rounded-lg group"
+                href="#">
+                <span class="material-symbols-outlined group-hover:text-primary transition-colors"
+                    data-icon="trending_up">trending_up</span>
+                <span class="font-label-md text-label-md">Progress</span>
+            </a>
+            <a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant mx-2 hover:bg-surface-container-highest transition-colors duration-200 rounded-lg group"
+                href="#">
+                <span class="material-symbols-outlined group-hover:text-primary transition-colors"
+                    data-icon="notifications">notifications</span>
+                <span class="font-label-md text-label-md">Reminders</span>
+            </a>
+            <a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant mx-2 hover:bg-surface-container-highest transition-colors duration-200 rounded-lg group mt-auto"
+                href="#">
+                <span class="material-symbols-outlined group-hover:text-primary transition-colors"
+                    data-icon="settings">settings</span>
+                <span class="font-label-md text-label-md">Settings</span>
+            </a>
+        </div>
+    </nav>
+    <!-- Main Content Canvas -->
+    <main
+        class="flex-1 w-full max-w-[800px] mx-auto px-container-padding-mobile md:px-container-padding-desktop py-8 md:py-12 overflow-y-auto">
+        <!-- Header Section -->
+        <div class="mb-10">
+            <h1
+                class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-2">
+                Intentions &amp; Reminders</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">Cultivate your daily practice through gentle
+                nudges.</p>
+        </div>
+        <!-- Active Goals Stacked Layout -->
+        <div class="space-y-6 mb-12">
+            <!-- Card 1: Morning Light -->
+            <div
+                class="glass-card rounded-xl p-6 relative overflow-hidden group hover:shadow-[0px_4px_20px_rgba(27,67,50,0.05)] transition-shadow duration-300">
+                <div
+                    class="absolute top-0 right-0 w-32 h-32 bg-tertiary-fixed/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none">
+                </div>
+                <div class="flex justify-between items-start mb-4 relative z-10">
+                    <div>
+                        <div
+                            class="inline-flex items-center px-3 py-1 rounded-full bg-surface-container-low border border-outline-variant/30 text-primary text-xs font-semibold tracking-wide uppercase mb-3">
+                            Daily Practice
+                        </div>
+                        <h2 class="font-headline-md text-headline-md text-primary mb-1">Morning Light</h2>
+                        <p class="font-body-md text-body-md text-on-surface-variant">Subhanallah, Alhamdulillah, Allahu
+                            Akbar</p>
+                    </div>
+                    <!-- Toggle Switch -->
+                    <div
+                        class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in mt-1">
+                        <input checked=""
+                            class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-1 left-1 checked:right-1 checked:left-auto"
+                            id="toggle_morning" name="toggle_morning" type="checkbox" />
+                        <label
+                            class="toggle-label block overflow-hidden h-8 rounded-full bg-surface-container-highest cursor-pointer border border-outline-variant/20"
+                            for="toggle_morning"></label>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between mt-6 relative z-10">
+                    <div class="flex items-center gap-2 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[20px]" data-icon="schedule">schedule</span>
+                        <span class="font-label-md text-label-md">06:00 AM</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-primary font-label-md text-label-md">
+                        <span>33x each</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 2: Evening Peace -->
+            <div
+                class="glass-card rounded-xl p-6 relative overflow-hidden group hover:shadow-[0px_4px_20px_rgba(27,67,50,0.05)] transition-shadow duration-300">
+                <div
+                    class="absolute top-0 right-0 w-32 h-32 bg-primary-fixed/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none">
+                </div>
+                <div class="flex justify-between items-start mb-4 relative z-10">
+                    <div>
+                        <div
+                            class="inline-flex items-center px-3 py-1 rounded-full bg-surface-container-low border border-outline-variant/30 text-primary text-xs font-semibold tracking-wide uppercase mb-3">
+                            Daily Practice
+                        </div>
+                        <h2 class="font-headline-md text-headline-md text-primary mb-1">Evening Peace</h2>
+                        <p class="font-body-md text-body-md text-on-surface-variant">Astaghfirullah</p>
+                    </div>
+                    <!-- Toggle Switch -->
+                    <div
+                        class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in mt-1">
+                        <input checked=""
+                            class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-1 left-1 checked:right-1 checked:left-auto"
+                            id="toggle_evening" name="toggle_evening" type="checkbox" />
+                        <label
+                            class="toggle-label block overflow-hidden h-8 rounded-full bg-surface-container-highest cursor-pointer border border-outline-variant/20"
+                            for="toggle_evening"></label>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between mt-6 relative z-10">
+                    <div class="flex items-center gap-2 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[20px]" data-icon="schedule">schedule</span>
+                        <span class="font-label-md text-label-md">08:00 PM</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-primary font-label-md text-label-md">
+                        <span>100x</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 3: Friday Blessings -->
+            <div
+                class="glass-card rounded-xl p-6 relative overflow-hidden group hover:shadow-[0px_4px_20px_rgba(27,67,50,0.05)] transition-shadow duration-300">
+                <div
+                    class="absolute top-0 right-0 w-32 h-32 bg-tertiary-container/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none">
+                </div>
+                <div class="flex justify-between items-start mb-4 relative z-10">
+                    <div>
+                        <div
+                            class="inline-flex items-center px-3 py-1 rounded-full bg-tertiary-fixed/30 text-on-tertiary-fixed text-xs font-semibold tracking-wide uppercase mb-3 border border-tertiary-fixed-dim/30">
+                            Weekly
+                        </div>
+                        <h2 class="font-headline-md text-headline-md text-primary mb-1">Friday Blessings</h2>
+                        <p class="font-body-md text-body-md text-on-surface-variant">Salawat upon the Prophet (PBUH)</p>
+                    </div>
+                    <!-- Toggle Switch -->
+                    <div
+                        class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in mt-1">
+                        <input
+                            class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-1 left-1 checked:right-1 checked:left-auto"
+                            id="toggle_friday" name="toggle_friday" type="checkbox" />
+                        <label
+                            class="toggle-label block overflow-hidden h-8 rounded-full bg-surface-container-highest cursor-pointer border border-outline-variant/20"
+                            for="toggle_friday"></label>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between mt-6 relative z-10">
+                    <div class="flex items-center gap-2 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[20px]" data-icon="event">event</span>
+                        <span class="font-label-md text-label-md">Fridays</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-primary font-label-md text-label-md">
+                        <span>300x</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Create New CTA -->
+        <div class="mt-8 mb-4">
+            <button
+                class="w-full bg-primary text-on-primary rounded-xl h-touch-target-min flex items-center justify-center font-label-md text-label-md hover:opacity-90 transition-opacity active:scale-[0.98] duration-200 gap-2 shadow-sm">
+                <span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+                Create New Intention
+            </button>
+        </div>
+    </main>
+    <!-- BottomNavBar (Mobile Only) -->
+    <nav
+        class="fixed bottom-0 w-full z-50 rounded-t-xl border-t border-outline-variant/20 shadow-sm bg-surface md:hidden flex justify-around items-center h-touch-target-min pb-safe px-4 text-primary font-label-md text-label-md">
+        <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 active:scale-90 transition-transform duration-150 rounded-xl group"
+            href="#">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors"
+                data-icon="home">home</span>
+            <span
+                class="text-[10px] mt-1 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">Home</span>
+        </a>
+        <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 active:scale-90 transition-transform duration-150"
+            href="#">
+            <span class="material-symbols-outlined icon-filled" data-icon="target">target</span>
+            <span class="text-[10px] mt-1 font-semibold">Goals</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 active:scale-90 transition-transform duration-150 rounded-xl group"
+            href="#">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors"
+                data-icon="trending_up">trending_up</span>
+            <span
+                class="text-[10px] mt-1 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">Progress</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 active:scale-90 transition-transform duration-150 rounded-xl group"
+            href="#">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors"
+                data-icon="notifications">notifications</span>
+            <span
+                class="text-[10px] mt-1 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">Reminders</span>
+        </a>
+    </nav>
+</body>
+
+</html>

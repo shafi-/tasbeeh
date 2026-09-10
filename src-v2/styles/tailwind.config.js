@@ -1,14 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}', './src-v2/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class',
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "./src-v2/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
     extend: {
-      maxWidth: {
-        'mobile-container': '640px'
-      },
-
-      // V2 Design System - Material Design 3 inspired colors
+      // Semantic Color System (Material Design 3 inspired)
       colors: {
         // Primary (Forest Green)
         primary: '#012d1d',
@@ -69,6 +69,9 @@ export default {
         // Inverse surfaces (dark mode)
         'inverse-surface': '#303030',
         'inverse-on-surface': '#f3f0f0',
+
+        // Surface brightness (for dark mode)
+        'surface-bright': '#fcf9f8',
       },
 
       // Border Radius
@@ -133,7 +136,7 @@ export default {
           '50%': { transform: 'scale(1.05)' },
         },
       },
-    }
+    },
   },
-  plugins: []
+  plugins: [],
 };

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <title>Dhikr Sanctuary - Dashboard</title>
+    <!-- Material Symbols -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Google Fonts: Plus Jakarta Sans & Source Sans 3 -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@500&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;family=Source+Sans+3:wght@400&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Tailwind Configuration -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#ffe088",
+                        "primary-container": "#1b4332",
+                        "on-tertiary-container": "#4e3d00",
+                        "on-tertiary-fixed": "#241a00",
+                        "surface-bright": "#fcf9f8",
+                        "on-surface": "#1b1c1c",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#a5d0b9",
+                        "tertiary-fixed-dim": "#e9c349",
+                        "secondary": "#5e5f56",
+                        "on-secondary-container": "#64655c",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-primary-container": "#86af99",
+                        "on-secondary-fixed": "#1b1c15",
+                        "surface": "#fcf9f8",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#574500",
+                        "on-primary-fixed": "#002114",
+                        "on-surface-variant": "#414844",
+                        "on-primary-fixed-variant": "#274e3d",
+                        "inverse-on-surface": "#f3f0f0",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#e4e3d7",
+                        "on-secondary-fixed-variant": "#46473f",
+                        "tertiary": "#735c00",
+                        "surface-container": "#f0eded",
+                        "outline": "#717973",
+                        "secondary-container": "#e4e3d7",
+                        "background": "#fcf9f8",
+                        "surface-variant": "#e4e2e1",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#3f6653",
+                        "surface-dim": "#dcd9d9",
+                        "inverse-surface": "#303030",
+                        "outline-variant": "#c1c8c2",
+                        "primary": "#012d1d",
+                        "surface-container-high": "#eae7e7",
+                        "primary-fixed-dim": "#a5d0b9",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#c1ecd4",
+                        "secondary-fixed-dim": "#c7c7bc",
+                        "on-background": "#1b1c1c",
+                        "tertiary-container": "#cba72f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding-desktop": "64px",
+                        "unit": "8px",
+                        "touch-target-min": "56px",
+                        "container-padding-mobile": "24px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-lg": ["\"Source Sans 3\""],
+                        "display-arabic": ["Noto Serif"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "body-md": ["\"Source Sans 3\""],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "caption": ["\"Source Sans 3\""]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-lg": ["20px", { "lineHeight": "30px", "fontWeight": "400" }],
+                        "display-arabic": ["48px", { "lineHeight": "72px", "fontWeight": "500" }],
+                        "label-md": ["16px", { "lineHeight": "24px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "body-md": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "caption": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Hide scrollbar for horizontal scrolling but keep functionality */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Subtle texture background to enhance 'Soft Tactility' */
+        body {
+            background-color: theme('colors.background');
+            background-image: radial-gradient(theme('colors.surface-variant') 1px, transparent 1px);
+            background-size: 24px 24px;
+            background-position: -12px -12px;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="text-on-surface font-body-md antialiased min-h-screen flex flex-col md:hidden">
+    <!-- TopAppBar -->
+    <header
+        class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 flex justify-between items-center h-16 px-container-padding-mobile">
+        <h1 class="font-headline-md text-headline-md text-primary">Dhikr Sanctuary</h1>
+        <button aria-label="Profile"
+            class="text-primary active:scale-95 duration-200 hover:opacity-80 transition-opacity p-2 -mr-2 rounded-full">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">account_circle</span>
+        </button>
+    </header>
+    <!-- Main Content Canvas (Optimized for vertical mobile scrolling) -->
+    <main class="flex-1 pt-24 pb-32 px-container-padding-mobile flex flex-col gap-8">
+        <!-- Welcome & Streak Header -->
+        <section class="flex flex-col items-center text-center gap-2">
+            <div
+                class="inline-flex items-center gap-2 bg-secondary-container text-on-secondary-container px-4 py-1.5 rounded-full font-label-md text-label-md">
+                <span class="material-symbols-outlined text-[20px]"
+                    style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                <span>12 Day Streak</span>
+            </div>
+            <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mt-2">Peace be upon you</h2>
+            <p class="font-body-md text-body-md text-on-surface-variant">Continue your journey of remembrance.</p>
+        </section>
+        <!-- Daily Reflection Progress Circle -->
+        <section
+            class="relative w-full max-w-[280px] mx-auto flex flex-col items-center justify-center p-6 bg-surface-container-low rounded-xl border border-outline-variant/20 shadow-[0px_4px_20px_rgba(27,28,28,0.02)]">
+            <div class="relative w-48 h-48 flex items-center justify-center">
+                <!-- Background track -->
+                <svg class="absolute inset-0 w-full h-full transform -rotate-90" viewbox="0 0 160 160">
+                    <circle class="text-surface-variant opacity-50" cx="80" cy="80" fill="none" r="72"
+                        stroke="currentColor" stroke-width="8"></circle>
+                    <!-- Progress track (approx 75% complete. Circumference = 2 * PI * 72 = 452) -->
+                    <circle class="text-tertiary-container transition-all duration-1000 ease-out" cx="80" cy="80"
+                        fill="none" r="72" stroke="currentColor" stroke-dasharray="452" stroke-dashoffset="113"
+                        stroke-linecap="round" stroke-width="8"></circle>
+                </svg>
+                <!-- Inner Content -->
+                <div class="flex flex-col items-center justify-center text-center z-10">
+                    <span class="material-symbols-outlined text-tertiary text-4xl mb-1"
+                        style="font-variation-settings: 'FILL' 1;">spa</span>
+                    <span class="font-headline-lg-mobile text-headline-lg-mobile text-primary">75%</span>
+                    <span class="font-caption text-caption text-on-surface-variant mt-1">Daily Goal</span>
+                </div>
+            </div>
+        </section>
+        <!-- Quick Start Dhikr List (Horizontal Scroll) -->
+        <section class="flex flex-col gap-4 -mx-container-padding-mobile px-container-padding-mobile">
+            <h3 class="font-headline-md text-headline-md text-primary">Quick Start</h3>
+            <div class="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-2 hide-scrollbar">
+                <!-- Card 1 -->
+                <div
+                    class="snap-center shrink-0 w-[75vw] max-w-[280px] bg-surface rounded-xl border border-outline-variant/30 p-5 flex flex-col gap-4 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-tertiary-fixed/20 rounded-bl-full -mr-4 -mt-4">
+                    </div>
+                    <div class="flex justify-between items-start z-10">
+                        <div class="bg-surface-container-high p-2 rounded-lg text-primary">
+                            <span class="material-symbols-outlined">cabin</span>
+                        </div>
+                        <span
+                            class="font-label-md text-label-md text-on-surface-variant bg-surface-variant px-2 py-0.5 rounded text-sm">33x</span>
+                    </div>
+                    <div class="flex flex-col gap-1 z-10 mt-2">
+                        <h4 class="font-headline-md text-headline-md text-primary text-xl">SubhanAllah</h4>
+                        <p class="font-caption text-caption text-on-surface-variant">Glory be to Allah</p>
+                    </div>
+                    <button
+                        class="mt-2 w-full min-h-[56px] bg-primary text-on-primary rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
+                        <span class="material-symbols-outlined text-[20px]">play_arrow</span> Start
+                    </button>
+                </div>
+                <!-- Card 2 -->
+                <div
+                    class="snap-center shrink-0 w-[75vw] max-w-[280px] bg-surface rounded-xl border border-outline-variant/30 p-5 flex flex-col gap-4 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-tertiary-fixed/20 rounded-bl-full -mr-4 -mt-4">
+                    </div>
+                    <div class="flex justify-between items-start z-10">
+                        <div class="bg-surface-container-high p-2 rounded-lg text-primary">
+                            <span class="material-symbols-outlined">favorite</span>
+                        </div>
+                        <span
+                            class="font-label-md text-label-md text-on-surface-variant bg-surface-variant px-2 py-0.5 rounded text-sm">33x</span>
+                    </div>
+                    <div class="flex flex-col gap-1 z-10 mt-2">
+                        <h4 class="font-headline-md text-headline-md text-primary text-xl">Alhamdulillah</h4>
+                        <p class="font-caption text-caption text-on-surface-variant">Praise be to Allah</p>
+                    </div>
+                    <button
+                        class="mt-2 w-full min-h-[56px] bg-surface-container-highest text-primary rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform border border-outline-variant/50">
+                        <span class="material-symbols-outlined text-[20px]">play_arrow</span> Start
+                    </button>
+                </div>
+                <!-- Card 3 -->
+                <div
+                    class="snap-center shrink-0 w-[75vw] max-w-[280px] bg-surface rounded-xl border border-outline-variant/30 p-5 flex flex-col gap-4 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-tertiary-fixed/20 rounded-bl-full -mr-4 -mt-4">
+                    </div>
+                    <div class="flex justify-between items-start z-10">
+                        <div class="bg-surface-container-high p-2 rounded-lg text-primary">
+                            <span class="material-symbols-outlined">star</span>
+                        </div>
+                        <span
+                            class="font-label-md text-label-md text-on-surface-variant bg-surface-variant px-2 py-0.5 rounded text-sm">34x</span>
+                    </div>
+                    <div class="flex flex-col gap-1 z-10 mt-2">
+                        <h4 class="font-headline-md text-headline-md text-primary text-xl">Allahu Akbar</h4>
+                        <p class="font-caption text-caption text-on-surface-variant">Allah is the Greatest</p>
+                    </div>
+                    <button
+                        class="mt-2 w-full min-h-[56px] bg-surface-container-highest text-primary rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform border border-outline-variant/50">
+                        <span class="material-symbols-outlined text-[20px]">play_arrow</span> Start
+                    </button>
+                </div>
+                <!-- Spacer for scrolling bleed -->
+                <div class="shrink-0 w-4"></div>
+            </div>
+        </section>
+    </main>
+    <!-- BottomNavBar -->
+    <nav
+        class="fixed bottom-0 left-0 w-full z-50 bg-surface rounded-t-xl border-t border-outline-variant/20 shadow-sm flex justify-around items-center h-touch-target-min pb-safe px-4 pt-2">
+        <!-- Active Tab: Home -->
+        <button
+            class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-5 py-1.5 active:scale-90 transition-transform duration-150">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+            <span class="font-label-md text-label-md text-[12px] leading-tight mt-0.5">Home</span>
+        </button>
+        <!-- Inactive Tab: Goals -->
+        <button
+            class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-xl active:scale-90 transition-transform duration-150">
+            <span class="material-symbols-outlined">target</span>
+            <span class="font-label-md text-label-md text-[12px] leading-tight mt-0.5">Goals</span>
+        </button>
+        <!-- Inactive Tab: Progress -->
+        <button
+            class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-xl active:scale-90 transition-transform duration-150">
+            <span class="material-symbols-outlined">trending_up</span>
+            <span class="font-label-md text-label-md text-[12px] leading-tight mt-0.5">Progress</span>
+        </button>
+        <!-- Inactive Tab: Reminders -->
+        <button
+            class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-xl active:scale-90 transition-transform duration-150">
+            <span class="material-symbols-outlined">notifications</span>
+            <span class="font-label-md text-label-md text-[12px] leading-tight mt-0.5">Reminders</span>
+        </button>
+    </nav>
+</body>
+
+</html>

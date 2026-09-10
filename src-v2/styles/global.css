@@ -1,8 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/**
+ * V2 Global Styles
+ * Design system styles for the new UI implementation
+ */
 
-/* V2 Design System Base Styles */
+/* Material Symbols Outlined base styles */
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
@@ -36,7 +37,7 @@ html {
 
 /* Subtle texture background */
 body {
-  background-color: theme('colors.surface');
+  background-color: theme('colors.background');
   background-image: radial-gradient(theme('colors.surface-variant') 1px, transparent 1px);
   background-size: 24px 24px;
   background-position: -12px -12px;
@@ -135,30 +136,17 @@ body {
   scroll-snap-align: center;
 }
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Focus styles for accessibility */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid theme('colors.primary');
+  outline-offset: 2px;
 }
 
-#root {
-  max-width: 100%;
-  margin: 0 auto;
-}
-
-/* Global transitions for smooth state changes */
-button,
-a,
-input {
-  transition-property: color, background-color, border-color, opacity, box-shadow;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
-/* Reduced motion support for accessibility */
+/* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -166,42 +154,13 @@ input {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
   }
 }
 
-/* Fade-in animation for page transitions */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  .dark\:glass-card {
+    background: rgba(28, 25, 23, 0.7);
+    border-color: rgba(62, 57, 54, 0.5);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-/* Pulse animation for counter updates */
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-.pulse {
-  animation: pulse 0.2s ease-in-out;
-}
-
-/* Focus visible styles for keyboard navigation */
-*:focus-visible {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
 }

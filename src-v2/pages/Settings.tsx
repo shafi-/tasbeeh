@@ -1,0 +1,501 @@
+/**
+ * Settings Screen (V2)
+ * Settings page with dark mode, haptics, data management, and about sections
+ */
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import ToggleSwitch from '../components/forms/ToggleSwitch';
+import MaterialIcon from '../components/MaterialIcon';
+import ZikrFormModal from '../components/ZikrFormModal';
+import { useSettingsStore } from '../../src/core/stores/settingsStore';
+import { useZikrStore } from '../../src/core/stores/zikrStore';
+import { exportService } from '../../src/core/services/exportService';
+import { zikrService } from '../../src/core/services/zikrService';
+import { db } from '../../src/core/db/db';
+import { Zikr } from '../../src/core/db/types';
+
+const Settings: React.FC = () => {
+  const navigate = useNavigate();
+
+  // Store integrations
+  const settings = useSettingsStore(state => state.settings);
+  const loading = useSettingsStore(state => state.loading);
+  const loadSettings = useSettingsStore(state => state.loadSettings);
+  const saveSetting = useSettingsStore(state => state.saveSetting);
+  const zikrs = useZikrStore(state => state.zikrs);
+
+  // Local state
+  const [darkMode, setDarkMode] = useState(false);
+  const [hapticsEnabled, setHapticsEnabled] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Modal state
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [editZikr, setEditZikr] = useState<Zikr | null>(null);
+
+  // Filter zikrs based on search query
+  const filteredZikrs = zikrs.filter(zikr => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return zikr.name.toLowerCase().includes(query);
+  });
+
+  // Load settings on mount
+  useEffect(() => {
+    loadSettings();
+  }, [loadSettings]);
+
+  // Update local state when settings change
+  useEffect(() => {
+    setDarkMode(settings.darkMode ?? false);
+    setHapticsEnabled(settings.hapticsEnabled ?? true);
+  }, [settings]);
+
+  const handleDarkModeToggle = async (value: boolean) => {
+    setDarkMode(value);
+    await saveSetting('darkMode', value);
+
+    // Apply dark mode to document
+    if (value) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+
+  const handleHapticsToggle = async (value: boolean) => {
+    setHapticsEnabled(value);
+    await saveSetting('hapticsEnabled', value);
+  };
+
+  const handleExportData = async () => {
+    setIsExporting(true);
+    try {
+      await exportService.exportData();
+    } catch (error) {
+      console.error('Failed to export data:', error);
+      alert('Failed to export data. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleImportData = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const confirmed = confirm(
+        'This will replace all your current data. This action cannot be undone. Continue?'
+      );
+
+      if (!confirmed) return;
+
+      setIsImporting(true);
+      try {
+        await exportService.importData(file);
+        alert('Data imported successfully! The app will now reload.');
+        window.location.reload();
+      } catch (error) {
+        console.error('Failed to import data:', error);
+        alert('Failed to import data. Please make sure you selected a valid backup file.');
+      } finally {
+        setIsImporting(false);
+      }
+    };
+    input.click();
+  };
+
+  const handleClearAllData = async () => {
+    const confirmed1 = confirm('Are you sure you want to clear all data? This cannot be undone.');
+    if (!confirmed1) return;
+
+    const confirmed2 = confirm('This will delete ALL your zikrs, sessions, goals, and settings. Are you absolutely sure?');
+    if (!confirmed2) return;
+
+    try {
+      await db.delete();
+      alert('All data cleared. The app will now reload.');
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to clear data:', error);
+      alert('Failed to clear data. Please try again.');
+    }
+  };
+
+  // Zikr management handlers
+  const handleRefreshZikrs = () => {
+    useZikrStore.getState().initialize();
+  };
+
+  const handleEditZikr = (zikr: Zikr) => {
+    setEditZikr(zikr);
+  };
+
+  const handleDeleteZikr = async (zikr: Zikr) => {
+    const confirmed = confirm(
+      `Are you sure you want to delete "${zikr.name}"? This will also delete all associated sessions and goals. This action cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    try {
+      await zikrService.softDelete(zikr.id!);
+      alert('Zikr deleted successfully.');
+    } catch (error) {
+      console.error('Failed to delete zikr:', error);
+      alert('Failed to delete zikr. Please try again.');
+    }
+  };
+
+  const handleCloseCreateModal = () => {
+    setIsCreateModalOpen(false);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditZikr(null);
+  };
+
+  // Get app version
+  const appVersion = process.env.PACKAGE_VERSION || '1.0.0';
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-surface text-on-surface antialiased flex items-center justify-center">
+        <div className="text-on-surface-variant">Loading...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-surface text-on-surface antialiased flex flex-col pt-16 pb-24 max-w-md mx-auto">
+      {/* Top App Bar */}
+      <header className="bg-surface/80 backdrop-blur-md fixed top-0 w-full z-50 border-b border-outline-variant/30 flex justify-between items-center h-16 px-container-padding-mobile">
+        <button
+          onClick={() => navigate(-1)}
+          className="text-primary active:scale-95 duration-200 w-touch-target-min h-touch-target-min flex items-center justify-center -ml-4"
+        >
+          <MaterialIcon icon="arrow_back" className="text-2xl" />
+        </button>
+        <div className="font-headline-md text-headline-md text-primary font-bold">
+          Settings
+        </div>
+        <div className="w-touch-target-min" />
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 px-container-padding-mobile py-8 flex flex-col gap-8">
+        {/* Preferences Section */}
+        <section>
+          <h2 className="font-label-md text-label-md text-on-surface-variant mb-4 px-2">
+            Preferences
+          </h2>
+          <div className="flex flex-col gap-2">
+            {/* Dark Mode Toggle */}
+            <div className="bg-surface rounded-xl border border-outline-variant/20 p-4 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="bg-surface-container-high p-2 rounded-lg">
+                  <MaterialIcon icon="dark_mode" className="text-primary text-[20px]" />
+                </div>
+                <div>
+                  <p className="font-body-md text-body-md text-on-surface">Dark Mode</p>
+                  <p className="font-caption text-caption text-on-surface-variant">
+                    Switch between light and dark themes
+                  </p>
+                </div>
+              </div>
+              <ToggleSwitch checked={darkMode} onChange={handleDarkModeToggle} />
+            </div>
+
+            {/* Haptics Toggle */}
+            <div className="bg-surface rounded-xl border border-outline-variant/20 p-4 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="bg-surface-container-high p-2 rounded-lg">
+                  <MaterialIcon icon="vibration" className="text-primary text-[20px]" />
+                </div>
+                <div>
+                  <p className="font-body-md text-body-md text-on-surface">Haptic Feedback</p>
+                  <p className="font-caption text-caption text-on-surface-variant">
+                    Vibrate on taps and interactions
+                  </p>
+                </div>
+              </div>
+              <ToggleSwitch checked={hapticsEnabled} onChange={handleHapticsToggle} />
+            </div>
+          </div>
+        </section>
+
+        {/* Data Management Section */}
+        <section>
+          <h2 className="font-label-md text-label-md text-on-surface-variant mb-4 px-2">
+            Data Management
+          </h2>
+          <div className="flex flex-col gap-2">
+            {/* Export Data */}
+            <button
+              onClick={handleExportData}
+              disabled={isExporting}
+              className="bg-surface rounded-xl border border-outline-variant/20 p-4 flex items-center justify-between active:scale-[0.98] transition-transform disabled:opacity-50"
+            >
+              <div className="flex items-center gap-4 text-left">
+                <div className="bg-surface-container-high p-2 rounded-lg">
+                  <MaterialIcon icon="download" className="text-primary text-[20px]" />
+                </div>
+                <div>
+                  <p className="font-body-md text-body-md text-on-surface">Export Data</p>
+                  <p className="font-caption text-caption text-on-surface-variant">
+                    Download backup of all your data
+                  </p>
+                </div>
+              </div>
+              <MaterialIcon icon="chevron_right" className="text-on-surface-variant" />
+            </button>
+
+            {/* Import Data */}
+            <button
+              onClick={handleImportData}
+              disabled={isImporting}
+              className="bg-surface rounded-xl border border-outline-variant/20 p-4 flex items-center justify-between active:scale-[0.98] transition-transform disabled:opacity-50"
+            >
+              <div className="flex items-center gap-4 text-left">
+                <div className="bg-surface-container-high p-2 rounded-lg">
+                  <MaterialIcon icon="upload" className="text-primary text-[20px]" />
+                </div>
+                <div>
+                  <p className="font-body-md text-body-md text-on-surface">Import Data</p>
+                  <p className="font-caption text-caption text-on-surface-variant">
+                    Restore from backup file
+                  </p>
+                </div>
+              </div>
+              <MaterialIcon icon="chevron_right" className="text-on-surface-variant" />
+            </button>
+
+            {/* Clear All Data */}
+            <button
+              onClick={handleClearAllData}
+              className="bg-error/5 rounded-xl border border-error/20 p-4 flex items-center justify-between active:scale-[0.98] transition-transform"
+            >
+              <div className="flex items-center gap-4 text-left">
+                <div className="bg-error/10 p-2 rounded-lg">
+                  <MaterialIcon icon="delete_forever" className="text-error text-[20px]" />
+                </div>
+                <div>
+                  <p className="font-body-md text-body-md text-error">Clear All Data</p>
+                  <p className="font-caption text-caption text-error/70">
+                    Permanently delete all data
+                  </p>
+                </div>
+              </div>
+              <MaterialIcon icon="chevron_right" className="text-error" />
+            </button>
+          </div>
+        </section>
+
+        {/* Manage Zikrs Section */}
+        <section>
+          <div className="flex items-center justify-between mb-4 px-2">
+            <h2 className="font-label-md text-label-md text-on-surface-variant">
+              Manage Zikrs
+            </h2>
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="text-primary font-label-md text-label-md flex items-center gap-1 hover:opacity-80 transition-opacity"
+            >
+              <MaterialIcon icon="add" className="text-[18px]" />
+              Add New
+            </button>
+          </div>
+
+          {/* Search Input */}
+          {zikrs.length > 0 && (
+            <div className="mb-4">
+              <div className="relative">
+                <MaterialIcon
+                  icon="search"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]"
+                />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search zikrs..."
+                  className="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl pl-12 pr-4 h-touch-target-min font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors"
+                    aria-label="Clear search"
+                  >
+                    <MaterialIcon icon="close" className="text-[20px]" />
+                  </button>
+                )}
+              </div>
+              {searchQuery && (
+                <p className="font-caption text-caption text-on-surface-variant mt-2 px-2">
+                  {filteredZikrs.length} {filteredZikrs.length === 1 ? 'zikr' : 'zikrs'} found
+                </p>
+              )}
+            </div>
+          )}
+
+          <div className="flex flex-col gap-2">
+            {zikrs.length === 0 ? (
+              <div className="bg-surface rounded-xl border border-outline-variant/20 p-8 text-center">
+                <MaterialIcon icon="spa" className="text-4xl text-tertiary-container mx-auto mb-3" />
+                <p className="font-body-md text-body-md text-on-surface-variant">
+                  No zikrs yet. Create your first zikr to get started.
+                </p>
+              </div>
+            ) : searchQuery && filteredZikrs.length === 0 ? (
+              <div className="bg-surface rounded-xl border border-outline-variant/20 p-8 text-center">
+                <MaterialIcon icon="search_off" className="text-4xl text-tertiary-container mx-auto mb-3" />
+                <p className="font-body-md text-body-md text-on-surface-variant">
+                  No zikrs found matching "{searchQuery}"
+                </p>
+              </div>
+            ) : (
+              filteredZikrs.map((zikr) => (
+                <div
+                  key={zikr.id}
+                  className="bg-surface rounded-xl border border-outline-variant/20 p-4 flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="bg-primary-container/20 p-2 rounded-lg">
+                      <MaterialIcon icon="spa" filled className="text-primary text-[20px]" />
+                    </div>
+                    <div>
+                      <p className="font-body-md text-body-md text-on-surface">{zikr.name}</p>
+                      <p className="font-caption text-caption text-on-surface-variant">
+                        {zikr.custom ? 'Custom zikr' : 'Predefined zikr'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleEditZikr(zikr)}
+                      className="text-primary p-2 hover:bg-primary-container/20 rounded-lg transition-colors"
+                      aria-label={`Edit ${zikr.name}`}
+                    >
+                      <MaterialIcon icon="edit" className="text-[20px]" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteZikr(zikr)}
+                      className="text-error p-2 hover:bg-error/10 rounded-lg transition-colors"
+                      aria-label={`Delete ${zikr.name}`}
+                    >
+                      <MaterialIcon icon="delete" className="text-[20px]" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+
+        {/* About Section */}
+        <section>
+          <h2 className="font-label-md text-label-md text-on-surface-variant mb-4 px-2">
+            About
+          </h2>
+          <div className="bg-surface rounded-xl border border-outline-variant/20 p-4">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="bg-primary-container p-3 rounded-xl">
+                <MaterialIcon icon="spa" filled className="text-on-primary-container text-[28px]" />
+              </div>
+              <div>
+                <p className="font-headline-md text-headline-md text-primary">Zikr</p>
+                <p className="font-caption text-caption text-on-surface-variant">
+                  Version {appVersion}
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3 text-body-md text-on-surface-variant">
+              <p>Zikr is a Progressive Web App for Islamic dhikr practice.</p>
+              <p className="text-sm">
+                Features: custom zikr lists, manual progress entry, goals & streaks, and complete offline functionality.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Platform Info */}
+        <section className="text-center">
+          <p className="font-caption text-caption text-on-surface-variant">
+            Built with ❤️ for spiritual practice
+          </p>
+          <p className="font-caption text-caption text-on-surface-variant mt-1">
+            © 2024 Zikr
+          </p>
+        </section>
+      </main>
+
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 w-full z-50 bg-surface rounded-t-xl border-t border-outline-variant/20 shadow-sm flex justify-around items-center h-touch-target-min pb-safe px-4 pt-2">
+        {/* Home */}
+        <button
+          onClick={() => navigate('/')}
+          className="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-xl active-scale-90 transition-transform duration-150 group"
+        >
+          <MaterialIcon icon="home" className="group-hover:text-primary transition-colors" />
+          <span className="text-[10px] mt-1 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
+            Home
+          </span>
+        </button>
+
+        {/* Goals */}
+        <button
+          onClick={() => navigate('/goals')}
+          className="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-xl active-scale-90 transition-transform duration-150 group"
+        >
+          <MaterialIcon icon="target" className="group-hover:text-primary transition-colors" />
+          <span className="text-[10px] mt-1 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
+            Goals
+          </span>
+        </button>
+
+        {/* Progress */}
+        <button
+          onClick={() => navigate('/progress')}
+          className="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-xl active-scale-90 transition-transform duration-150 group"
+        >
+          <MaterialIcon icon="trending_up" className="group-hover:text-primary transition-colors" />
+          <span className="text-[10px] mt-1 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
+            Progress
+          </span>
+        </button>
+
+        {/* Settings (Active) */}
+        <button
+          onClick={() => navigate('/settings')}
+          className="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 active-scale-90 transition-transform duration-150"
+        >
+          <MaterialIcon icon="settings" filled />
+          <span className="text-[10px] mt-1 font-semibold">Settings</span>
+        </button>
+      </nav>
+
+      {/* Zikr Form Modals */}
+      <ZikrFormModal
+        isOpen={isCreateModalOpen}
+        onClose={handleCloseCreateModal}
+        onSave={handleRefreshZikrs}
+      />
+      <ZikrFormModal
+        isOpen={editZikr !== null}
+        onClose={handleCloseEditModal}
+        onSave={handleRefreshZikrs}
+        editZikr={editZikr}
+      />
+    </div>
+  );
+};
+
+export default Settings;
