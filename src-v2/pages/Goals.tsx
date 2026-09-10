@@ -10,11 +10,21 @@ import GlassCard from '../components/cards/GlassCard';
 import ToggleSwitch from '../components/forms/ToggleSwitch';
 import MaterialIcon from '../components/MaterialIcon';
 import GoalFormModal from '../components/GoalFormModal';
+import BottomNav from '../components/navigation/BottomNav';
+import OrnamentDivider from '../components/decor/OrnamentDivider';
+import { NavItem } from '../types/components';
 import { useGoalStore } from '../../src/core/stores/goalStore';
 import { useZikrStore } from '../../src/core/stores/zikrStore';
 import { getZikrDisplayInfo } from '../utils/zikrMapping';
 import { Goal } from '../../src/core/db/types';
 import { goalService } from '../../src/core/services/goalService';
+
+const NAV_ITEMS: NavItem[] = [
+  { id: 'home', label: 'Home', icon: 'home', path: '/' },
+  { id: 'goals', label: 'Goals', icon: 'target', path: '/goals' },
+  { id: 'progress', label: 'Progress', icon: 'trending_up', path: '/progress' },
+  { id: 'settings', label: 'Settings', icon: 'settings', path: '/settings' },
+];
 
 interface GoalWithDisplay extends Goal {
   zikrName: string;
@@ -165,13 +175,16 @@ const Goals: React.FC = () => {
       {/* Main Content */}
       <main className="flex-1 w-full max-w-[800px] mx-auto px-container-padding-mobile py-8 flex flex-col">
         {/* Header Section */}
-        <div className="mb-10">
-          <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2">
-            Intentions &amp; Reminders
-          </h1>
-          <p className="font-body-lg text-body-lg text-on-surface-variant">
-            Cultivate your daily practice through gentle nudges.
-          </p>
+        <div className="mb-10 flex flex-col gap-4">
+          <div>
+            <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2">
+              Intentions &amp; Reminders
+            </h1>
+            <p className="font-body-lg text-body-lg text-on-surface-variant">
+              Cultivate your daily practice through gentle nudges.
+            </p>
+          </div>
+          <OrnamentDivider className="w-48" />
         </div>
 
         {/* Active Goals Stacked Layout */}
@@ -191,12 +204,17 @@ const Goals: React.FC = () => {
               <GlassCard key={goal.id} hover>
                 <div className="flex justify-between items-start mb-4 relative z-10">
                   <div className="flex-1">
-                    <div className="inline-flex items-center px-3 py-1 rounded-full bg-surface-container-low border border-outline-variant/30 text-primary text-xs font-semibold tracking-wide uppercase mb-3">
+                    <div className="inline-flex items-center px-3 py-1 rounded-full bg-tertiary-container/10 border border-tertiary-container/30 text-tertiary text-xs font-semibold tracking-wide uppercase mb-3">
                       {formatPeriod(goal.period)}
                     </div>
                     <h2 className="font-headline-md text-headline-md text-primary mb-1">
                       {goal.zikrName}
                     </h2>
+                    {goal.displayInfo.arabicText && (
+                      <p className="font-display-arabic text-[22px] leading-8 text-tertiary mb-1" lang="ar" dir="rtl">
+                        {goal.displayInfo.arabicText}
+                      </p>
+                    )}
                     <p className="font-body-md text-body-md text-on-surface-variant">
                       {goal.displayInfo.translation}
                     </p>
@@ -253,7 +271,7 @@ const Goals: React.FC = () => {
           <button
             onClick={handleCreateNew}
             className="
-              w-full bg-primary text-on-primary
+              w-full bg-primary-container text-on-primary
               rounded-xl h-touch-target-min
               flex items-center justify-center
               font-label-md text-label-md
@@ -268,49 +286,11 @@ const Goals: React.FC = () => {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 w-full z-50 bg-surface rounded-t-xl border-t border-outline-variant/20 shadow-sm flex justify-around items-center h-touch-target-min pb-safe px-4 pt-2">
-        {/* Home */}
-        <button
-          onClick={() => navigate('/')}
-          className="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-xl active-scale-90 transition-transform duration-150 group"
-        >
-          <MaterialIcon icon="home" className="group-hover:text-primary transition-colors" />
-          <span className="text-[10px] mt-1 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
-            Home
-          </span>
-        </button>
-
-        {/* Goals (Active) */}
-        <button
-          onClick={() => navigate('/goals')}
-          className="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 active-scale-90 transition-transform duration-150"
-        >
-          <MaterialIcon icon="target" filled />
-          <span className="text-[10px] mt-1 font-semibold">Goals</span>
-        </button>
-
-        {/* Progress */}
-        <button
-          onClick={() => navigate('/progress')}
-          className="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-xl active-scale-90 transition-transform duration-150 group"
-        >
-          <MaterialIcon icon="trending_up" className="group-hover:text-primary transition-colors" />
-          <span className="text-[10px] mt-1 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
-            Progress
-          </span>
-        </button>
-
-        {/* Settings */}
-        <button
-          onClick={() => navigate('/settings')}
-          className="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-xl active-scale-90 transition-transform duration-150 group"
-        >
-          <MaterialIcon icon="settings" className="group-hover:text-primary transition-colors" />
-          <span className="text-[10px] mt-1 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
-            Settings
-          </span>
-        </button>
-      </nav>
+      <BottomNav
+        items={NAV_ITEMS}
+        activeId="goals"
+        onNavigate={(path) => navigate(path)}
+      />
 
       {/* Goal Form Modals */}
       <GoalFormModal

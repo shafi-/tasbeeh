@@ -12,12 +12,21 @@ import MaterialIcon from '../components/MaterialIcon';
 import WeeklyChart from '../components/progress/WeeklyChart';
 import SessionHistory from '../components/SessionHistory';
 import BulkEntryForm from '../components/BulkEntryForm';
+import BottomNav from '../components/navigation/BottomNav';
+import OrnamentDivider from '../components/decor/OrnamentDivider';
+import { NavItem, WeeklyDataPoint } from '../types/components';
 import { useSessionStore } from '../../src/core/stores/sessionStore';
 import { useStreakStore } from '../../src/core/stores/streakStore';
 import { useZikrStore } from '../../src/core/stores/zikrStore';
 import { sessionService } from '../../src/core/services/sessionService';
 import { formatDate, getToday } from '../../src/core/utils/dateUtils';
-import { WeeklyDataPoint } from '../types/components';
+
+const NAV_ITEMS: NavItem[] = [
+  { id: 'home', label: 'Home', icon: 'home', path: '/' },
+  { id: 'goals', label: 'Goals', icon: 'target', path: '/goals' },
+  { id: 'progress', label: 'Progress', icon: 'trending_up', path: '/progress' },
+  { id: 'settings', label: 'Settings', icon: 'settings', path: '/settings' },
+];
 
 const Progress: React.FC = () => {
   const navigate = useNavigate();
@@ -193,21 +202,24 @@ const Progress: React.FC = () => {
       {/* Main Content */}
       <main className="flex-grow pt-24 px-container-padding-mobile flex flex-col gap-8">
         {/* Header */}
-        <div className="text-center">
-          <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2">
-            Your Spiritual Journey
-          </h2>
-          <p className="font-body-md text-body-md text-on-surface-variant">
-            Consistency is the key to serenity.
-          </p>
+        <div className="text-center flex flex-col gap-4">
+          <div>
+            <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2">
+              Your Spiritual Journey
+            </h2>
+            <p className="font-body-md text-body-md text-on-surface-variant">
+              Consistency is the key to serenity.
+            </p>
+          </div>
+          <OrnamentDivider className="w-48 mx-auto" />
         </div>
 
         {/* Stats Overview (Bento Style) */}
         <div className="grid grid-cols-2 gap-4">
           {/* Streak Card */}
           <GlassCard className="p-6 flex flex-col items-center justify-center text-center">
-            <MaterialIcon icon="local_fire_department" filled className="text-tertiary-container mb-2 text-4xl" />
-            <p className="font-headline-md text-headline-md text-primary">
+            <MaterialIcon icon="local_fire_department" filled className="text-tertiary mb-2 text-4xl" />
+            <p className="font-headline-md text-headline-md text-primary tabular-nums">
               {streakDays} {streakDays === 1 ? 'Day' : 'Days'}
             </p>
             <p className="font-caption text-caption text-on-surface-variant mt-1">
@@ -217,8 +229,8 @@ const Progress: React.FC = () => {
 
           {/* Total Count Card */}
           <GlassCard className="p-6 flex flex-col items-center justify-center text-center">
-            <MaterialIcon icon="all_inclusive" className="text-primary-container mb-2 text-4xl" />
-            <p className="font-headline-md text-headline-md text-primary">
+            <MaterialIcon icon="all_inclusive" className="text-primary mb-2 text-4xl" />
+            <p className="font-headline-md text-headline-md text-primary tabular-nums">
               {totalDhikr.toLocaleString()}
             </p>
             <p className="font-caption text-caption text-on-surface-variant mt-1">
@@ -228,7 +240,7 @@ const Progress: React.FC = () => {
         </div>
 
         {/* Weekly Progress */}
-        <GlassCard className="p-6">
+        <GlassCard className="p-6" pattern>
           <h3 className="font-label-md text-label-md text-primary mb-6">Weekly Progress</h3>
           <WeeklyChart data={weeklyData} max={100} />
         </GlassCard>
@@ -282,7 +294,7 @@ const Progress: React.FC = () => {
               <select
                 value={selectedZikr || ''}
                 onChange={(e) => setSelectedZikr(Number(e.target.value))}
-                className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 h-touch-target-min font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+                className="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-xl px-4 h-touch-target-min font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
               >
                 <option value="">Select a zikr</option>
                 {zikrs.map((zikr) => (
@@ -355,49 +367,11 @@ const Progress: React.FC = () => {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="bg-surface fixed bottom-0 w-full z-50 rounded-t-xl border-t border-outline-variant/20 shadow-sm flex justify-around items-center h-touch-target-min pb-safe px-4">
-        {/* Home */}
-        <button
-          onClick={() => navigate('/')}
-          className="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 active-scale-90 transition-transform duration-150 rounded-xl group"
-        >
-          <MaterialIcon icon="home" className="group-hover:text-primary transition-colors" />
-          <span className="font-label-md text-label-md text-[10px] mt-1 opacity-0 group-hover:opacity-100 group-hover:h-auto transition-all">
-            Home
-          </span>
-        </button>
-
-        {/* Goals */}
-        <button
-          onClick={() => navigate('/goals')}
-          className="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 active-scale-90 transition-transform duration-150 rounded-xl group"
-        >
-          <MaterialIcon icon="target" className="group-hover:text-primary transition-colors" />
-          <span className="font-label-md text-label-md text-[10px] mt-1 opacity-0 group-hover:opacity-100 group-hover:h-auto transition-all">
-            Goals
-          </span>
-        </button>
-
-        {/* Progress (Active) */}
-        <button
-          onClick={() => navigate('/progress')}
-          className="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 active-scale-90 transition-transform duration-150"
-        >
-          <MaterialIcon icon="trending_up" filled />
-          <span className="font-label-md text-label-md text-[10px] mt-1">Progress</span>
-        </button>
-
-        {/* Settings */}
-        <button
-          onClick={() => navigate('/settings')}
-          className="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 active-scale-90 transition-transform duration-150 rounded-xl group"
-        >
-          <MaterialIcon icon="settings" className="group-hover:text-primary transition-colors" />
-          <span className="font-label-md text-label-md text-[10px] mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            Settings
-          </span>
-        </button>
-      </nav>
+      <BottomNav
+        items={NAV_ITEMS}
+        activeId="progress"
+        onNavigate={(path) => navigate(path)}
+      />
     </div>
   );
 };

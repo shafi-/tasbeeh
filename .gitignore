@@ -46,3 +46,6 @@ coverage/
 
 # Claude Code - Local settings only
 .claude/settings.local.json
+
+# ZCode session artifacts
+.zcode/

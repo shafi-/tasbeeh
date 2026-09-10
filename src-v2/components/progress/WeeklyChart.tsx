@@ -28,13 +28,13 @@ export const WeeklyChart: React.FC<WeeklyChartProps> = ({
                 ${isToday
                   ? 'bg-tertiary-container'
                   : point.value > 0
-                    ? 'bg-tertiary-fixed'
-                    : 'bg-surface-variant'
+                    ? 'bg-primary-container/70'
+                    : 'bg-surface-container-highest'
                 }
               `}
               style={{
                 height: `${Math.max(height, 8)}%`, // Min height for visibility
-                opacity: isToday ? 1 : point.value > 0 ? 0.4 + (point.value / chartMax) * 0.4 : 0.3,
+                opacity: isToday ? 1 : point.value > 0 ? 0.55 + (point.value / chartMax) * 0.45 : 0.6,
               }}
             />
 
@@ -42,7 +42,7 @@ export const WeeklyChart: React.FC<WeeklyChartProps> = ({
             <span
               className={`
                 font-caption text-caption
-                ${isToday ? 'text-primary font-bold' : 'text-on-surface-variant'}
+                ${isToday ? 'text-tertiary font-bold' : 'text-on-surface-variant'}
               `}
             >
               {point.day}

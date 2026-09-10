@@ -345,7 +345,7 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
             </button>
             <button
               type="submit"
-              className="flex-1 h-touch-target-min rounded-xl font-label-md text-label-md bg-primary text-on-primary hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 h-touch-target-min rounded-xl font-label-md text-label-md bg-primary-container text-on-primary hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
               disabled={isSaving}
             >
               <MaterialIcon icon={editZikr ? 'save' : 'add_circle'} className="text-[18px]" />

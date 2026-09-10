@@ -171,14 +171,14 @@ Replace mock data with Zustand stores
 
 ## Status
 
-- [x] Design system foundation
-- [x] Component library (15 components)
-- [x] Page implementations (4 pages)
+- [x] Design system foundation ("Noor" — emerald + gold, Amiri Arabic, khatam pattern)
+- [x] Component library
+- [x] Page implementations
 - [x] Hooks (ripple, haptic)
-- [ ] Store integration
-- [ ] Routing integration
-- [ ] Testing
-- [ ] Dark mode support
+- [x] Store integration
+- [x] Routing integration (V2 is the only UI; V1 removed)
+- [x] Dark mode (CSS-variable token swap via the `.dark` class)
+- [ ] Testing (component tests)
 
 ## Notes
 

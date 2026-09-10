@@ -1,22 +1,40 @@
 /**
  * Home Screen (V2)
- * Dashboard with streak badge, daily goal progress, and quick start cards
- * NOW INTEGRATED WITH ZUSTAND STORES
+ * Dashboard with Arabic greeting, streak badge, daily goal arch, and quick start cards
+ * INTEGRATED WITH ZUSTAND STORES
  */
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopAppBar from '../components/navigation/TopAppBar';
+import BottomNav from '../components/navigation/BottomNav';
 import CircularProgress from '../components/progress/CircularProgress';
 import ZikrCard from '../components/cards/ZikrCard';
 import MaterialIcon from '../components/MaterialIcon';
 import ZikrFormModal from '../components/ZikrFormModal';
+import PatternBackdrop from '../components/decor/PatternBackdrop';
+import OrnamentDivider from '../components/decor/OrnamentDivider';
+import { NavItem } from '../types/components';
 import { useZikrStore } from '../../src/core/stores/zikrStore';
 import { useSessionStore } from '../../src/core/stores/sessionStore';
 import { useGoalStore } from '../../src/core/stores/goalStore';
 import { getZikrDisplayInfo } from '../utils/zikrMapping';
 import { formatDate, getToday } from '../../src/core/utils/dateUtils';
 import { Zikr } from '../../src/core/db/types';
+
+const NAV_ITEMS: NavItem[] = [
+  { id: 'home', label: 'Home', icon: 'home', path: '/' },
+  { id: 'goals', label: 'Goals', icon: 'target', path: '/goals' },
+  { id: 'progress', label: 'Progress', icon: 'trending_up', path: '/progress' },
+  { id: 'settings', label: 'Settings', icon: 'settings', path: '/settings' },
+];
+
+const getGreeting = (): string => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 17) return 'Good afternoon';
+  return 'Good evening';
+};
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -128,20 +146,30 @@ const Home: React.FC = () => {
   // Empty state - no zikrs
   if (zikrs.length === 0) {
     return (
-      <div className="min-h-screen bg-surface text-on-surface antialiased flex flex-col items-center justify-center p-8 text-center">
-        <MaterialIcon icon="spa" className="text-6xl text-tertiary-container mb-4" />
-        <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2">
-          Begin Your Journey
-        </h2>
-        <p className="font-body-md text-body-md text-on-surface-variant mb-6">
-          Create your first zikr to start practicing.
-        </p>
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="bg-primary text-on-primary rounded-xl h-touch-target-min px-8 font-label-md"
-        >
-          Create Zikr
-        </button>
+      <div className="min-h-screen bg-surface text-on-surface antialiased flex flex-col items-center justify-center p-8 text-center relative overflow-hidden">
+        <PatternBackdrop className="absolute inset-0" />
+        <div className="relative z-10 flex flex-col items-center">
+          <div className="w-20 h-24 rounded-t-full rounded-b-xl border border-tertiary-container/40 bg-surface-container-low flex items-center justify-center mb-6">
+            <MaterialIcon icon="spa" className="text-5xl text-tertiary" />
+          </div>
+          <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2">
+            Begin Your Journey
+          </h2>
+          <p className="font-body-md text-body-md text-on-surface-variant mb-6">
+            Create your first zikr to start practicing.
+          </p>
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="bg-primary-container text-on-primary rounded-xl h-touch-target-min px-8 font-label-md"
+          >
+            Create Zikr
+          </button>
+        </div>
+        <ZikrFormModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSave={handleRefreshZikrs}
+        />
       </div>
     );
   }
@@ -160,19 +188,23 @@ const Home: React.FC = () => {
       />
 
       {/* Main Content */}
-      <main className="flex-1 pt-24 pb-32 px-container-padding-mobile flex flex-col gap-8">
+      <main className="flex-1 pt-24 pb-32 px-container-padding-mobile flex flex-col gap-8 relative">
         {/* Welcome & Streak Header */}
-        <section className="flex flex-col items-center text-center gap-2">
+        <section className="relative flex flex-col items-center text-center gap-2">
+          <PatternBackdrop className="absolute -inset-x-8 -top-8 h-48" />
+          <p className="relative font-display-arabic text-[32px] leading-[48px] text-tertiary" lang="ar" dir="rtl">
+            ٱلسَّلَامُ عَلَيْكُمْ
+          </p>
           {streakDays > 0 && (
-            <div className="inline-flex items-center gap-2 bg-secondary-container text-on-secondary-container px-4 py-1.5 rounded-full font-label-md text-label-md">
+            <div className="relative inline-flex items-center gap-2 bg-tertiary-container/10 text-tertiary border border-tertiary-container/30 px-4 py-1.5 rounded-full font-label-md text-label-md">
               <MaterialIcon icon="local_fire_department" filled className="text-[20px]" />
-              <span>{streakDays} Day Streak</span>
+              <span className="tabular-nums">{streakDays} Day Streak</span>
             </div>
           )}
-          <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-primary mt-2">
-            {streakDays > 0 ? 'Keep it going!' : 'Start Your Journey'}
+          <h2 className="relative font-headline-lg-mobile text-headline-lg-mobile text-primary mt-2">
+            {streakDays > 0 ? 'Keep it going!' : getGreeting()}
           </h2>
-          <p className="font-body-md text-body-md text-on-surface-variant">
+          <p className="relative font-body-md text-body-md text-on-surface-variant">
             {todayTotal > 0
               ? `You've done ${todayTotal} dhikr today`
               : 'Begin your practice of remembrance.'
@@ -180,20 +212,24 @@ const Home: React.FC = () => {
           </p>
         </section>
 
-        {/* Daily Goal Progress Circle */}
+        {/* Daily Goal Progress — mihrab arch */}
         {goals.length > 0 && (
-          <section className="relative w-full max-w-[280px] mx-auto flex flex-col items-center justify-center p-6 bg-surface-container-low rounded-xl border border-outline-variant/20 shadow-[0px_4px_20px_rgba(27,28,28,0.02)]">
-            <CircularProgress progress={dailyGoalProgress} size={192}>
-              <div className="flex flex-col items-center justify-center text-center">
-                <MaterialIcon icon="spa" filled className="text-tertiary text-4xl mb-1" />
-                <span className="font-headline-lg-mobile text-headline-lg-mobile text-primary">
-                  {dailyGoalProgress}%
-                </span>
-                <span className="font-caption text-caption text-on-surface-variant mt-1">
-                  Daily Goal
-                </span>
-              </div>
-            </CircularProgress>
+          <section className="relative w-full max-w-[300px] mx-auto flex flex-col items-center rounded-t-full rounded-b-2xl border border-tertiary-container/30 bg-surface-container-low shadow-card px-6 pt-20 pb-8 overflow-hidden">
+            <PatternBackdrop className="absolute inset-0" variant="green" />
+            <div className="relative flex flex-col items-center gap-5">
+              <CircularProgress progress={dailyGoalProgress} size={192}>
+                <div className="flex flex-col items-center justify-center text-center">
+                  <MaterialIcon icon="spa" filled className="text-tertiary text-4xl mb-1" />
+                  <span className="font-headline-lg-mobile text-headline-lg-mobile text-primary tabular-nums">
+                    {dailyGoalProgress}%
+                  </span>
+                  <span className="font-caption text-caption text-on-surface-variant mt-1">
+                    Daily Goal
+                  </span>
+                </div>
+              </CircularProgress>
+              <OrnamentDivider className="w-32" />
+            </div>
           </section>
         )}
 
@@ -214,6 +250,7 @@ const Home: React.FC = () => {
                     key={zikr.id}
                     id={zikr.id!}
                     name={zikr.name}
+                    arabicName={displayInfo.arabicText}
                     translation={displayInfo.translation}
                     targetCount={displayInfo.defaultTarget}
                     icon={practicedToday ? 'check_circle' : 'play_arrow'}
@@ -241,55 +278,11 @@ const Home: React.FC = () => {
       </main>
 
       {/* Bottom Navigation */}
-      <nav
-        aria-label="Main navigation"
-        className="fixed bottom-0 left-0 w-full z-50 bg-surface rounded-t-xl border-t border-outline-variant/20 shadow-sm flex justify-around items-center h-touch-target-min pb-safe px-4 pt-2"
-      >
-        {/* Home (Active) */}
-        <button
-          onClick={() => navigate('/')}
-          aria-current="page"
-          className="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-5 py-1.5 active-scale-90 transition-transform duration-150"
-        >
-          <MaterialIcon icon="home" filled />
-          <span className="font-label-md text-label-md text-[12px] leading-tight mt-0.5">
-            Home
-          </span>
-        </button>
-
-        {/* Goals */}
-        <button
-          onClick={() => navigate('/goals')}
-          className="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-xl active-scale-90 transition-transform duration-150"
-        >
-          <MaterialIcon icon="target" />
-          <span className="font-label-md text-label-md text-[12px] leading-tight mt-0.5">
-            Goals
-          </span>
-        </button>
-
-        {/* Progress */}
-        <button
-          onClick={() => navigate('/progress')}
-          className="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-xl active-scale-90 transition-transform duration-150"
-        >
-          <MaterialIcon icon="trending_up" />
-          <span className="font-label-md text-label-md text-[12px] leading-tight mt-0.5">
-            Progress
-          </span>
-        </button>
-
-        {/* Settings */}
-        <button
-          onClick={() => navigate('/settings')}
-          className="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-xl active-scale-90 transition-transform duration-150"
-        >
-          <MaterialIcon icon="settings" />
-          <span className="font-label-md text-label-md text-[12px] leading-tight mt-0.5">
-            Settings
-          </span>
-        </button>
-      </nav>
+      <BottomNav
+        items={NAV_ITEMS}
+        activeId="home"
+        onNavigate={(path) => navigate(path)}
+      />
 
       {/* Create Zikr Modal */}
       <ZikrFormModal

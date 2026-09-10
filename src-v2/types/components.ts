@@ -16,6 +16,8 @@ export interface NavItem {
 export interface ZikrCardProps {
   id: number;
   name: string;
+  /** Arabic script of the zikr, rendered in the Amiri calligraphy face */
+  arabicName?: string;
   translation: string;
   targetCount: number;
   icon: string;

@@ -2,11 +2,14 @@
  * Welcome Component (V2)
  * Onboarding screen for first-time users
  * Story 27: Welcome Screen
+ * Noor design: Bismillah greeting, pattern hero, mihrab-arch icon frame
  */
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MaterialIcon from './MaterialIcon';
+import PatternBackdrop from './decor/PatternBackdrop';
+import OrnamentDivider from './decor/OrnamentDivider';
 
 interface WelcomeSlide {
   title: string;
@@ -20,19 +23,19 @@ const WELCOME_SLIDES: WelcomeSlide[] = [
     title: 'Welcome to Zikr',
     description: 'A sanctuary for your spiritual practice. Track your dhikr with simplicity and focus.',
     icon: 'spa',
-    color: 'text-tertiary-container',
+    color: 'text-tertiary',
   },
   {
     title: 'Counter',
     description: 'Tap to count your dhikr with haptic feedback. Customizable targets for your practice.',
     icon: 'touch_app',
-    color: 'text-primary-container',
+    color: 'text-primary',
   },
   {
     title: 'Goals & Progress',
     description: 'Set daily, weekly, or monthly goals. Track your streaks and celebrate your consistency.',
     icon: 'trending_up',
-    color: 'text-secondary-container',
+    color: 'text-tertiary',
   },
   {
     title: 'Offline First',
@@ -95,23 +98,35 @@ const Welcome: React.FC = () => {
   const slide = WELCOME_SLIDES[currentSlide];
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface antialiased flex flex-col">
+    <div className="min-h-screen bg-surface text-on-surface antialiased flex flex-col relative overflow-hidden">
+      {/* Pattern backdrop across the upper half */}
+      <PatternBackdrop className="absolute top-0 left-0 right-0 h-[55%]" />
+
       {/* Skip Button */}
       <button
         onClick={handleSkip}
-        className="absolute top-6 right-6 text-on-surface-variant hover:text-on-surface transition-colors font-label-md text-label-md px-4 py-2"
+        className="absolute top-6 right-6 z-20 text-on-surface-variant hover:text-on-surface transition-colors font-label-md text-label-md px-4 py-2"
       >
         Skip
       </button>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-8 py-12 max-w-md mx-auto">
-        {/* Icon */}
-        <div className="mb-12 flex items-center justify-center">
-          <div className="relative">
-            <div className={`w-32 h-32 rounded-full bg-surface-container-low flex items-center justify-center ${isExiting ? 'scale-out' : 'scale-in'}`}>
-              <MaterialIcon icon={slide.icon} filled className={`text-6xl ${slide.color}`} />
-            </div>
+      <main className="flex-1 flex flex-col items-center justify-center px-8 py-12 max-w-md mx-auto relative z-10">
+        {/* Bismillah */}
+        <div className="mb-10 flex flex-col items-center gap-3">
+          <p className="font-display-arabic text-[28px] leading-10 text-tertiary" lang="ar" dir="rtl">
+            بِسْمِ ٱللَّٰهِ
+          </p>
+          <OrnamentDivider className="w-40" />
+        </div>
+
+        {/* Mihrab arch icon frame */}
+        <div className="mb-12 flex items-end justify-center">
+          <div
+            key={currentSlide}
+            className={`w-36 h-44 rounded-t-full rounded-b-2xl border border-tertiary-container/40 bg-surface-container-low shadow-card flex items-center justify-center ${isExiting ? 'scale-out' : 'scale-in'}`}
+          >
+            <MaterialIcon icon={slide.icon} filled className={`text-6xl ${slide.color}`} />
           </div>
         </div>
 
@@ -132,10 +147,10 @@ const Welcome: React.FC = () => {
               key={index}
               onClick={() => goToSlide(index)}
               aria-label={`Go to slide ${index + 1}`}
-              className={`w-2 h-2 rounded-full transition-all ${
+              className={`h-2 rounded-full transition-all ${
                 index === currentSlide
-                  ? 'bg-primary w-8'
-                  : 'bg-surface-variant'
+                  ? 'bg-tertiary-container w-8'
+                  : 'bg-surface-container-highest w-2'
               }`}
             />
           ))}
@@ -144,7 +159,7 @@ const Welcome: React.FC = () => {
         {/* Action Button */}
         <button
           onClick={handleNext}
-          className="w-full max-w-[280px] h-touch-target-min bg-primary text-on-primary rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-sm"
+          className="w-full max-w-[280px] h-touch-target-min bg-primary-container text-on-primary rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-sm"
         >
           {currentSlide < WELCOME_SLIDES.length - 1 ? (
             <>
@@ -161,7 +176,7 @@ const Welcome: React.FC = () => {
       </main>
 
       {/* Version Info */}
-      <footer className="text-center py-6">
+      <footer className="text-center py-6 relative z-10">
         <p className="font-caption text-caption text-on-surface-variant">
           Zikr PWA • Version 1.0.0
         </p>

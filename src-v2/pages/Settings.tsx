@@ -8,12 +8,22 @@ import { useNavigate } from 'react-router-dom';
 import ToggleSwitch from '../components/forms/ToggleSwitch';
 import MaterialIcon from '../components/MaterialIcon';
 import ZikrFormModal from '../components/ZikrFormModal';
+import BottomNav from '../components/navigation/BottomNav';
+import OrnamentDivider from '../components/decor/OrnamentDivider';
+import { NavItem } from '../types/components';
 import { useSettingsStore } from '../../src/core/stores/settingsStore';
 import { useZikrStore } from '../../src/core/stores/zikrStore';
 import { exportService } from '../../src/core/services/exportService';
 import { zikrService } from '../../src/core/services/zikrService';
 import { db } from '../../src/core/db/db';
 import { Zikr } from '../../src/core/db/types';
+
+const NAV_ITEMS: NavItem[] = [
+  { id: 'home', label: 'Home', icon: 'home', path: '/' },
+  { id: 'goals', label: 'Goals', icon: 'target', path: '/goals' },
+  { id: 'progress', label: 'Progress', icon: 'trending_up', path: '/progress' },
+  { id: 'settings', label: 'Settings', icon: 'settings', path: '/settings' },
+];
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();
@@ -26,7 +36,9 @@ const Settings: React.FC = () => {
   const zikrs = useZikrStore(state => state.zikrs);
 
   // Local state
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(
+    () => window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -50,7 +62,10 @@ const Settings: React.FC = () => {
 
   // Update local state when settings change
   useEffect(() => {
-    setDarkMode(settings.darkMode ?? false);
+    // Reflect the effective theme: explicit setting, else system preference
+    setDarkMode(
+      settings.darkMode ?? window.matchMedia('(prefers-color-scheme: dark)').matches
+    );
     setHapticsEnabled(settings.hapticsEnabled ?? true);
   }, [settings]);
 
@@ -197,7 +212,7 @@ const Settings: React.FC = () => {
           </h2>
           <div className="flex flex-col gap-2">
             {/* Dark Mode Toggle */}
-            <div className="bg-surface rounded-xl border border-outline-variant/20 p-4 flex items-center justify-between">
+            <div className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-4 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="bg-surface-container-high p-2 rounded-lg">
                   <MaterialIcon icon="dark_mode" className="text-primary text-[20px]" />
@@ -213,7 +228,7 @@ const Settings: React.FC = () => {
             </div>
 
             {/* Haptics Toggle */}
-            <div className="bg-surface rounded-xl border border-outline-variant/20 p-4 flex items-center justify-between">
+            <div className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-4 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="bg-surface-container-high p-2 rounded-lg">
                   <MaterialIcon icon="vibration" className="text-primary text-[20px]" />
@@ -240,7 +255,7 @@ const Settings: React.FC = () => {
             <button
               onClick={handleExportData}
               disabled={isExporting}
-              className="bg-surface rounded-xl border border-outline-variant/20 p-4 flex items-center justify-between active:scale-[0.98] transition-transform disabled:opacity-50"
+              className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-4 flex items-center justify-between active:scale-[0.98] transition-transform disabled:opacity-50"
             >
               <div className="flex items-center gap-4 text-left">
                 <div className="bg-surface-container-high p-2 rounded-lg">
@@ -260,7 +275,7 @@ const Settings: React.FC = () => {
             <button
               onClick={handleImportData}
               disabled={isImporting}
-              className="bg-surface rounded-xl border border-outline-variant/20 p-4 flex items-center justify-between active:scale-[0.98] transition-transform disabled:opacity-50"
+              className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-4 flex items-center justify-between active:scale-[0.98] transition-transform disabled:opacity-50"
             >
               <div className="flex items-center gap-4 text-left">
                 <div className="bg-surface-container-high p-2 rounded-lg">
@@ -347,14 +362,14 @@ const Settings: React.FC = () => {
 
           <div className="flex flex-col gap-2">
             {zikrs.length === 0 ? (
-              <div className="bg-surface rounded-xl border border-outline-variant/20 p-8 text-center">
+              <div className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-8 text-center">
                 <MaterialIcon icon="spa" className="text-4xl text-tertiary-container mx-auto mb-3" />
                 <p className="font-body-md text-body-md text-on-surface-variant">
                   No zikrs yet. Create your first zikr to get started.
                 </p>
               </div>
             ) : searchQuery && filteredZikrs.length === 0 ? (
-              <div className="bg-surface rounded-xl border border-outline-variant/20 p-8 text-center">
+              <div className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-8 text-center">
                 <MaterialIcon icon="search_off" className="text-4xl text-tertiary-container mx-auto mb-3" />
                 <p className="font-body-md text-body-md text-on-surface-variant">
                   No zikrs found matching "{searchQuery}"
@@ -364,7 +379,7 @@ const Settings: React.FC = () => {
               filteredZikrs.map((zikr) => (
                 <div
                   key={zikr.id}
-                  className="bg-surface rounded-xl border border-outline-variant/20 p-4 flex items-center justify-between"
+                  className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-4 flex items-center justify-between"
                 >
                   <div className="flex items-center gap-4">
                     <div className="bg-primary-container/20 p-2 rounded-lg">
@@ -404,10 +419,10 @@ const Settings: React.FC = () => {
           <h2 className="font-label-md text-label-md text-on-surface-variant mb-4 px-2">
             About
           </h2>
-          <div className="bg-surface rounded-xl border border-outline-variant/20 p-4">
+          <div className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-4">
             <div className="flex items-center gap-4 mb-4">
-              <div className="bg-primary-container p-3 rounded-xl">
-                <MaterialIcon icon="spa" filled className="text-on-primary-container text-[28px]" />
+              <div className="w-12 h-14 rounded-t-full rounded-b-lg bg-primary-container flex items-center justify-center">
+                <span className="font-display-arabic text-[26px] leading-9 text-tertiary-fixed" lang="ar" aria-hidden="true">ذِكْر</span>
               </div>
               <div>
                 <p className="font-headline-md text-headline-md text-primary">Zikr</p>
@@ -417,70 +432,35 @@ const Settings: React.FC = () => {
               </div>
             </div>
 
+            <OrnamentDivider className="mb-4" />
+
             <div className="space-y-3 text-body-md text-on-surface-variant">
               <p>Zikr is a Progressive Web App for Islamic dhikr practice.</p>
               <p className="text-sm">
-                Features: custom zikr lists, manual progress entry, goals & streaks, and complete offline functionality.
+                Features: custom zikr lists, manual progress entry, goals &amp; streaks, and complete offline functionality.
               </p>
             </div>
           </div>
         </section>
 
         {/* Platform Info */}
-        <section className="text-center">
+        <section className="text-center flex flex-col gap-3">
+          <OrnamentDivider className="w-40 mx-auto" />
           <p className="font-caption text-caption text-on-surface-variant">
-            Built with ❤️ for spiritual practice
+            Built for remembrance
           </p>
-          <p className="font-caption text-caption text-on-surface-variant mt-1">
+          <p className="font-caption text-caption text-on-surface-variant">
             © 2024 Zikr
           </p>
         </section>
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 w-full z-50 bg-surface rounded-t-xl border-t border-outline-variant/20 shadow-sm flex justify-around items-center h-touch-target-min pb-safe px-4 pt-2">
-        {/* Home */}
-        <button
-          onClick={() => navigate('/')}
-          className="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-xl active-scale-90 transition-transform duration-150 group"
-        >
-          <MaterialIcon icon="home" className="group-hover:text-primary transition-colors" />
-          <span className="text-[10px] mt-1 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
-            Home
-          </span>
-        </button>
-
-        {/* Goals */}
-        <button
-          onClick={() => navigate('/goals')}
-          className="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-xl active-scale-90 transition-transform duration-150 group"
-        >
-          <MaterialIcon icon="target" className="group-hover:text-primary transition-colors" />
-          <span className="text-[10px] mt-1 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
-            Goals
-          </span>
-        </button>
-
-        {/* Progress */}
-        <button
-          onClick={() => navigate('/progress')}
-          className="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-variant/50 rounded-xl active-scale-90 transition-transform duration-150 group"
-        >
-          <MaterialIcon icon="trending_up" className="group-hover:text-primary transition-colors" />
-          <span className="text-[10px] mt-1 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
-            Progress
-          </span>
-        </button>
-
-        {/* Settings (Active) */}
-        <button
-          onClick={() => navigate('/settings')}
-          className="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 active-scale-90 transition-transform duration-150"
-        >
-          <MaterialIcon icon="settings" filled />
-          <span className="text-[10px] mt-1 font-semibold">Settings</span>
-        </button>
-      </nav>
+      <BottomNav
+        items={NAV_ITEMS}
+        activeId="settings"
+        onNavigate={(path) => navigate(path)}
+      />
 
       {/* Zikr Form Modals */}
       <ZikrFormModal

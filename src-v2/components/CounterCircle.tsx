@@ -1,6 +1,7 @@
 /**
  * Counter Circle Component
- * Large interactive counter button with progress ring and ripple effects
+ * Large interactive counter button with gold progress ring, pattern fill,
+ * milestone glow, and ripple effects
  */
 
 import React, { useRef, useEffect } from 'react';
@@ -29,6 +30,8 @@ export const CounterCircle: React.FC<CounterCircleProps> = ({
   const circumference = 2 * Math.PI * 48; // r=48 from SVG
   const progress = Math.min(count / target, 1);
   const offset = circumference - progress * circumference;
+  const isComplete = count >= target;
+  const isMilestone = count > 0 && (count % 33 === 0 || isComplete);
 
   const handleInteraction = (
     e: React.MouseEvent<HTMLButtonElement> | React.TouchEvent<HTMLButtonElement>
@@ -86,7 +89,7 @@ export const CounterCircle: React.FC<CounterCircleProps> = ({
           cy={50}
           fill="none"
           r={48}
-          strokeWidth="2"
+          strokeWidth={isComplete ? '3.5' : '2'}
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="round"
@@ -108,8 +111,8 @@ export const CounterCircle: React.FC<CounterCircleProps> = ({
         }}
         className={`
           relative w-[85%] h-[85%] rounded-full
-          bg-surface-bright border border-tertiary-fixed
-          shadow-[0_4px_20px_rgba(27,28,28,0.05)]
+          bg-surface-bright border
+          ${isComplete ? 'border-tertiary-container shadow-gold-glow' : isMilestone ? 'border-tertiary-fixed shadow-gold-glow' : 'border-tertiary-fixed/60 shadow-card'}
           flex flex-col items-center justify-center
           overflow-hidden touch-manipulation
           outline-none focus:ring-2 focus:ring-primary focus:ring-offset-4 focus:ring-offset-surface
@@ -119,10 +122,13 @@ export const CounterCircle: React.FC<CounterCircleProps> = ({
         `}
         aria-label={`Tap to increment count. Current: ${count}, Target: ${target}`}
       >
-        <span className="font-headline-lg-mobile text-[64px] leading-none font-bold text-primary mb-2">
+        {/* Subtle khatam pattern inside the circle */}
+        <div className="islamic-pattern absolute inset-0 rounded-full" aria-hidden="true" />
+
+        <span className="relative font-headline-lg-mobile text-[64px] leading-none font-bold text-primary mb-2 tabular-nums">
           {count}
         </span>
-        <span className="font-label-md text-label-md text-on-surface-variant opacity-70">
+        <span className="relative font-label-md text-label-md text-tertiary tabular-nums">
           of {target}
         </span>
       </button>

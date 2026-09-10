@@ -2,7 +2,182 @@
 @tailwind components;
 @tailwind utilities;
 
-/* V2 Design System Base Styles */
+/* ============================================================
+   "Noor" Design System — theme tokens
+   Light: warm parchment surfaces, deep emerald, restrained gold.
+   Dark: deep green-black surfaces, light emerald, brighter gold.
+   ============================================================ */
+:root {
+  /* Primary (Deep Emerald) */
+  --color-primary: 1 45 29;               /* #012d1d */
+  --color-primary-container: 27 67 50;    /* #1b4332 */
+  --color-on-primary: 255 255 255;
+  --color-on-primary-container: 134 175 153; /* #86af99 */
+  --color-inverse-primary: 165 208 185;   /* #a5d0b9 */
+  --color-primary-fixed: 193 236 212;     /* #c1ecd4 */
+  --color-primary-fixed-dim: 165 208 185;
+
+  /* Secondary (Sage/Olive) */
+  --color-secondary: 94 95 86;            /* #5e5f56 */
+  --color-secondary-container: 228 227 213; /* #e4e3d5 */
+  --color-on-secondary: 255 255 255;
+  --color-on-secondary-container: 100 101 92; /* #64655c */
+  --color-secondary-fixed: 228 227 213;
+  --color-secondary-fixed-dim: 199 199 188; /* #c7c7bc */
+  --color-on-secondary-fixed: 27 28 21;
+  --color-on-secondary-fixed-variant: 70 71 63; /* #46473f */
+
+  /* Tertiary (Gold) */
+  --color-tertiary: 115 92 0;             /* #735c00 */
+  --color-tertiary-container: 201 162 39; /* #c9a227 */
+  --color-tertiary-fixed: 255 224 136;    /* #ffe088 */
+  --color-tertiary-fixed-dim: 233 195 73; /* #e9c349 */
+  --color-on-tertiary: 255 255 255;
+  --color-on-tertiary-container: 78 61 0; /* #4e3d00 */
+  --color-on-tertiary-fixed: 36 26 0;
+  --color-on-tertiary-fixed-variant: 87 69 0; /* #574500 */
+
+  /* Surfaces (warm parchment) */
+  --color-surface: 250 247 240;           /* #faf7f0 */
+  --color-surface-container: 238 234 223; /* #eeeadf */
+  --color-surface-container-low: 244 241 232; /* #f4f1e8 */
+  --color-surface-container-high: 232 228 214; /* #e8e4d6 */
+  --color-surface-container-highest: 226 221 205; /* #e2ddcd */
+  --color-surface-container-lowest: 255 255 255;
+  --color-surface-dim: 219 215 200;       /* #dbd7c8 */
+  --color-surface-bright: 253 250 243;    /* #fdfaf3 */
+  --color-surface-variant: 231 227 213;   /* #e7e3d5 */
+  --color-surface-tint: 63 102 83;        /* #3f6653 */
+
+  /* Text */
+  --color-on-surface: 27 28 24;           /* #1b1c18 */
+  --color-on-surface-variant: 72 73 63;   /* #48493f */
+  --color-on-background: 27 28 24;
+
+  /* Outlines */
+  --color-outline: 121 120 108;           /* #79786c */
+  --color-outline-variant: 201 199 180;   /* #c9c7b4 */
+
+  /* Error */
+  --color-error: 186 26 26;               /* #ba1a1a */
+  --color-on-error: 255 255 255;
+  --color-error-container: 255 218 214;   /* #ffdad6 */
+  --color-on-error-container: 147 0 10;   /* #93000a */
+
+  /* Inverse surfaces */
+  --color-inverse-surface: 48 48 48;
+  --color-inverse-on-surface: 243 240 240;
+
+  --pattern-opacity: 0.05;
+  --texture-dot-opacity: 0.7;
+}
+
+.dark {
+  /* Primary (light emerald for text/headings on dark) */
+  --color-primary: 158 212 181;           /* #9ed4b5 */
+  --color-primary-container: 47 107 80;   /* #2f6b50 */
+  --color-on-primary: 255 255 255;
+  --color-on-primary-container: 201 238 218; /* #c9eeda */
+  --color-inverse-primary: 1 45 29;       /* #012d1d */
+  --color-primary-fixed: 193 236 212;
+  --color-primary-fixed-dim: 165 208 185;
+
+  /* Secondary */
+  --color-secondary: 199 200 188;         /* #c7c8bc */
+  --color-secondary-container: 71 72 63;  /* #47483f */
+  --color-on-secondary: 52 54 44;
+  --color-on-secondary-container: 228 227 213;
+  --color-secondary-fixed: 71 72 63;
+  --color-secondary-fixed-dim: 52 54 44;
+  --color-on-secondary-fixed: 228 227 213;
+  --color-on-secondary-fixed-variant: 199 200 188;
+
+  /* Tertiary (brighter gold for dark surfaces) */
+  --color-tertiary: 233 195 73;           /* #e9c349 */
+  --color-tertiary-container: 212 175 55; /* #d4af37 */
+  --color-tertiary-fixed: 255 224 136;
+  --color-tertiary-fixed-dim: 212 175 55;
+  --color-on-tertiary: 63 47 0;
+  --color-on-tertiary-container: 255 224 136;
+  --color-on-tertiary-fixed: 36 26 0;
+  --color-on-tertiary-fixed-variant: 255 224 136;
+
+  /* Surfaces (deep green-black) */
+  --color-surface: 15 23 19;              /* #0f1713 */
+  --color-surface-container: 27 36 32;    /* #1b2420 */
+  --color-surface-container-low: 23 31 27; /* #171f1b */
+  --color-surface-container-high: 38 47 42; /* #262f2a */
+  --color-surface-container-highest: 49 58 53; /* #313a35 */
+  --color-surface-container-lowest: 10 16 13; /* #0a100d */
+  --color-surface-dim: 15 23 19;
+  --color-surface-bright: 59 68 62;       /* #3b443e */
+  --color-surface-variant: 38 47 42;      /* #262f2a */
+  --color-surface-tint: 158 212 181;
+
+  /* Text */
+  --color-on-surface: 229 226 216;        /* #e5e2d8 */
+  --color-on-surface-variant: 195 200 189; /* #c3c8bd */
+  --color-on-background: 229 226 216;
+
+  /* Outlines */
+  --color-outline: 142 147 136;           /* #8e9388 */
+  --color-outline-variant: 68 73 63;      /* #44493f */
+
+  /* Error */
+  --color-error: 255 180 171;             /* #ffb4ab */
+  --color-on-error: 105 0 5;
+  --color-error-container: 147 0 10;
+  --color-on-error-container: 255 218 214;
+
+  /* Inverse surfaces */
+  --color-inverse-surface: 229 226 216;
+  --color-inverse-on-surface: 27 28 24;
+
+  --pattern-opacity: 0.06;
+  --texture-dot-opacity: 0.35;
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Roboto', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: rgb(var(--color-on-surface));
+}
+
+/* Soft tactility: subtle dotted texture over the parchment surface */
+body {
+  background-color: rgb(var(--color-surface));
+  background-image: radial-gradient(
+    rgb(var(--color-surface-variant) / var(--texture-dot-opacity)) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+  background-position: -12px -12px;
+}
+
+#root {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Focus visible styles for keyboard navigation (theme-aware) */
+*:focus-visible {
+  outline: 2px solid rgb(var(--color-primary));
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   Icons
+   ============================================================ */
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
@@ -11,12 +186,70 @@
   font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-/* Glass Card Effect */
+/* ============================================================
+   Islamic pattern — 8-pointed star (khatam) lattice.
+   Rendered via CSS mask so the theme controls its color.
+   ============================================================ */
+.islamic-pattern {
+  background-color: rgb(var(--color-primary));
+  opacity: var(--pattern-opacity);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.2'%3E%3Crect x='31' y='31' width='34' height='34'/%3E%3Crect x='31' y='31' width='34' height='34' transform='rotate(45 48 48)'/%3E%3Cpath d='M48 0v14M48 82v14M0 48h14M82 48h14'/%3E%3Cpath d='M0 0l10 10M96 0l-10 10M0 96l10-10M96 96l-10-10'/%3E%3C/g%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.2'%3E%3Crect x='31' y='31' width='34' height='34'/%3E%3Crect x='31' y='31' width='34' height='34' transform='rotate(45 48 48)'/%3E%3Cpath d='M48 0v14M48 82v14M0 48h14M82 48h14'/%3E%3Cpath d='M0 0l10 10M96 0l-10 10M0 96l10-10M96 96l-10-10'/%3E%3C/g%3E%3C/svg%3E");
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+  -webkit-mask-size: 96px 96px;
+  mask-size: 96px 96px;
+  pointer-events: none;
+}
+
+/* Gold on gold surfaces (e.g. inside primary-container cards) */
+.islamic-pattern-gold {
+  background-color: rgb(var(--color-tertiary-fixed));
+  opacity: 0.12;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.2'%3E%3Crect x='31' y='31' width='34' height='34'/%3E%3Crect x='31' y='31' width='34' height='34' transform='rotate(45 48 48)'/%3E%3Cpath d='M48 0v14M48 82v14M0 48h14M82 48h14'/%3E%3Cpath d='M0 0l10 10M96 0l-10 10M0 96l10-10M96 96l-10-10'/%3E%3C/g%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.2'%3E%3Crect x='31' y='31' width='34' height='34'/%3E%3Crect x='31' y='31' width='34' height='34' transform='rotate(45 48 48)'/%3E%3Cpath d='M48 0v14M48 82v14M0 48h14M82 48h14'/%3E%3Cpath d='M0 0l10 10M96 0l-10 10M0 96l10-10M96 96l-10-10'/%3E%3C/g%3E%3C/svg%3E");
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+  -webkit-mask-size: 96px 96px;
+  mask-size: 96px 96px;
+  pointer-events: none;
+}
+
+/* Gradient gold text for accents */
+.gold-gradient-text {
+  background-image: linear-gradient(135deg, #e9c349 0%, #c9a227 55%, #a8841c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.dark .gold-gradient-text {
+  background-image: linear-gradient(135deg, #ffe088 0%, #d4af37 55%, #b8912a 100%);
+}
+
+/* ============================================================
+   Cards & effects
+   ============================================================ */
 .glass-card {
-  background: rgba(252, 249, 248, 0.7);
+  background: rgb(var(--color-surface-container-low) / 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(229, 224, 201, 0.5);
+  border: 1px solid rgb(var(--color-outline-variant) / 0.5);
+}
+
+.dark .glass-card {
+  background: rgb(var(--color-surface-container-low) / 0.8);
+  border-color: rgb(var(--color-outline-variant) / 0.35);
+}
+
+/* Ripple Effect */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  background-color: rgb(var(--color-inverse-primary) / 0.4);
+  pointer-events: none;
 }
 
 /* Hide scrollbar but keep functionality */
@@ -29,19 +262,6 @@
   scrollbar-width: none;
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Subtle texture background */
-body {
-  background-color: theme('colors.surface');
-  background-image: radial-gradient(theme('colors.surface-variant') 1px, transparent 1px);
-  background-size: 24px 24px;
-  background-position: -12px -12px;
-}
-
 /* iOS Safe Area */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
@@ -49,16 +269,6 @@ body {
 
 .pt-safe {
   padding-top: env(safe-area-inset-top);
-}
-
-/* Ripple Effect */
-.ripple {
-  position: absolute;
-  border-radius: 50%;
-  transform: scale(0);
-  animation: ripple 0.6s linear;
-  background-color: rgba(165, 208, 185, 0.4);
-  pointer-events: none;
 }
 
 /* Touch-friendly button base */
@@ -98,17 +308,17 @@ body {
 /* Toggle Switch */
 .toggle-checkbox:checked {
   right: 0;
-  border-color: theme('colors.primary');
+  border-color: rgb(var(--color-primary));
 }
 
 .toggle-checkbox:checked + .toggle-label {
-  background-color: theme('colors.inverse-primary');
+  background-color: rgb(var(--color-tertiary-container));
 }
 
 .toggle-checkbox:checked + .toggle-label:after {
   transform: translateX(100%);
   border-color: white;
-  background-color: theme('colors.primary');
+  background-color: #ffffff;
 }
 
 .toggle-label {
@@ -135,20 +345,6 @@ body {
   scroll-snap-align: center;
 }
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-#root {
-  max-width: 100%;
-  margin: 0 auto;
-}
-
 /* Global transitions for smooth state changes */
 button,
 a,
@@ -156,18 +352,6 @@ input {
   transition-property: color, background-color, border-color, opacity, box-shadow;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
-}
-
-/* Reduced motion support for accessibility */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
 }
 
 /* Fade-in animation for page transitions */
@@ -200,8 +384,14 @@ input {
   animation: pulse 0.2s ease-in-out;
 }
 
-/* Focus visible styles for keyboard navigation */
-*:focus-visible {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
+/* Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

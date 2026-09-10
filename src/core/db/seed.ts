@@ -24,12 +24,25 @@ const PREDEFINED_ZIKRS: Omit<Zikr, 'id'>[] = [
   }
 ];
 
-export async function seedZikrs(database: ZikrDatabase): Promise<void> {
-  // Check if already seeded
-  const count = await database.zikrs.count();
-  if (count > 0) {
-    return; // Already seeded
-  }
+let seedPromise: Promise<void> | null = null;
 
-  await database.zikrs.bulkAdd(PREDEFINED_ZIKRS);
+export function seedZikrs(database: ZikrDatabase): Promise<void> {
+  // Memoize so concurrent callers (e.g. React StrictMode double effects)
+  // can't race past the existence check and seed duplicates.
+  if (!seedPromise) {
+    seedPromise = seedZikrsByIdempotentNames(database).catch(err => {
+      seedPromise = null; // allow retry on failure
+      throw err;
+    });
+  }
+  return seedPromise;
+}
+
+async function seedZikrsByIdempotentNames(database: ZikrDatabase): Promise<void> {
+  const existing = await database.zikrs.toArray();
+  const existingNames = new Set(existing.map(z => z.name));
+  const missing = PREDEFINED_ZIKRS.filter(z => !existingNames.has(z.name));
+  if (missing.length === 0) return;
+
+  await database.zikrs.bulkAdd(missing);
 }

@@ -24,6 +24,12 @@ export { default as GlassCard } from './components/cards/GlassCard';
 export { ZikrCard } from './components/cards/ZikrCard';
 export { default as ZikrCard } from './components/cards/ZikrCard';
 
+// Decorative
+export { PatternBackdrop } from './components/decor/PatternBackdrop';
+export { default as PatternBackdrop } from './components/decor/PatternBackdrop';
+export { OrnamentDivider } from './components/decor/OrnamentDivider';
+export { default as OrnamentDivider } from './components/decor/OrnamentDivider';
+
 // Progress
 export { CircularProgress } from './components/progress/CircularProgress';
 export { default as CircularProgress } from './components/progress/CircularProgress';
@@ -43,6 +49,8 @@ export { default as Counter } from './pages/Counter';
 export { default as Home } from './pages/Home';
 export { default as Goals } from './pages/Goals';
 export { default as Progress } from './pages/Progress';
+export { default as Settings } from './pages/Settings';
+export { default as Welcome } from './components/Welcome';
 
 // Hooks
 export { default as useRipple } from './hooks/useRipple';

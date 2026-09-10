@@ -8,67 +8,69 @@ export default {
         'mobile-container': '640px'
       },
 
-      // V2 Design System - Material Design 3 inspired colors
+      // "Noor" design system - Material Design 3 semantic tokens.
+      // Values are CSS variables defined in src/index.css; the .dark class
+      // swaps every token, so dark mode works without per-class overrides.
       colors: {
-        // Primary (Forest Green)
-        primary: '#012d1d',
-        'primary-container': '#1b4332',
-        'on-primary': '#ffffff',
-        'on-primary-container': '#86af99',
-        'inverse-primary': '#a5d0b9',
-        'primary-fixed': '#c1ecd4',
-        'primary-fixed-dim': '#a5d0b9',
+        // Primary (Deep Emerald)
+        primary: 'rgb(var(--color-primary) / <alpha-value>)',
+        'primary-container': 'rgb(var(--color-primary-container) / <alpha-value>)',
+        'on-primary': 'rgb(var(--color-on-primary) / <alpha-value>)',
+        'on-primary-container': 'rgb(var(--color-on-primary-container) / <alpha-value>)',
+        'inverse-primary': 'rgb(var(--color-inverse-primary) / <alpha-value>)',
+        'primary-fixed': 'rgb(var(--color-primary-fixed) / <alpha-value>)',
+        'primary-fixed-dim': 'rgb(var(--color-primary-fixed-dim) / <alpha-value>)',
 
         // Secondary (Sage/Olive)
-        secondary: '#5e5f56',
-        'secondary-container': '#e4e3d7',
-        'on-secondary': '#ffffff',
-        'on-secondary-container': '#64655c',
-        'secondary-fixed': '#e4e3d7',
-        'secondary-fixed-dim': '#c7c7bc',
-        'on-secondary-fixed': '#1b1c15',
-        'on-secondary-fixed-variant': '#46473f',
+        secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
+        'secondary-container': 'rgb(var(--color-secondary-container) / <alpha-value>)',
+        'on-secondary': 'rgb(var(--color-on-secondary) / <alpha-value>)',
+        'on-secondary-container': 'rgb(var(--color-on-secondary-container) / <alpha-value>)',
+        'secondary-fixed': 'rgb(var(--color-secondary-fixed) / <alpha-value>)',
+        'secondary-fixed-dim': 'rgb(var(--color-secondary-fixed-dim) / <alpha-value>)',
+        'on-secondary-fixed': 'rgb(var(--color-on-secondary-fixed) / <alpha-value>)',
+        'on-secondary-fixed-variant': 'rgb(var(--color-on-secondary-fixed-variant) / <alpha-value>)',
 
-        // Tertiary (Gold/Amber)
-        tertiary: '#735c00',
-        'tertiary-container': '#cba72f',
-        'tertiary-fixed': '#ffe088',
-        'tertiary-fixed-dim': '#e9c349',
-        'on-tertiary': '#ffffff',
-        'on-tertiary-container': '#4e3d00',
-        'on-tertiary-fixed': '#241a00',
-        'on-tertiary-fixed-variant': '#574500',
+        // Tertiary (Gold)
+        tertiary: 'rgb(var(--color-tertiary) / <alpha-value>)',
+        'tertiary-container': 'rgb(var(--color-tertiary-container) / <alpha-value>)',
+        'tertiary-fixed': 'rgb(var(--color-tertiary-fixed) / <alpha-value>)',
+        'tertiary-fixed-dim': 'rgb(var(--color-tertiary-fixed-dim) / <alpha-value>)',
+        'on-tertiary': 'rgb(var(--color-on-tertiary) / <alpha-value>)',
+        'on-tertiary-container': 'rgb(var(--color-on-tertiary-container) / <alpha-value>)',
+        'on-tertiary-fixed': 'rgb(var(--color-on-tertiary-fixed) / <alpha-value>)',
+        'on-tertiary-fixed-variant': 'rgb(var(--color-on-tertiary-fixed-variant) / <alpha-value>)',
 
-        // Surfaces
-        surface: '#fcf9f8',
-        'surface-container': '#f0eded',
-        'surface-container-low': '#f6f3f2',
-        'surface-container-high': '#eae7e7',
-        'surface-container-highest': '#e4e2e1',
-        'surface-container-lowest': '#ffffff',
-        'surface-dim': '#dcd9d9',
-        'surface-bright': '#fcf9f8',
-        'surface-variant': '#e4e2e1',
-        'surface-tint': '#3f6653',
+        // Surfaces (warm parchment in light, deep green-black in dark)
+        surface: 'rgb(var(--color-surface) / <alpha-value>)',
+        'surface-container': 'rgb(var(--color-surface-container) / <alpha-value>)',
+        'surface-container-low': 'rgb(var(--color-surface-container-low) / <alpha-value>)',
+        'surface-container-high': 'rgb(var(--color-surface-container-high) / <alpha-value>)',
+        'surface-container-highest': 'rgb(var(--color-surface-container-highest) / <alpha-value>)',
+        'surface-container-lowest': 'rgb(var(--color-surface-container-lowest) / <alpha-value>)',
+        'surface-dim': 'rgb(var(--color-surface-dim) / <alpha-value>)',
+        'surface-bright': 'rgb(var(--color-surface-bright) / <alpha-value>)',
+        'surface-variant': 'rgb(var(--color-surface-variant) / <alpha-value>)',
+        'surface-tint': 'rgb(var(--color-surface-tint) / <alpha-value>)',
 
         // Text
-        'on-surface': '#1b1c1c',
-        'on-surface-variant': '#414844',
-        'on-background': '#1b1c1c',
+        'on-surface': 'rgb(var(--color-on-surface) / <alpha-value>)',
+        'on-surface-variant': 'rgb(var(--color-on-surface-variant) / <alpha-value>)',
+        'on-background': 'rgb(var(--color-on-background) / <alpha-value>)',
 
         // Outlines
-        outline: '#717973',
-        'outline-variant': '#c1c8c2',
+        outline: 'rgb(var(--color-outline) / <alpha-value>)',
+        'outline-variant': 'rgb(var(--color-outline-variant) / <alpha-value>)',
 
         // Error
-        error: '#ba1a1a',
-        'on-error': '#ffffff',
-        'error-container': '#ffdad6',
-        'on-error-container': '#93000a',
+        error: 'rgb(var(--color-error) / <alpha-value>)',
+        'on-error': 'rgb(var(--color-on-error) / <alpha-value>)',
+        'error-container': 'rgb(var(--color-error-container) / <alpha-value>)',
+        'on-error-container': 'rgb(var(--color-on-error-container) / <alpha-value>)',
 
-        // Inverse surfaces (dark mode)
-        'inverse-surface': '#303030',
-        'inverse-on-surface': '#f3f0f0',
+        // Inverse surfaces
+        'inverse-surface': 'rgb(var(--color-inverse-surface) / <alpha-value>)',
+        'inverse-on-surface': 'rgb(var(--color-inverse-on-surface) / <alpha-value>)',
       },
 
       // Border Radius
@@ -96,7 +98,7 @@ export default {
         'body-lg': ['"Source Sans 3"', 'sans-serif'],
         'body-md': ['"Source Sans 3"', 'sans-serif'],
         'caption': ['"Source Sans 3"', 'sans-serif'],
-        'display-arabic': ['Noto Serif', 'serif'],
+        'display-arabic': ['Amiri', 'Noto Serif', 'serif'],
         'label-md': ['Plus Jakarta Sans', 'sans-serif'],
       },
 
@@ -110,6 +112,13 @@ export default {
         'body-md': ['18px', { lineHeight: '28px', fontWeight: '400' }],
         'headline-md': ['24px', { lineHeight: '32px', fontWeight: '600' }],
         'caption': ['14px', { lineHeight: '20px', fontWeight: '400' }],
+      },
+
+      // Elevation
+      boxShadow: {
+        'card': '0 4px 20px rgba(27, 28, 24, 0.05)',
+        'card-lifted': '0 8px 32px rgba(27, 28, 24, 0.10)',
+        'gold-glow': '0 0 24px rgba(201, 162, 39, 0.35)',
       },
 
       // Animation

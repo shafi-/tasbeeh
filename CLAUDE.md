@@ -117,13 +117,28 @@ src/
 │   ├── services/   # Domain services
 │   ├── stores/     # Zustand state
 │   ├── utils/      # Core utilities (date formatting, etc.)
-│   └── components/ # Shared UI components
+│   └── components/ # Shared UI components (ErrorBoundary, etc.)
 ├── features/       # Feature-specific code (sessions/)
-├── components/     # Page-level components
-├── pages/          # Route pages (Counter, Goals, Progress, Settings)
+├── pages/          # Static HTML design mockups (not part of the build)
 ├── hooks/          # Custom React hooks
 └── utils/          # Shared utilities (validation, etc.)
+src-v2/             # The UI layer ("Noor" design system)
+├── components/     # navigation/, cards/, progress/, forms/, decor/, modals
+├── pages/          # Route pages (Home, Counter, Goals, Progress, Settings)
+├── hooks/          # useRipple, useHaptic
+├── types/          # Component prop types
+└── utils/          # zikrMapping (Arabic text, translations, targets)
 ```
+
+### UI: "Noor" Design System (src-v2/)
+
+The only UI. Refined Islamic identity: deep emerald + gold on warm parchment (light) / deep green-black (dark).
+
+- **Theme tokens:** CSS variables in `src/index.css` (`--color-*`), mapped in `tailwind.config.js` with `<alpha-value>`; the `.dark` class swaps every token, so semantic classes (`bg-surface`, `text-primary`) are dark-mode aware automatically
+- **Typography:** Plus Jakarta Sans (headlines), Source Sans 3 (body), Amiri (`font-display-arabic`) for Arabic script — always pair Arabic text with `lang="ar" dir="rtl"`
+- **Signature elements:** `PatternBackdrop` (khatam star pattern), `OrnamentDivider` (gold star divider), arch-topped cards (`rounded-t-full` mihrab niches), gold-on-green active nav pill
+- **Buttons:** use `bg-primary-container text-on-primary` (works in both themes); `bg-primary` is a text-grade token in dark mode
+- **Dark mode:** `darkMode: 'class'`; `App.tsx` syncs the `.dark` class from the settings store + system preference
 
 ## Development Notes
 

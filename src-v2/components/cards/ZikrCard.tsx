@@ -1,6 +1,7 @@
 /**
  * Zikr Card Component
- * Quick start card for zikr with icon, target count, and start button
+ * Quick start card for zikr: arch-niche icon, Arabic calligraphy name,
+ * target badge, and start button.
  */
 
 import React from 'react';
@@ -12,6 +13,7 @@ import useHaptic from '../../hooks/useHaptic';
 export const ZikrCard: React.FC<ZikrCardProps> = ({
   id,
   name,
+  arabicName,
   translation,
   targetCount,
   icon,
@@ -36,18 +38,21 @@ export const ZikrCard: React.FC<ZikrCardProps> = ({
   const ariaLabel = `Start ${name} practice, ${translation}, target ${targetCount}`;
 
   return (
-    <div className="snap-center shrink-0 w-[75vw] max-w-[280px] bg-surface rounded-xl border border-outline-variant/30 p-5 flex flex-col gap-4 shadow-sm relative overflow-hidden">
-      {/* Decorative gradient circle */}
+    <div className="snap-center shrink-0 w-[75vw] max-w-[280px] bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-5 flex flex-col gap-4 shadow-card relative overflow-hidden">
+      {/* Decorative quarter-circle gold wash */}
       <div className="absolute top-0 right-0 w-24 h-24 bg-tertiary-fixed/20 rounded-bl-full -mr-4 -mt-4 pointer-events-none"
         aria-hidden="true"
       />
 
-      {/* Header: Icon and target badge */}
+      {/* Header: arch-niche icon and target badge */}
       <div className="flex justify-between items-start z-10">
-        <div className="bg-surface-container-high p-2 rounded-lg text-primary">
+        <div
+          className="w-12 h-14 rounded-t-full rounded-b-lg bg-surface-container-high flex items-center justify-center pt-2 text-primary"
+          aria-hidden="true"
+        >
           <MaterialIcon icon={icon} className="text-2xl" />
         </div>
-        <span className="font-label-md text-label-md text-on-surface-variant bg-surface-variant px-2 py-0.5 rounded text-sm">
+        <span className="font-label-md text-label-md text-tertiary bg-tertiary-container/10 border border-tertiary-container/30 px-2 py-0.5 rounded-full text-sm tabular-nums">
           {targetCount}x
         </span>
       </div>
@@ -57,6 +62,11 @@ export const ZikrCard: React.FC<ZikrCardProps> = ({
         <h4 className="font-headline-md text-headline-md text-primary text-xl">
           {name}
         </h4>
+        {arabicName && (
+          <p className="font-display-arabic text-[22px] leading-8 text-tertiary" lang="ar" dir="rtl">
+            {arabicName}
+          </p>
+        )}
         <p className="font-caption text-caption text-on-surface-variant">
           {translation}
         </p>
@@ -77,7 +87,7 @@ export const ZikrCard: React.FC<ZikrCardProps> = ({
           active-scale-95 transition-transform
           ${completed
             ? 'bg-primary-container text-on-primary'
-            : 'bg-surface-container-highest text-primary border border-outline-variant/50'
+            : 'bg-surface-container-high text-primary border border-outline-variant/50'
           }
         `}
       >

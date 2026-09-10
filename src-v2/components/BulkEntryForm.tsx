@@ -294,7 +294,7 @@ const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess, onCancel }) =>
         <button
           onClick={handleSave}
           disabled={isSaving || totalCount === 0}
-          className="w-full h-touch-target-min rounded-xl font-label-md text-label-md bg-primary text-on-primary hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full h-touch-target-min rounded-xl font-label-md text-label-md bg-primary-container text-on-primary hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           <MaterialIcon icon="save" className="text-[18px]" />
           {isSaving ? 'Saving...' : `Save ${entriesWithCounts.length} Session${entriesWithCounts.length > 1 ? 's' : ''}`}

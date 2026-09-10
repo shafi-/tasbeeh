@@ -3,6 +3,10 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  define: {
+    // Settings page reads the app version; `process` doesn't exist in the browser
+    'process.env.PACKAGE_VERSION': JSON.stringify(process.env.npm_package_version || '1.0.0'),
+  },
   plugins: [
     react(),
     VitePWA({
@@ -12,8 +16,8 @@ export default defineConfig({
         name: 'Zikr',
         short_name: 'Zikr',
         description: 'Islamic dhikr practice tracker',
-        theme_color: '#0f172a',
-        background_color: '#0f172a',
+        theme_color: '#012d1d',
+        background_color: '#faf7f0',
         display: 'standalone',
         icons: [
           { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },

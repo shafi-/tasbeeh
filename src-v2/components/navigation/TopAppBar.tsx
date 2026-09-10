@@ -16,7 +16,7 @@ export const TopAppBar: React.FC<HeaderProps> = ({
   action,
 }) => {
   return (
-    <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 flex justify-between items-center h-16 px-container-padding-mobile">
+    <header className="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-md border-b border-outline-variant/30 flex justify-between items-center h-16 px-container-padding-mobile">
       {/* Left: Back or Close button */}
       {(showBack || showClose) && (
         <button

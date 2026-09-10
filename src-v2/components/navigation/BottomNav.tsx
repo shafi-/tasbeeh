@@ -1,6 +1,7 @@
 /**
  * Bottom Navigation Component
- * Mobile bottom navigation bar with active state highlighting
+ * Mobile bottom navigation bar with active state highlighting.
+ * Active item: deep green pill with a gold icon — the Noor design signature.
  */
 
 import React from 'react';
@@ -22,10 +23,11 @@ export const BottomNav: React.FC<BottomNavProps> = ({
 }) => {
   return (
     <nav
+      aria-label="Main navigation"
       className={`
         fixed bottom-0 left-0 w-full z-50
-        bg-surface rounded-t-xl
-        border-t border-outline-variant/20 shadow-sm
+        bg-surface/90 backdrop-blur-lg
+        rounded-t-2xl border-t border-outline-variant/20 shadow-card
         flex justify-around items-center
         h-touch-target-min pb-safe
         px-4 pt-2
@@ -46,7 +48,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               active-scale-90 transition-transform duration-150
               ${isActive
                 ? 'bg-primary-container text-on-primary-container'
-                : 'text-on-surface-variant hover:bg-surface-variant/50 group'
+                : 'text-on-surface-variant hover:bg-surface-variant/50'
               }
             `}
             aria-label={item.label}
@@ -55,7 +57,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             <MaterialIcon
               icon={item.icon}
               filled={isActive}
-              className={isActive ? '' : 'group-hover:text-primary transition-colors'}
+              className={isActive ? 'text-tertiary-fixed' : ''}
             />
             <span className="font-label-md text-label-md text-[10px] leading-tight mt-0.5">
               {item.label}

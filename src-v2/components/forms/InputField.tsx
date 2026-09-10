@@ -59,10 +59,11 @@ export const InputField: React.FC<InputFieldProps> = ({
           aria-invalid={!!error}
           aria-describedby={error ? `${id}-error` : undefined}
           className={`
-            w-full bg-surface
+            w-full bg-surface-container-lowest
             border rounded-xl
             h-touch-target-min
             font-body-md text-body-md text-on-surface
+            placeholder:text-on-surface-variant/50
             focus:border-primary focus:ring-1 focus:ring-primary
             outline-none transition-colors
             ${icon ? 'pl-12' : 'pl-4'}

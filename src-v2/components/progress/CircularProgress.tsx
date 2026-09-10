@@ -28,7 +28,7 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
         viewBox={`0 0 ${size} ${size}`}
       >
         <circle
-          className="text-surface-variant opacity-50"
+          className="text-surface-container-highest"
           cx={size / 2}
           cy={size / 2}
           fill="none"

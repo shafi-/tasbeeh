@@ -38,10 +38,11 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
           aria-label={label || 'Toggle switch'}
           className="
             toggle-checkbox
-            absolute block w-6 h-6 rounded-full bg-white border-4
+            absolute block w-6 h-6 rounded-full bg-white border-4 border-outline-variant/40
             appearance-none cursor-pointer z-10
             top-1 left-1
             checked:right-1 checked:left-auto
+            checked:border-surface-container-lowest
             transition-all duration-200
           "
         />

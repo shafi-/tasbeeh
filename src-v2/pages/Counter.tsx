@@ -9,6 +9,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import TopAppBar from '../components/navigation/TopAppBar';
 import CounterCircle from '../components/CounterCircle';
 import MaterialIcon from '../components/MaterialIcon';
+import OrnamentDivider from '../components/decor/OrnamentDivider';
+import PatternBackdrop from '../components/decor/PatternBackdrop';
 import useHaptic from '../hooks/useHaptic';
 import { useZikrStore } from '../../src/core/stores/zikrStore';
 import { useSessionStore } from '../../src/core/stores/sessionStore';
@@ -182,7 +184,7 @@ const Counter: React.FC = () => {
         </p>
         <button
           onClick={() => navigate('/')}
-          className="bg-primary text-on-primary rounded-xl h-touch-target-min px-8 font-label-md"
+          className="bg-primary-container text-on-primary rounded-xl h-touch-target-min px-8 font-label-md"
         >
           Go to Home
         </button>
@@ -206,22 +208,17 @@ const Counter: React.FC = () => {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center pt-16 pb-32 px-container-padding-mobile relative">
-        {/* Subtle background texture */}
-        <div
-          className="absolute inset-0 opacity-[0.03] pointer-events-none"
-          style={{
-            backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)',
-            backgroundSize: '24px 24px',
-          }}
-        />
+        {/* Khatam pattern backdrop */}
+        <PatternBackdrop className="absolute inset-0" />
 
         {/* Zikr Info */}
         <div className="text-center mb-12 z-10 flex flex-col gap-4">
           {zikrDisplayInfo.arabicText && (
-            <h1 className="font-display-arabic text-display-arabic text-primary">
+            <h1 className="font-display-arabic text-display-arabic text-primary" lang="ar" dir="rtl">
               {zikrDisplayInfo.arabicText}
             </h1>
           )}
+          <OrnamentDivider className="w-44 mx-auto" />
           <p className="font-body-lg text-body-lg text-on-surface-variant">
             {zikrDisplayInfo.translation}
           </p>
