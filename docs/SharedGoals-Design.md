@@ -128,6 +128,12 @@ New **5th bottom tab "Group"** (Home, Goals, Group, Progress, Settings):
 
 ## Trade-offs (accepted)
 
+- **Loss of device data is non-recoverable, by design.** No account-recovery
+  mechanism will be built: a new device is a new anonymous identity, and the
+  user rejoins rooms via codes as a fresh member (room totals unaffected).
+  Deliberately rejected: recovery IDs / secrets — any recoverable credential
+  reintroduces accounts, secrets and takeover risk the no-login model exists
+  to avoid.
 - Progress updates are near-live (≤ 60 s), not instant.
 - "My contribution" is device-bound: reinstall = fresh local history (room total unaffected).
 - Owner can remove a member's name; increments already applied remain in the total (no per-member ledger to undo).
