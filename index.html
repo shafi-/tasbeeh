@@ -2,6 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      // GitHub Pages SPA fallback: after the 404.html redirect, restore the
+      // original path so BrowserRouter renders the right route.
+      (function () {
+        var r = sessionStorage.getItem('gh-pages-redirect');
+        if (r && r !== location.pathname + location.search) {
+          sessionStorage.removeItem('gh-pages-redirect');
+          history.replaceState(null, '', r);
+        }
+      })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="/zikr.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#012d1d" />

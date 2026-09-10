@@ -35,6 +35,10 @@ npm run test            # Run Vitest tests
 npm run test:ui         # Vitest UI mode
 npm run test:watch      # Watch mode
 
+# Deployment
+# GitHub Pages via Actions (push to main2) — see docs/DEPLOYMENT.md
+```
+
 # Linting & Quality
 npm run lint            # ESLint
 npm run size-check      # Verify bundle size against 200KB limit

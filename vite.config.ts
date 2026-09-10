@@ -3,6 +3,9 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  // GitHub Pages project sites serve from /<repo>/ — override per environment
+  // via VITE_BASE (the deploy workflow computes it; custom domains use '/').
+  base: process.env.VITE_BASE || '/',
   define: {
     // Settings page reads the app version; `process` doesn't exist in the browser
     'process.env.PACKAGE_VERSION': JSON.stringify(process.env.npm_package_version || '1.0.0'),

@@ -1,0 +1,83 @@
+name: Deploy to GitHub Pages
+
+# Static deployment of the PWA to GitHub Pages.
+# See docs/DEPLOYMENT.md for one-time setup and custom domains.
+
+on:
+  push:
+    branches: [main2]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # Project pages live at /<repo>/ and need a Vite base path to match.
+      # User/organization sites (<user>.github.io) and custom domains use '/'.
+      # Override by defining the repository variable VITE_BASE (e.g. '/').
+      - name: Compute base path
+        env:
+          CUSTOM_BASE: ${{ vars.VITE_BASE }}
+        run: |
+          if [ -n "$CUSTOM_BASE" ]; then
+            echo "VITE_BASE=$CUSTOM_BASE" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+          if [[ "$REPO_NAME" == *.github.io ]]; then
+            echo "VITE_BASE=/" >> "$GITHUB_ENV"
+          else
+            echo "VITE_BASE=/$REPO_NAME/" >> "$GITHUB_ENV"
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SHARED_ROOMS_BACKEND: ${{ secrets.VITE_SHARED_ROOMS_BACKEND }}
+        run: npm run build
+
+      # GitHub Pages has no server-side rewrites: index.html is copied to
+      # 404.html with a small capture script that sends unknown paths back to
+      # the app root, where index.html restores them (see index.html <head>).
+      - name: SPA fallback (404.html)
+        run: |
+          { echo '<script>sessionStorage.setItem("gh-pages-redirect",location.pathname+location.search);location.replace("'"$VITE_BASE"'");</script>'
+            cat dist/index.html
+          } > dist/404.html
+
+      - name: Run tests
+        run: npm test
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
