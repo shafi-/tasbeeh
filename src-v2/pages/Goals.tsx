@@ -10,6 +10,7 @@ import GlassCard from '../components/cards/GlassCard';
 import ToggleSwitch from '../components/forms/ToggleSwitch';
 import MaterialIcon from '../components/MaterialIcon';
 import GoalFormModal from '../components/GoalFormModal';
+import TopAppBar from '../components/navigation/TopAppBar';
 import BottomNav from '../components/navigation/BottomNav';
 import { NAV_ITEMS } from '../components/navigation/navItems';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
@@ -152,18 +153,16 @@ const Goals: React.FC = () => {
   return (
     <div className="min-h-screen bg-surface text-on-surface antialiased flex flex-col pt-16 pb-24 max-w-md mx-auto">
       {/* Top App Bar */}
-      <header className="bg-surface/80 backdrop-blur-md fixed top-0 w-full z-50 border-b border-outline-variant/30 flex justify-between items-center h-16 px-container-padding-mobile">
-        <div className="font-headline-md text-headline-md text-primary font-bold">
-          Dhikr Sanctuary
-        </div>
-        <button
-          aria-label="Settings"
-          className="text-primary hover:opacity-80 transition-opacity active-scale-95 duration-200 w-touch-target-min h-touch-target-min flex items-center justify-center rounded-full"
-          onClick={() => navigate('/settings')}
-        >
-          <MaterialIcon icon="settings" className="text-2xl" />
-        </button>
-      </header>
+      <TopAppBar
+        brand
+        actions={[
+          {
+            icon: 'settings',
+            onClick: () => navigate('/settings'),
+            ariaLabel: 'Settings',
+          },
+        ]}
+      />
 
       {/* Main Content */}
       <main className="flex-1 w-full max-w-[800px] mx-auto px-container-padding-mobile py-8 flex flex-col">

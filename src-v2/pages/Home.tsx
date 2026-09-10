@@ -171,8 +171,7 @@ const Home: React.FC = () => {
     <div className="min-h-screen bg-surface text-on-surface antialiased flex flex-col">
       {/* Top App Bar */}
       <TopAppBar
-        showClose={false}
-        onClose={() => {}}
+        brand
         action={{
           icon: 'settings',
           onClick: () => navigate('/settings'),

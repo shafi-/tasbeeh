@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import GlassCard from '../components/cards/GlassCard';
 import InputField from '../components/forms/InputField';
 import MaterialIcon from '../components/MaterialIcon';
+import TopAppBar from '../components/navigation/TopAppBar';
 import WeeklyChart from '../components/progress/WeeklyChart';
 import SessionHistory from '../components/SessionHistory';
 import BulkEntryForm from '../components/BulkEntryForm';
@@ -178,20 +179,16 @@ const Progress: React.FC = () => {
   return (
     <div className="min-h-screen bg-surface text-on-surface antialiased flex flex-col pb-24 max-w-md mx-auto">
       {/* Top App Bar */}
-      <header className="bg-surface/80 backdrop-blur-md fixed top-0 w-full z-50 border-b border-outline-variant/30 flex justify-between items-center h-16 px-container-padding-mobile">
-        <h1 className="font-headline-md text-headline-md text-primary font-bold">
-          Dhikr Sanctuary
-        </h1>
-        <div className="flex items-center gap-4">
-          <button
-            aria-label="Settings"
-            className="text-primary hover:opacity-80 transition-opacity active-scale-95 duration-200"
-            onClick={() => navigate('/settings')}
-          >
-            <MaterialIcon icon="settings" />
-          </button>
-        </div>
-      </header>
+      <TopAppBar
+        brand
+        actions={[
+          {
+            icon: 'settings',
+            onClick: () => navigate('/settings'),
+            ariaLabel: 'Settings',
+          },
+        ]}
+      />
 
       {/* Main Content */}
       <main className="flex-grow pt-24 px-container-padding-mobile flex flex-col gap-8">

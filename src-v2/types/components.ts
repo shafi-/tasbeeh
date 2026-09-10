@@ -102,6 +102,8 @@ export interface HeaderAction {
 
 export interface HeaderProps {
   title?: string;
+  /** Show the app icon + name at the left (main screens). */
+  brand?: boolean;
   showBack?: boolean;
   showClose?: boolean;
   onBack?: () => void;

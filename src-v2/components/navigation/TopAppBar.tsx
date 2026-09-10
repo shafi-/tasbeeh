@@ -1,7 +1,7 @@
 /**
  * Top App Bar Component
- * Fixed header with back/close button, title, and optional top-right
- * action button(s).
+ * Fixed header: brand (app icon + name) or back/close at the left,
+ * optional page title, and optional top-right action button(s).
  */
 
 import React from 'react';
@@ -10,6 +10,7 @@ import { HeaderProps } from '../../types/components';
 
 export const TopAppBar: React.FC<HeaderProps> = ({
   title,
+  brand = false,
   showBack = false,
   showClose = false,
   onBack,
@@ -18,11 +19,12 @@ export const TopAppBar: React.FC<HeaderProps> = ({
   actions = [],
 }) => {
   const allActions = action ? [action, ...actions] : actions;
+  const showLeading = showBack || showClose;
 
   return (
     <header className="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-md border-b border-outline-variant/30 flex justify-between items-center h-16 px-container-padding-mobile">
-      {/* Left: Back or Close button */}
-      {(showBack || showClose) && (
+      {/* Left: Brand, Back/Close, or spacer */}
+      {showLeading ? (
         <button
           onClick={showBack ? onBack : onClose}
           aria-label={showBack ? 'Go back' : 'Close'}
@@ -33,6 +35,15 @@ export const TopAppBar: React.FC<HeaderProps> = ({
             className="text-2xl"
           />
         </button>
+      ) : brand ? (
+        <div className="flex items-center gap-2.5">
+          <img src="/zikr.svg" alt="" className="w-7 h-7" aria-hidden="true" />
+          <span className="font-headline-md text-headline-md text-primary font-bold">
+            Zikr
+          </span>
+        </div>
+      ) : (
+        <div className="w-touch-target-min -ml-4" />
       )}
 
       {/* Center: Title */}
@@ -58,10 +69,7 @@ export const TopAppBar: React.FC<HeaderProps> = ({
         </div>
       )}
 
-      {/* Spacer when no left button */}
-      {!showBack && !showClose && <div className="w-touch-target-min -ml-4" />}
-
-      {/* Spacer when no action buttons */}
+      {/* Right spacer when no actions */}
       {allActions.length === 0 && <div className="w-touch-target-min -mr-4" />}
     </header>
   );
