@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import MaterialIcon from './MaterialIcon';
 import PatternBackdrop from './decor/PatternBackdrop';
 import OrnamentDivider from './decor/OrnamentDivider';
-import { useI18n } from '../../src/core/i18n';
+import { useI18n } from '../../core/i18n';
 
 interface WelcomeSlide {
   titleKey: string;

@@ -9,14 +9,14 @@ import ToggleSwitch from '../components/forms/ToggleSwitch';
 import MaterialIcon from '../components/MaterialIcon';
 import ZikrFormModal from '../components/ZikrFormModal';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
-import { useSettingsStore } from '../../src/core/stores/settingsStore';
-import { useZikrStore } from '../../src/core/stores/zikrStore';
-import { exportService } from '../../src/core/services/exportService';
-import { zikrService } from '../../src/core/services/zikrService';
-import { db } from '../../src/core/db/db';
-import { Zikr } from '../../src/core/db/types';
-import { useSharedRoomStore } from '../../src/core/stores/sharedRoomStore';
-import { useI18n, LANGUAGES } from '../../src/core/i18n';
+import { useSettingsStore } from '../../core/stores/settingsStore';
+import { useZikrStore } from '../../core/stores/zikrStore';
+import { exportService } from '../../core/services/exportService';
+import { zikrService } from '../../core/services/zikrService';
+import { db } from '../../core/db/db';
+import { Zikr } from '../../core/db/types';
+import { useSharedRoomStore } from '../../core/stores/sharedRoomStore';
+import { useI18n, LANGUAGES } from '../../core/i18n';
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();

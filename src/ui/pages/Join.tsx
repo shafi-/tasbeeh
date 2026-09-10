@@ -10,9 +10,9 @@ import MaterialIcon from '../components/MaterialIcon';
 import PatternBackdrop from '../components/decor/PatternBackdrop';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
 import InputField from '../components/forms/InputField';
-import { useSharedRoomStore, sharedRoomErrorMessage } from '../../src/core/stores/sharedRoomStore';
-import { normalizeRoomCode } from '../../src/core/utils/sharedRoomUtils';
-import { useI18n } from '../../src/core/i18n';
+import { useSharedRoomStore, sharedRoomErrorMessage } from '../../core/stores/sharedRoomStore';
+import { normalizeRoomCode } from '../../core/utils/sharedRoomUtils';
+import { useI18n } from '../../core/i18n';
 
 const Join: React.FC = () => {
   const { code = '' } = useParams();

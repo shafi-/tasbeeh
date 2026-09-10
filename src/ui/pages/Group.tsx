@@ -13,10 +13,10 @@ import { NAV_ITEMS } from '../components/navigation/navItems';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
 import CreateRoomModal from '../components/CreateRoomModal';
 import JoinRoomModal from '../components/JoinRoomModal';
-import { useSharedRoomStore } from '../../src/core/stores/sharedRoomStore';
-import { SharedRoom } from '../../src/core/db/types';
-import { formatTimeRemaining, getRoomPhase, progressPercent } from '../../src/core/utils/sharedRoomUtils';
-import { useI18n } from '../../src/core/i18n';
+import { useSharedRoomStore } from '../../core/stores/sharedRoomStore';
+import { SharedRoom } from '../../core/db/types';
+import { formatTimeRemaining, getRoomPhase, progressPercent } from '../../core/utils/sharedRoomUtils';
+import { useI18n } from '../../core/i18n';
 
 const Group: React.FC = () => {
   const navigate = useNavigate();

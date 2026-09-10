@@ -5,12 +5,12 @@
 
 import React, { useEffect, useState } from 'react';
 import MaterialIcon from './MaterialIcon';
-import { useSessionHistoryStore } from '../../src/core/stores/sessionHistoryStore';
-import { useZikrStore } from '../../src/core/stores/zikrStore';
-import { sessionService } from '../../src/core/services/sessionService';
-import { formatDate } from '../../src/core/utils/dateUtils';
-import { Session } from '../../src/core/db/types';
-import { useI18n, localeTag } from '../../src/core/i18n';
+import { useSessionHistoryStore } from '../../core/stores/sessionHistoryStore';
+import { useZikrStore } from '../../core/stores/zikrStore';
+import { sessionService } from '../../core/services/sessionService';
+import { formatDate } from '../../core/utils/dateUtils';
+import { Session } from '../../core/db/types';
+import { useI18n, localeTag } from '../../core/i18n';
 
 const EDIT_WINDOW_DAYS = 3;
 

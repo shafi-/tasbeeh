@@ -6,12 +6,12 @@
 
 import React, { useState, useEffect } from 'react';
 import MaterialIcon from './MaterialIcon';
-import { useZikrStore } from '../../src/core/stores/zikrStore';
-import { useSessionStore } from '../../src/core/stores/sessionStore';
-import { sessionService } from '../../src/core/services/sessionService';
+import { useZikrStore } from '../../core/stores/zikrStore';
+import { useSessionStore } from '../../core/stores/sessionStore';
+import { sessionService } from '../../core/services/sessionService';
 import { getZikrDisplayInfo } from '../utils/zikrMapping';
-import { formatDate, getToday } from '../../src/core/utils/dateUtils';
-import { useI18n } from '../../src/core/i18n';
+import { formatDate, getToday } from '../../core/utils/dateUtils';
+import { useI18n } from '../../core/i18n';
 
 interface ZikrEntry {
   zikrId: number;

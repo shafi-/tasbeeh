@@ -11,15 +11,15 @@ import { sharedRoomService } from './core/services/sharedRoom';
 import { useEffect, useState } from 'react';
 
 // Noor UI (V2)
-import WelcomeV2 from '../src-v2/components/Welcome';
-import HomeV2 from '../src-v2/pages/Home';
-import CounterV2 from '../src-v2/pages/Counter';
-import GoalsV2 from '../src-v2/pages/Goals';
-import ProgressV2 from '../src-v2/pages/Progress';
-import SettingsV2 from '../src-v2/pages/Settings';
-import GroupV2 from '../src-v2/pages/Group';
-import RoomV2 from '../src-v2/pages/Room';
-import JoinV2 from '../src-v2/pages/Join';
+import WelcomeV2 from './ui/components/Welcome';
+import HomeV2 from './ui/pages/Home';
+import CounterV2 from './ui/pages/Counter';
+import GoalsV2 from './ui/pages/Goals';
+import ProgressV2 from './ui/pages/Progress';
+import SettingsV2 from './ui/pages/Settings';
+import GroupV2 from './ui/pages/Group';
+import RoomV2 from './ui/pages/Room';
+import JoinV2 from './ui/pages/Join';
 
 // Gate the dashboard on onboarding completion. The flag must be read inside a
 // component (keyed by location) so navigation after Welcome sees the fresh value.

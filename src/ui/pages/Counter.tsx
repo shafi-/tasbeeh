@@ -12,13 +12,13 @@ import MaterialIcon from '../components/MaterialIcon';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
 import PatternBackdrop from '../components/decor/PatternBackdrop';
 import useHaptic from '../hooks/useHaptic';
-import { useI18n } from '../../src/core/i18n';
-import { useZikrStore } from '../../src/core/stores/zikrStore';
-import { useSessionStore } from '../../src/core/stores/sessionStore';
-import { useSettingsStore } from '../../src/core/stores/settingsStore';
-import { sessionService } from '../../src/core/services/sessionService';
+import { useI18n } from '../../core/i18n';
+import { useZikrStore } from '../../core/stores/zikrStore';
+import { useSessionStore } from '../../core/stores/sessionStore';
+import { useSettingsStore } from '../../core/stores/settingsStore';
+import { sessionService } from '../../core/services/sessionService';
 import { getZikrDisplayInfo } from '../utils/zikrMapping';
-import { Zikr } from '../../src/core/db/types';
+import { Zikr } from '../../core/db/types';
 
 const Counter: React.FC = () => {
   const navigate = useNavigate();

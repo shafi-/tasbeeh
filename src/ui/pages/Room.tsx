@@ -15,15 +15,15 @@ import CircularProgress from '../components/progress/CircularProgress';
 import PatternBackdrop from '../components/decor/PatternBackdrop';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
 import InputField from '../components/forms/InputField';
-import { useSharedRoomStore, sharedRoomErrorMessage } from '../../src/core/stores/sharedRoomStore';
-import { SharedSubmission } from '../../src/core/db/types';
+import { useSharedRoomStore, sharedRoomErrorMessage } from '../../core/stores/sharedRoomStore';
+import { SharedSubmission } from '../../core/db/types';
 import {
   formatTimeRemaining,
   getRoomPhase,
   progressPercent,
   isValidDelta,
-} from '../../src/core/utils/sharedRoomUtils';
-import { useI18n } from '../../src/core/i18n';
+} from '../../core/utils/sharedRoomUtils';
+import { useI18n } from '../../core/i18n';
 
 const QUICK_AMOUNTS = [10, 33, 100];
 

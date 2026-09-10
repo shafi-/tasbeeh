@@ -5,7 +5,7 @@
  * This is a temporary solution until the Zikr schema is extended
  */
 
-import type { Lang } from '../../src/core/i18n';
+import type { Lang } from '../../core/i18n';
 
 export interface ZikrDisplayInfo {
   arabicText: string;

@@ -7,7 +7,7 @@
 import React from 'react';
 import MaterialIcon from '../MaterialIcon';
 import { NavItem } from '../../types/components';
-import { useI18n } from '../../../src/core/i18n';
+import { useI18n } from '../../../core/i18n';
 
 interface BottomNavProps {
   items: NavItem[];

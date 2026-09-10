@@ -5,11 +5,11 @@
 
 import React, { useState, useEffect } from 'react';
 import MaterialIcon from './MaterialIcon';
-import { goalService } from '../../src/core/services/goalService';
-import { Goal } from '../../src/core/db/types';
-import { useZikrStore } from '../../src/core/stores/zikrStore';
+import { goalService } from '../../core/services/goalService';
+import { Goal } from '../../core/db/types';
+import { useZikrStore } from '../../core/stores/zikrStore';
 import { getZikrDisplayInfo } from '../utils/zikrMapping';
-import { useI18n } from '../../src/core/i18n';
+import { useI18n } from '../../core/i18n';
 
 interface GoalFormModalProps {
   isOpen: boolean;

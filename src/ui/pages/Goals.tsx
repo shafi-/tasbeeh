@@ -14,12 +14,12 @@ import TopAppBar from '../components/navigation/TopAppBar';
 import BottomNav from '../components/navigation/BottomNav';
 import { NAV_ITEMS } from '../components/navigation/navItems';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
-import { useGoalStore } from '../../src/core/stores/goalStore';
-import { useZikrStore } from '../../src/core/stores/zikrStore';
+import { useGoalStore } from '../../core/stores/goalStore';
+import { useZikrStore } from '../../core/stores/zikrStore';
 import { getZikrDisplayInfo } from '../utils/zikrMapping';
-import { Goal } from '../../src/core/db/types';
-import { goalService } from '../../src/core/services/goalService';
-import { useI18n } from '../../src/core/i18n';
+import { Goal } from '../../core/db/types';
+import { goalService } from '../../core/services/goalService';
+import { useI18n } from '../../core/i18n';
 
 interface GoalWithDisplay extends Goal {
   zikrName: string;

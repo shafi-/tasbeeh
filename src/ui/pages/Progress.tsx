@@ -17,12 +17,12 @@ import BottomNav from '../components/navigation/BottomNav';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
 import { NAV_ITEMS } from '../components/navigation/navItems';
 import { WeeklyDataPoint } from '../types/components';
-import { useSessionStore } from '../../src/core/stores/sessionStore';
-import { useStreakStore } from '../../src/core/stores/streakStore';
-import { useZikrStore } from '../../src/core/stores/zikrStore';
-import { sessionService } from '../../src/core/services/sessionService';
-import { formatDate, getToday } from '../../src/core/utils/dateUtils';
-import { useI18n } from '../../src/core/i18n';
+import { useSessionStore } from '../../core/stores/sessionStore';
+import { useStreakStore } from '../../core/stores/streakStore';
+import { useZikrStore } from '../../core/stores/zikrStore';
+import { sessionService } from '../../core/services/sessionService';
+import { formatDate, getToday } from '../../core/utils/dateUtils';
+import { useI18n } from '../../core/i18n';
 
 const Progress: React.FC = () => {
   const navigate = useNavigate();

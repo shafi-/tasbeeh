@@ -5,10 +5,10 @@
 
 import React, { useState, useEffect } from 'react';
 import MaterialIcon from './MaterialIcon';
-import { zikrService } from '../../src/core/services/zikrService';
-import { Zikr } from '../../src/core/db/types';
+import { zikrService } from '../../core/services/zikrService';
+import { Zikr } from '../../core/db/types';
 import { getZikrDisplayInfo, getPredefinedZikrNames } from '../utils/zikrMapping';
-import { useI18n } from '../../src/core/i18n';
+import { useI18n } from '../../core/i18n';
 
 interface ZikrFormModalProps {
   isOpen: boolean;

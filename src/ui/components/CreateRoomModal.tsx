@@ -9,11 +9,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import MaterialIcon from './MaterialIcon';
 import InputField from './forms/InputField';
 import OrnamentDivider from './decor/OrnamentDivider';
-import { useSharedRoomStore, sharedRoomErrorMessage } from '../../src/core/stores/sharedRoomStore';
-import { SharedRoom } from '../../src/core/db/types';
+import { useSharedRoomStore, sharedRoomErrorMessage } from '../../core/stores/sharedRoomStore';
+import { SharedRoom } from '../../core/db/types';
 import { getPredefinedZikrNames, getZikrDisplayInfo } from '../utils/zikrMapping';
-import { windowPreset } from '../../src/core/utils/sharedRoomUtils';
-import { useI18n } from '../../src/core/i18n';
+import { windowPreset } from '../../core/utils/sharedRoomUtils';
+import { useI18n } from '../../core/i18n';
 
 interface CreateRoomModalProps {
   isOpen: boolean;

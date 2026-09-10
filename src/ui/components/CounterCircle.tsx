@@ -7,7 +7,7 @@
 import React, { useRef, useEffect } from 'react';
 import useRipple from '../hooks/useRipple';
 import useHaptic from '../hooks/useHaptic';
-import { useI18n } from '../../src/core/i18n';
+import { useI18n } from '../../core/i18n';
 
 interface CounterCircleProps {
   count: number;

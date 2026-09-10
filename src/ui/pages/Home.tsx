@@ -15,13 +15,13 @@ import ZikrFormModal from '../components/ZikrFormModal';
 import PatternBackdrop from '../components/decor/PatternBackdrop';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
 import { NAV_ITEMS } from '../components/navigation/navItems';
-import { useZikrStore } from '../../src/core/stores/zikrStore';
-import { useSessionStore } from '../../src/core/stores/sessionStore';
-import { useGoalStore } from '../../src/core/stores/goalStore';
-import { useI18n } from '../../src/core/i18n';
+import { useZikrStore } from '../../core/stores/zikrStore';
+import { useSessionStore } from '../../core/stores/sessionStore';
+import { useGoalStore } from '../../core/stores/goalStore';
+import { useI18n } from '../../core/i18n';
 import { getZikrDisplayInfo } from '../utils/zikrMapping';
-import { formatDate, getToday } from '../../src/core/utils/dateUtils';
-import { Zikr } from '../../src/core/db/types';
+import { formatDate, getToday } from '../../core/utils/dateUtils';
+import { Zikr } from '../../core/db/types';
 
 /** Rotating hero phrases — one per day, rooted in dhikr itself (i18n keys). */
 const DAILY_PHRASE_KEYS = [1, 2, 3, 4, 5];

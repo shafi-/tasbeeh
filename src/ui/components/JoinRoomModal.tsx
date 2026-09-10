@@ -8,10 +8,10 @@ import React, { useEffect, useState } from 'react';
 import MaterialIcon from './MaterialIcon';
 import InputField from './forms/InputField';
 import OrnamentDivider from './decor/OrnamentDivider';
-import { useSharedRoomStore, sharedRoomErrorMessage } from '../../src/core/stores/sharedRoomStore';
-import { SharedRoom } from '../../src/core/db/types';
-import { normalizeRoomCode } from '../../src/core/utils/sharedRoomUtils';
-import { useI18n } from '../../src/core/i18n';
+import { useSharedRoomStore, sharedRoomErrorMessage } from '../../core/stores/sharedRoomStore';
+import { SharedRoom } from '../../core/db/types';
+import { normalizeRoomCode } from '../../core/utils/sharedRoomUtils';
+import { useI18n } from '../../core/i18n';
 
 interface JoinRoomModalProps {
   isOpen: boolean;

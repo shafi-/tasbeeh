@@ -112,23 +112,29 @@ const unsubscribe = createRetryableSubscription(
 
 ```
 src/
-├── core/           # Business logic layer
+├── core/           # Data + logic layer — NEVER imports from ui/
 │   ├── db/         # IndexedDB schema and migrations
-│   ├── services/   # Domain services
+│   ├── services/   # Domain services (+ sharedRoom/ backend abstraction)
 │   ├── stores/     # Zustand state
-│   ├── utils/      # Core utilities (date formatting, etc.)
+│   ├── i18n/       # Locales (en/bn) + useI18n hook
+│   ├── utils/      # Core utilities (date formatting, shared-room rules)
 │   └── components/ # Shared UI components (ErrorBoundary, etc.)
-├── features/       # Feature-specific code (sessions/)
-├── pages/          # Static HTML design mockups (not part of the build)
-├── hooks/          # Custom React hooks
-└── utils/          # Shared utilities (validation, etc.)
-src-v2/             # The UI layer ("Noor" design system)
-├── components/     # navigation/, cards/, progress/, forms/, decor/, modals
-├── pages/          # Route pages (Home, Counter, Goals, Progress, Settings)
-├── hooks/          # useRipple, useHaptic
-├── types/          # Component prop types
-└── utils/          # zikrMapping (Arabic text, translations, targets)
+├── ui/             # Everything that renders (the Noor design system)
+│   ├── components/ # navigation/, cards/, decor/, forms/, progress/, modals
+│   ├── pages/      # Route pages (Home, Counter, Goals, Group, Progress, Settings)
+│   ├── hooks/      # useRipple, useHaptic
+│   ├── types/      # Component prop types
+│   └── utils/      # Display helpers (zikrMapping: Arabic text, meanings, targets)
+├── features/       # (empty — candidate for feature modules)
+├── hooks/          # Legacy V1 hooks (pending removal)
+├── utils/          # V1-era utils (goalUtils, validation) — used by core + tests
+└── pages/          # (removed)
+docs/design/        # Static HTML design mockups (reference only, not built)
 ```
+
+**Placement rule:** new UI goes in `src/ui`, new logic goes in `src/core`.
+`core` must never import from `ui`. (Known debt: V1-era `src/utils` and
+`src/core/utils` both exist; `src/features` and `src/hooks` are unused.)
 
 ### UI: "Noor" Design System (src-v2/)
 
