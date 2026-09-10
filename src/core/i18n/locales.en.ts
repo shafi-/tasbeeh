@@ -78,7 +78,7 @@ export const en = {
   'progress.weekly': 'Weekly Progress',
   'progress.logOffline': 'Log Offline Progress',
   'progress.single': 'Single',
-  'progress.bulk': 'Bulk',
+  'progress.bulk': 'Multiple',
   'progress.zikr': 'Zikr',
   'progress.selectZikr': 'Select a zikr',
   'progress.date': 'Date',
