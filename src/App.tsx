@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ErrorBoundary } from './core/components/ErrorBoundary';
 import { useZikrStore } from './core/stores/zikrStore';
 import { useSessionStore } from './core/stores/sessionStore';
@@ -110,7 +110,7 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <HashRouter>
+      <BrowserRouter>
         <div className="min-h-screen">
           <Routes>
             <Route path="/" element={<HomeGate />} />
@@ -125,7 +125,7 @@ function App() {
             <Route path="/join/:code" element={<JoinV2 />} />
           </Routes>
         </div>
-      </HashRouter>
+      </BrowserRouter>
     </ErrorBoundary>
   );
 }

@@ -126,9 +126,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({ isOpen, onClose, onCr
     }
   };
 
-  const shareLink = created
-    ? `${window.location.origin}${window.location.pathname}#/join/${created.code}`
-    : '';
+  const shareLink = created ? `${window.location.origin}/join/${created.code}` : '';
 
   const copy = async (kind: 'code' | 'link', value: string) => {
     try {

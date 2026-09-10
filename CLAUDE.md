@@ -142,6 +142,7 @@ The only UI. Refined Islamic identity: deep emerald + gold on warm parchment (li
 
 ## Development Notes
 
+- **Routing:** `BrowserRouter` (clean paths, e.g. `/join/CODE` invite links). The host MUST serve `index.html` for unknown paths — `public/_redirects` (Netlify/Cloudflare Pages) and `vercel.json` (Vercel) are included; for nginx use `try_files $uri /index.html;`, for GitHub Pages use the 404.html trick.
 - **Date handling:** Always use `dateUtils.ts` helpers - dates are normalized to midnight for "date" fields
 - **Streaks:** Track consecutive days - critical for user retention. Use `streakService.updateForSession()` after any session change
 - **Transactions:** Wrap related DB operations in `db.transaction()` to ensure atomicity

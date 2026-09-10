@@ -72,9 +72,7 @@ const Room: React.FC = () => {
   const room = currentRoom;
   const phase = useMemo(() => (room ? getRoomPhase(room) : 'active'), [room]);
 
-  const shareLink = room
-    ? `${window.location.origin}${window.location.pathname}#/join/${room.code}`
-    : '';
+  const shareLink = room ? `${window.location.origin}/join/${room.code}` : '';
 
   const copy = async (kind: 'code' | 'link', value: string) => {
     try {
