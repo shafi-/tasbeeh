@@ -174,9 +174,9 @@ const Home: React.FC = () => {
         showClose={false}
         onClose={() => {}}
         action={{
-          icon: 'account_circle',
+          icon: 'settings',
           onClick: () => navigate('/settings'),
-          ariaLabel: 'Profile',
+          ariaLabel: 'Settings',
         }}
       />
 

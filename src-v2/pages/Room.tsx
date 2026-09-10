@@ -121,6 +121,13 @@ const Room: React.FC = () => {
         title={room ? room.title : 'Room'}
         showBack
         onBack={() => navigate('/group')}
+        actions={[
+          {
+            icon: 'settings',
+            onClick: () => navigate('/settings'),
+            ariaLabel: 'Settings',
+          },
+        ]}
       />
 
       {/* Main Content */}

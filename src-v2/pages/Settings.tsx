@@ -8,8 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import ToggleSwitch from '../components/forms/ToggleSwitch';
 import MaterialIcon from '../components/MaterialIcon';
 import ZikrFormModal from '../components/ZikrFormModal';
-import BottomNav from '../components/navigation/BottomNav';
-import { NAV_ITEMS } from '../components/navigation/navItems';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
 import { useSettingsStore } from '../../src/core/stores/settingsStore';
 import { useZikrStore } from '../../src/core/stores/zikrStore';
@@ -185,7 +183,7 @@ const Settings: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface antialiased flex flex-col pt-16 pb-24 max-w-md mx-auto">
+    <div className="min-h-screen bg-surface text-on-surface antialiased flex flex-col pt-16 pb-8 max-w-md mx-auto">
       {/* Top App Bar */}
       <header className="bg-surface/80 backdrop-blur-md fixed top-0 w-full z-50 border-b border-outline-variant/30 flex justify-between items-center h-16 px-container-padding-mobile">
         <button
@@ -521,13 +519,6 @@ const Settings: React.FC = () => {
           </p>
         </section>
       </main>
-
-      {/* Bottom Navigation */}
-      <BottomNav
-        items={NAV_ITEMS}
-        activeId="settings"
-        onNavigate={(path) => navigate(path)}
-      />
 
       {/* Zikr Form Modals */}
       <ZikrFormModal

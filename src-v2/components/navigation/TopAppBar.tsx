@@ -1,6 +1,7 @@
 /**
  * Top App Bar Component
- * Fixed header with back/close button, title, and optional action button
+ * Fixed header with back/close button, title, and optional top-right
+ * action button(s).
  */
 
 import React from 'react';
@@ -14,7 +15,10 @@ export const TopAppBar: React.FC<HeaderProps> = ({
   onBack,
   onClose,
   action,
+  actions = [],
 }) => {
+  const allActions = action ? [action, ...actions] : actions;
+
   return (
     <header className="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-md border-b border-outline-variant/30 flex justify-between items-center h-16 px-container-padding-mobile">
       {/* Left: Back or Close button */}
@@ -38,26 +42,27 @@ export const TopAppBar: React.FC<HeaderProps> = ({
         </h1>
       )}
 
-      {/* Right: Action button */}
-      {action && (
-        <button
-          onClick={action.onClick}
-          aria-label={action.ariaLabel}
-          className="text-primary hover:opacity-80 active:scale-95 transition-all w-touch-target-min h-touch-target-min flex items-center justify-center -mr-4"
-        >
-          <MaterialIcon
-            icon={action.icon}
-            filled={true}
-            className="text-2xl"
-          />
-        </button>
+      {/* Right: Action buttons */}
+      {allActions.length > 0 && (
+        <div className="flex items-center -mr-4">
+          {allActions.map((a, i) => (
+            <button
+              key={`${a.ariaLabel}-${i}`}
+              onClick={a.onClick}
+              aria-label={a.ariaLabel}
+              className="text-primary hover:opacity-80 active:scale-95 transition-all w-touch-target-min h-touch-target-min flex items-center justify-center"
+            >
+              <MaterialIcon icon={a.icon} filled={true} className="text-2xl" />
+            </button>
+          ))}
+        </div>
       )}
 
       {/* Spacer when no left button */}
       {!showBack && !showClose && <div className="w-touch-target-min -ml-4" />}
 
-      {/* Spacer when no action button */}
-      {!action && <div className="w-touch-target-min -mr-4" />}
+      {/* Spacer when no action buttons */}
+      {allActions.length === 0 && <div className="w-touch-target-min -mr-4" />}
     </header>
   );
 };

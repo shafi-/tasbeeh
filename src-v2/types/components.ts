@@ -94,17 +94,21 @@ export interface ScreenProps {
   className?: string;
 }
 
+export interface HeaderAction {
+  icon: string;
+  onClick: () => void;
+  ariaLabel: string;
+}
+
 export interface HeaderProps {
   title?: string;
   showBack?: boolean;
   showClose?: boolean;
   onBack?: () => void;
   onClose?: () => void;
-  action?: {
-    icon: string;
-    onClick: () => void;
-    ariaLabel: string;
-  };
+  action?: HeaderAction;
+  /** Multiple top-right actions (e.g. haptics toggle + settings gear). */
+  actions?: HeaderAction[];
 }
 
 // Counter screen specific

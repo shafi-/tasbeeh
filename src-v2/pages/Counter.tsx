@@ -199,11 +199,18 @@ const Counter: React.FC = () => {
         title={selectedZikr.name}
         showClose
         onClose={() => navigate('/')}
-        action={{
-          icon: hapticsEnabled ? 'vibration' : 'smartphone',
-          onClick: handleToggleHaptics,
-          ariaLabel: 'Toggle haptic feedback',
-        }}
+        actions={[
+          {
+            icon: hapticsEnabled ? 'vibration' : 'smartphone',
+            onClick: handleToggleHaptics,
+            ariaLabel: 'Toggle haptic feedback',
+          },
+          {
+            icon: 'settings',
+            onClick: () => navigate('/settings'),
+            ariaLabel: 'Settings',
+          },
+        ]}
       />
 
       {/* Main Content */}

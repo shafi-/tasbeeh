@@ -56,11 +56,11 @@ const Group: React.FC = () => {
           Dhikr Sanctuary
         </div>
         <button
-          aria-label="Profile"
+          aria-label="Settings"
           className="text-primary hover:opacity-80 transition-opacity active-scale-95 duration-200 w-touch-target-min h-touch-target-min flex items-center justify-center rounded-full"
           onClick={() => navigate('/settings')}
         >
-          <MaterialIcon icon="account_circle" className="text-2xl" />
+          <MaterialIcon icon="settings" className="text-2xl" />
         </button>
       </header>
 

@@ -184,11 +184,11 @@ const Progress: React.FC = () => {
         </h1>
         <div className="flex items-center gap-4">
           <button
-            aria-label="Profile"
-            className="text-on-surface-variant hover:opacity-80 transition-opacity active-scale-95 duration-200"
+            aria-label="Settings"
+            className="text-primary hover:opacity-80 transition-opacity active-scale-95 duration-200"
             onClick={() => navigate('/settings')}
           >
-            <MaterialIcon icon="account_circle" />
+            <MaterialIcon icon="settings" />
           </button>
         </div>
       </header>
