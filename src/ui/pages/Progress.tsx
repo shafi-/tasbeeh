@@ -15,7 +15,7 @@ import SessionHistory from '../components/SessionHistory';
 import BulkEntryForm from '../components/BulkEntryForm';
 import BottomNav from '../components/navigation/BottomNav';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
-import { NAV_ITEMS } from '../components/navigation/navItems';
+import { getNavItems } from '../components/navigation/navItems';
 import { WeeklyDataPoint } from '../types/components';
 import { useSessionStore } from '../../core/stores/sessionStore';
 import { useStreakStore } from '../../core/stores/streakStore';
@@ -361,7 +361,7 @@ const Progress: React.FC = () => {
 
       {/* Bottom Navigation */}
       <BottomNav
-        items={NAV_ITEMS}
+        items={getNavItems()}
         activeId="progress"
         onNavigate={(path) => navigate(path)}
       />

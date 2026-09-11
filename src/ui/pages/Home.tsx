@@ -14,7 +14,7 @@ import MaterialIcon from '../components/MaterialIcon';
 import ZikrFormModal from '../components/ZikrFormModal';
 import PatternBackdrop from '../components/decor/PatternBackdrop';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
-import { NAV_ITEMS } from '../components/navigation/navItems';
+import { getNavItems } from '../components/navigation/navItems';
 import { useZikrStore } from '../../core/stores/zikrStore';
 import { useSessionStore } from '../../core/stores/sessionStore';
 import { useGoalStore } from '../../core/stores/goalStore';
@@ -280,7 +280,7 @@ const Home: React.FC = () => {
 
       {/* Bottom Navigation */}
       <BottomNav
-        items={NAV_ITEMS}
+        items={getNavItems()}
         activeId="home"
         onNavigate={(path) => navigate(path)}
       />

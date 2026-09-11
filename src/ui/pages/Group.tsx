@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import MaterialIcon from '../components/MaterialIcon';
 import TopAppBar from '../components/navigation/TopAppBar';
 import BottomNav from '../components/navigation/BottomNav';
-import { NAV_ITEMS } from '../components/navigation/navItems';
+import { getNavItems } from '../components/navigation/navItems';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
 import CreateRoomModal from '../components/CreateRoomModal';
 import JoinRoomModal from '../components/JoinRoomModal';
@@ -203,7 +203,7 @@ const Group: React.FC = () => {
       />
 
       {/* Bottom Navigation */}
-      <BottomNav items={NAV_ITEMS} activeId="group" onNavigate={(path) => navigate(path)} />
+      <BottomNav items={getNavItems()} activeId="group" onNavigate={(path) => navigate(path)} />
     </div>
   );
 };

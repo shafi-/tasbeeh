@@ -12,7 +12,7 @@ import MaterialIcon from '../components/MaterialIcon';
 import GoalFormModal from '../components/GoalFormModal';
 import TopAppBar from '../components/navigation/TopAppBar';
 import BottomNav from '../components/navigation/BottomNav';
-import { NAV_ITEMS } from '../components/navigation/navItems';
+import { getNavItems } from '../components/navigation/navItems';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
 import { useGoalStore } from '../../core/stores/goalStore';
 import { useZikrStore } from '../../core/stores/zikrStore';
@@ -281,7 +281,7 @@ const Goals: React.FC = () => {
 
       {/* Bottom Navigation */}
       <BottomNav
-        items={NAV_ITEMS}
+        items={getNavItems()}
         activeId="goals"
         onNavigate={(path) => navigate(path)}
       />

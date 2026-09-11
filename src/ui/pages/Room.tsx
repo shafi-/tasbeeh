@@ -10,7 +10,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import MaterialIcon from '../components/MaterialIcon';
 import TopAppBar from '../components/navigation/TopAppBar';
 import BottomNav from '../components/navigation/BottomNav';
-import { NAV_ITEMS } from '../components/navigation/navItems';
+import { getNavItems } from '../components/navigation/navItems';
 import CircularProgress from '../components/progress/CircularProgress';
 import PatternBackdrop from '../components/decor/PatternBackdrop';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
@@ -480,7 +480,7 @@ const Room: React.FC = () => {
       </main>
 
       {/* Bottom Navigation */}
-      <BottomNav items={NAV_ITEMS} activeId="group" onNavigate={(path) => navigate(path)} />
+      <BottomNav items={getNavItems()} activeId="group" onNavigate={(path) => navigate(path)} />
     </div>
   );
 };
