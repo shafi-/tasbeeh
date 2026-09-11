@@ -21,7 +21,17 @@ const PREDEFINED_ZIKRS: Omit<Zikr, 'id'>[] = [
     name: 'La ilaha illallah',
     custom: false,
     createdAt: new Date()
-  }
+  },
+  {
+    name: 'Astaghfirullah',
+    custom: false,
+    createdAt: new Date()
+  },
+  {
+    name: 'Short Salawat',
+    custom: false,
+    createdAt: new Date()
+  },
 ];
 
 let seedPromise: Promise<void> | null = null;

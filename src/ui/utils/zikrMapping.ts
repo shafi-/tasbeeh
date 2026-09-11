@@ -51,6 +51,12 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     translationBn: 'আমি আল্লাহর কাছে ক্ষমা প্রার্থনা করছি',
     defaultTarget: 100,
   },
+  'Short Salawat': {
+    arabicText: 'اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ',
+    translation: 'O Allah, bless Muhammad',
+    translationBn: 'হে আল্লাহ, মুহাম্মদের উপর রহমত বর্ষণ করুন',
+    defaultTarget: 100,
+  },
   'Salawat': {
     arabicText: 'صَلَّى ٱللَّٰهُ عَلَيْهِ وَسَلَّمَ',
     translation: 'May Allah bless him and grant him peace',
