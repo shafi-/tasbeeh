@@ -44,15 +44,12 @@ The build handles two things GitHub Pages can't do natively:
    example.com
    ```
 
-   (Vite copies `public/` into every build, and GitHub Pages requires the
-   `CNAME` file to be present in the deployed artifact.)
-3. **Repo variable for the base path** — a custom domain serves from the
-   root, so the `/repo/` base must become `/`:
-   **Settings → Secrets and variables → Actions → Variables** →
-   *New repository variable*: name `VITE_BASE`, value `/`.
-4. **Repo → Settings → Pages → Custom domain** → enter your domain → Save.
+   (Vite copies `public/` into every build. GitHub Pages requires the
+   `CNAME` file in the deployed artifact for the custom domain to stick,
+   and the workflow auto-detects it to switch the Vite base path to `/`.)
+3. **Repo → Settings → Pages → Custom domain** → enter your domain → Save.
    Once the certificate is issued, tick **Enforce HTTPS**.
-5. Push (or re-run the workflow). The site now serves from your domain.
+4. Push (or re-run the workflow). The site now serves from your domain.
 
 > Changing the domain later? Update `public/CNAME` and the `VITE_BASE`
 > variable — nothing else.

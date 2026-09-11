@@ -29,14 +29,19 @@ jobs:
           cache: npm
 
       # Project pages live at /<repo>/ and need a Vite base path to match.
-      # User/organization sites (<user>.github.io) and custom domains use '/'.
-      # Override by defining the repository variable VITE_BASE (e.g. '/').
+      # A custom domain (public/CNAME present) serves from the root, so the
+      # base becomes '/'. User/organization sites (<user>.github.io) also use
+      # '/'. Override by defining the repository variable VITE_BASE.
       - name: Compute base path
         env:
           CUSTOM_BASE: ${{ vars.VITE_BASE }}
         run: |
           if [ -n "$CUSTOM_BASE" ]; then
             echo "VITE_BASE=$CUSTOM_BASE" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          if [ -f public/CNAME ]; then
+            echo "VITE_BASE=/" >> "$GITHUB_ENV"
             exit 0
           fi
           REPO_NAME="${GITHUB_REPOSITORY#*/}"
