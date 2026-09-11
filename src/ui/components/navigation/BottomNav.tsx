@@ -28,7 +28,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
     <nav
       aria-label="Main navigation"
       className={`
-        fixed bottom-0 left-0 w-full z-50
+        fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-50
         bg-surface/90 backdrop-blur-lg
         rounded-t-2xl border-t border-outline-variant/20 shadow-card
         flex justify-around items-center

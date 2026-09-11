@@ -183,7 +183,7 @@ const Settings: React.FC = () => {
   return (
     <div className="min-h-screen bg-surface text-on-surface antialiased flex flex-col pt-16 pb-8 max-w-md mx-auto">
       {/* Top App Bar */}
-      <header className="bg-surface/80 backdrop-blur-md fixed top-0 w-full z-50 border-b border-outline-variant/30 flex justify-between items-center h-16 px-container-padding-mobile">
+      <header className="bg-surface/80 backdrop-blur-md fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-md z-50 border-b border-outline-variant/30 flex justify-between items-center h-16 px-container-padding-mobile">
         <button
           onClick={() => navigate(-1)}
           className="text-primary active:scale-95 duration-200 w-touch-target-min h-touch-target-min flex items-center justify-center -ml-4"

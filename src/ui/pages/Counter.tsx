@@ -252,7 +252,7 @@ const Counter: React.FC = () => {
       </main>
 
       {/* Bottom Action Area */}
-      <div className="fixed bottom-0 left-0 w-full p-container-padding-mobile pb-[calc(env(safe-area-inset-bottom)+24px)] bg-gradient-to-t from-surface via-surface/90 to-transparent z-40">
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-container-padding-mobile pb-[calc(env(safe-area-inset-bottom)+24px)] bg-gradient-to-t from-surface via-surface/90 to-transparent z-40">
         <button
           onClick={handleComplete}
           disabled={localCount === 0}

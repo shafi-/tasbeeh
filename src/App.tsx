@@ -119,19 +119,22 @@ function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter>
-        <div className="min-h-screen">
-          <Routes>
-            <Route path="/" element={<HomeGate />} />
-            <Route path="/welcome" element={<WelcomeV2 />} />
-            <Route path="/home" element={<HomeV2 />} />
-            <Route path="/counter" element={<CounterV2 />} />
-            <Route path="/goals" element={<GoalsV2 />} />
-            <Route path="/progress" element={<ProgressV2 />} />
-            <Route path="/settings" element={<SettingsV2 />} />
-            <Route path="/group" element={<GroupV2 />} />
-            <Route path="/group/:code" element={<RoomV2 />} />
-            <Route path="/join/:code" element={<JoinV2 />} />
-          </Routes>
+        {/* Centered phone-width column on desktop; full-bleed on mobile */}
+        <div className="min-h-screen bg-surface flex justify-center">
+          <div className="w-full max-w-md min-h-screen md:border-x md:border-outline-variant/20">
+            <Routes>
+              <Route path="/" element={<HomeGate />} />
+              <Route path="/welcome" element={<WelcomeV2 />} />
+              <Route path="/home" element={<HomeV2 />} />
+              <Route path="/counter" element={<CounterV2 />} />
+              <Route path="/goals" element={<GoalsV2 />} />
+              <Route path="/progress" element={<ProgressV2 />} />
+              <Route path="/settings" element={<SettingsV2 />} />
+              <Route path="/group" element={<GroupV2 />} />
+              <Route path="/group/:code" element={<RoomV2 />} />
+              <Route path="/join/:code" element={<JoinV2 />} />
+            </Routes>
+          </div>
         </div>
       </BrowserRouter>
     </ErrorBoundary>

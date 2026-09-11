@@ -175,7 +175,7 @@ const Home: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface antialiased flex flex-col">
+    <div className="min-h-screen bg-surface text-on-surface antialiased flex flex-col max-w-md mx-auto">
       {/* Top App Bar */}
       <TopAppBar
         brand

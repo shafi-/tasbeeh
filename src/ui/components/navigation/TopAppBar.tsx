@@ -22,7 +22,7 @@ export const TopAppBar: React.FC<HeaderProps> = ({
   const showLeading = showBack || showClose;
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-md border-b border-outline-variant/30 flex justify-between items-center h-16 px-container-padding-mobile">
+    <header className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-md z-50 bg-surface/85 backdrop-blur-md border-b border-outline-variant/30 flex justify-between items-center h-16 px-container-padding-mobile">
       {/* Left: Brand, Back/Close, or spacer */}
       {showLeading ? (
         <button
