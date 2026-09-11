@@ -8,6 +8,7 @@ import { useSettingsStore } from './core/stores/settingsStore';
 import { db } from './core/db/db';
 import { seedZikrs } from './core/db/seed';
 import { sharedRoomService } from './core/services/sharedRoom';
+import { applyDocumentLanguage, detectLanguage } from './core/i18n';
 import { useEffect, useState } from 'react';
 
 // Noor UI (V2)
@@ -65,8 +66,15 @@ function App() {
     useSettingsStore
       .getState()
       .loadSettings()
-      .then(initializeDarkMode)
-      .catch(initializeDarkMode);
+      .then(() => {
+        initializeDarkMode();
+        // Keep <html lang> aligned with the selected app language.
+        const l = useSettingsStore.getState().getSetting('language');
+        applyDocumentLanguage(l === 'bn' ? 'bn' : l === 'en' ? 'en' : detectLanguage());
+      })
+      .catch(() => {
+        initializeDarkMode();
+      });
 
     // Listen for system preference changes
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');

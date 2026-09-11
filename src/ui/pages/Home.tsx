@@ -253,7 +253,7 @@ const Home: React.FC = () => {
                   <ZikrCard
                     key={zikr.id}
                     id={zikr.id!}
-                    name={zikr.name}
+                    name={displayInfo.localizedName}
                     arabicName={displayInfo.arabicText}
                     translation={displayInfo.translation}
                     targetCount={displayInfo.defaultTarget}

@@ -48,6 +48,13 @@ export function localeTag(lang: Lang): string {
   return lang === 'bn' ? 'bn-BD' : 'en-US';
 }
 
+/** Keep <html lang> in sync so fonts and screen readers follow the app language. */
+export function applyDocumentLanguage(lang: Lang): void {
+  if (typeof document !== 'undefined') {
+    document.documentElement.lang = lang;
+  }
+}
+
 /**
  * Hook: returns the active language and a bound `t`.
  * Re-renders components when the language setting changes.

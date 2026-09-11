@@ -10,6 +10,8 @@
 import type { Lang } from '../../core/i18n';
 
 export interface ZikrDisplayInfo {
+  /** Zikr name in the selected language (Bangla name when lang is 'bn'). */
+  localizedName: string;
   arabicText: string;
   translation: string;
   defaultTarget: number;
@@ -18,6 +20,7 @@ export interface ZikrDisplayInfo {
 }
 
 interface ZikrMeanings {
+  nameBn: string;
   arabicText: string;
   translation: string;
   translationBn: string;
@@ -27,6 +30,7 @@ interface ZikrMeanings {
 
 const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
   'SubhanAllah': {
+    nameBn: 'সুবহানাল্লাহ',
     arabicText: 'سُبْحَانَ ٱللَّٰهِ',
     isQuickStarter: true,
     translation: 'Glory be to Allah',
@@ -34,6 +38,7 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     defaultTarget: 33,
   },
   'Alhamdulillah': {
+    nameBn: 'আলহামদুলিল্লাহ',
     arabicText: 'ٱلْحَمْدُ لِلَّٰهِ',
     isQuickStarter: true,
     translation: 'All praise is for Allah',
@@ -41,6 +46,7 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     defaultTarget: 33,
   },
   'Allahu Akbar': {
+    nameBn: 'আল্লাহু আকবার',
     arabicText: 'ٱللَّٰهُ أَكْبَرُ',
     isQuickStarter: true,
     translation: 'Allah is the Greatest',
@@ -48,6 +54,7 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     defaultTarget: 34,
   },
   'La ilaha illallah': {
+    nameBn: 'লা ইলাহা ইল্লাল্লাহ',
     arabicText: 'لَا إِلَٰهَ إِلَّا ٱللَّٰهُ',
     isQuickStarter: true,
     translation: 'There is no god but Allah',
@@ -55,6 +62,7 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     defaultTarget: 100,
   },
   'Astaghfirullah': {
+    nameBn: 'আস্তাগফিরুল্লাহ',
     arabicText: 'أَسْتَغْفِرُ ٱللَّٰهَ',
     isQuickStarter: true,
     translation: 'I seek forgiveness from Allah',
@@ -62,6 +70,7 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     defaultTarget: 100,
   },
   'Salawat': {
+    nameBn: 'সালাওয়াত',
     arabicText: 'اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ',
     isQuickStarter: true,
     translation: 'O Allah, bless Muhammad',
@@ -69,6 +78,7 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     defaultTarget: 100,
   },
   'Subhanallahi wa Bihamdihi': {
+    nameBn: 'সুবহানাল্লাহি ওয়া বিহামদিহি',
     arabicText: 'سُبْحَانَ ٱللَّٰهِ وَبِحَمْدِهِ',
     isQuickStarter: true,
     translation: 'Glory be to Allah and all praise is His',
@@ -76,6 +86,7 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     defaultTarget: 100,
   },
   'Subhanallahi walhamdulillahi wa La ilaha illallahu wallahu Akbar': {
+    nameBn: 'সুবহানাল্লাহি ওয়ালহামদুলিল্লাহ',
     arabicText: 'سُبْحَانَ ٱللَّٰهِ وَٱلْحَمْدُ لِلَّٰهِ وَلَا إِلَٰهَ إِلَّا ٱللَّٰهُ وَٱللَّٰهُ أَكْبَرُ',
     isQuickStarter: false,
     translation: 'Glory, praise, oneness and greatness belong to Allah',
@@ -83,6 +94,7 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     defaultTarget: 100,
   },
   'La ilaha illallahu wahdahu la sharika lah': {
+    nameBn: 'লা ইলাহা ইল্লাল্লাহু ওয়াহদাহু',
     arabicText: 'لَا إِلَٰهَ إِلَّا ٱللَّٰهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ ٱلْمُلْكُ وَلَهُ ٱلْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ',
     isQuickStarter: false,
     translation: 'Allah alone, no partner — His is the dominion and the praise',
@@ -90,6 +102,7 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     defaultTarget: 100,
   },
   'La hawla wa la quwwata illa Billah': {
+    nameBn: 'লা হাওলা ওয়া লা কুওয়াতা ইল্লা বিল্লাহ',
     arabicText: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِٱللَّٰهِ',
     isQuickStarter: true,
     translation: 'There is no might except with Allah',
@@ -97,6 +110,7 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     defaultTarget: 100,
   },
   'Allahumma Ajirni Minan-Nar': {
+    nameBn: 'আল্লাহুম্মা আজিরনী মিনান নার',
     arabicText: 'ٱللَّٰهُمَّ أَجِرْنِي مِنَ ٱلنَّارِ',
     isQuickStarter: true,
     translation: 'O Allah, protect me from the Fire',
@@ -104,6 +118,7 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     defaultTarget: 7,
   },
   'Hasbiyallahu La ilaha illa Huwa': {
+    nameBn: 'হাসবিয়াল্লাহ',
     arabicText: 'حَسْبِيَ ٱللَّٰهُ لَا إِلَٰهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ ٱلْعَرْشِ ٱلْعَظِيمِ',
     isQuickStarter: false,
     translation: 'Allah is sufficient for me; in Him I trust',
@@ -111,6 +126,7 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     defaultTarget: 7,
   },
   'Bismillahilladhi la Yadurru': {
+    nameBn: 'বিসমিল্লাহিল্লাজি লা ইয়াদুররু',
     arabicText: 'بِسْمِ ٱللَّٰهِ ٱلَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي ٱلْأَرْضِ وَلَا فِي ٱلسَّمَاءِ وَهُوَ ٱلسَّمِيعُ ٱلْعَلِيمُ',
     isQuickStarter: true,
     translation: "In Allah's name — nothing can harm",
@@ -118,6 +134,7 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     defaultTarget: 3,
   },
   'Radhitu Billahi Rabba': {
+    nameBn: 'রাদিতু বিল্লাহি রাব্বা',
     arabicText: 'رَضِيتُ بِٱللَّٰهِ رَبًّا وَبِٱلْإِسْلَامِ دِينًا وَبِمُحَمَّدٍ صَلَّىٰ ٱللَّٰهُ عَلَيْهِ وَسَلَّمَ نَبِيًّا',
     isQuickStarter: false,
     translation: 'I am pleased with Allah as my Lord, Islam as my religion',
@@ -125,6 +142,7 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     defaultTarget: 3,
   },
   "Allahumma A'inni ala Dhikrika": {
+    nameBn: 'আল্লাহুম্মা আইন্নি আলা জিক্রিকা',
     arabicText: 'ٱللَّٰهُمَّ أَعِنِّي عَلَىٰ ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ',
     isQuickStarter: true,
     translation: 'O Allah, help me remember You, thank You, and worship You well',
@@ -132,6 +150,7 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     defaultTarget: 10,
   },
   'Sayyidul Istighfar': {
+    nameBn: 'সাইয়েদুল ইস্তিগফার',
     arabicText: 'ٱللَّٰهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَىٰ عَهْدِكَ وَوَعْدِكَ مَا ٱسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي، فَٱغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ ٱلذُّنُوبَ إِلَّا أَنْتَ',
     isQuickStarter: true,
     translation: 'O Allah, You are my Lord — forgive me, for none forgives sins but You',
@@ -139,6 +158,7 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     defaultTarget: 1,
   },
   "Hasbunallahu wa Ni'mal Wakeel": {
+    nameBn: "হাসবুনাল্লাহু ওয়া নি'মাল ওয়াকিল",
     arabicText: 'حَسْبُنَا ٱللَّٰهُ وَنِعْمَ ٱلْوَكِيلُ',
     isQuickStarter: false,
     translation: 'Allah is sufficient for us, and He is the best Disposer',
@@ -155,6 +175,7 @@ export function getZikrDisplayInfo(name: string, lang: Lang = 'en'): ZikrDisplay
   const entry = ZIKR_MAPPING[name];
   if (!entry) {
     return {
+      localizedName: name,
       arabicText: '',
       translation: lang === 'bn' ? 'কাস্টম জিকির' : 'Custom dhikr',
       defaultTarget: 33,
@@ -162,6 +183,7 @@ export function getZikrDisplayInfo(name: string, lang: Lang = 'en'): ZikrDisplay
     };
   }
   return {
+    localizedName: lang === 'bn' ? entry.nameBn : name,
     arabicText: entry.arabicText,
     translation: lang === 'bn' ? entry.translationBn : entry.translation,
     defaultTarget: entry.defaultTarget,

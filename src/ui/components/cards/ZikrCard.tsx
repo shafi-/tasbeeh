@@ -57,8 +57,8 @@ export const ZikrCard: React.FC<ZikrCardProps> = ({
         </span>
       </div>
 
-      {/* Zikr info */}
-      <div className="flex flex-col gap-1 z-10 mt-2">
+      {/* Zikr info — grows so the Start button anchors to the card bottom */}
+      <div className="flex flex-col gap-1 z-10 mt-2 flex-1">
         <h4 className="font-headline-md text-headline-md text-primary text-xl">
           {name}
         </h4>

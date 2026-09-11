@@ -16,7 +16,7 @@ import { zikrService } from '../../core/services/zikrService';
 import { db } from '../../core/db/db';
 import { Zikr } from '../../core/db/types';
 import { useSharedRoomStore } from '../../core/stores/sharedRoomStore';
-import { useI18n, LANGUAGES } from '../../core/i18n';
+import { useI18n, LANGUAGES, applyDocumentLanguage } from '../../core/i18n';
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();
@@ -257,7 +257,7 @@ const Settings: React.FC = () => {
               {LANGUAGES.map((l) => (
                 <button
                   key={l.code}
-                  onClick={() => saveSetting('language', l.code)}
+                  onClick={() => { saveSetting('language', l.code); applyDocumentLanguage(l.code); }}
                   className={`px-3 py-2 rounded-lg font-label-md text-label-md transition-all ${
                     lang === l.code ? 'bg-primary-container text-on-primary' : 'text-on-surface-variant hover:bg-surface-variant/50'
                   }`}
