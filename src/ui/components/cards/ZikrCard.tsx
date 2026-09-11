@@ -57,17 +57,22 @@ export const ZikrCard: React.FC<ZikrCardProps> = ({
         </span>
       </div>
 
-      {/* Zikr info — grows so the Start button anchors to the card bottom */}
-      <div className="flex flex-col gap-1 z-10 mt-2 flex-1">
-        <h4 className="font-headline-md text-headline-md text-primary text-xl">
+      {/* Zikr info — grows so the Start button anchors to the card bottom.
+          Long text is clamped with ellipsis so every card stays compact. */}
+      <div className="flex flex-col gap-2 z-10 mt-2 flex-1 min-w-0">
+        <h4 className="font-headline-md text-headline-md text-primary text-xl line-clamp-1">
           {name}
         </h4>
         {arabicName && (
-          <p className="font-display-arabic text-[22px] leading-8 text-tertiary" lang="ar" dir="rtl">
+          <p
+            className="font-display-arabic text-[22px] leading-8 text-tertiary line-clamp-2"
+            lang="ar"
+            dir="rtl"
+          >
             {arabicName}
           </p>
         )}
-        <p className="font-caption text-caption text-on-surface-variant">
+        <p className="font-caption text-caption text-on-surface-variant line-clamp-2">
           {translation}
         </p>
       </div>
