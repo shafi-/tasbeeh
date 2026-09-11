@@ -32,6 +32,61 @@ const PREDEFINED_ZIKRS: Omit<Zikr, 'id'>[] = [
     custom: false,
     createdAt: new Date()
   },
+  {
+    name: 'Subhanallahi wa Bihamdihi',
+    custom: false,
+    createdAt: new Date()
+  },
+  {
+    name: 'Subhanallahi walhamdulillahi wa La ilaha illallahu wallahu Akbar',
+    custom: false,
+    createdAt: new Date()
+  },
+  {
+    name: 'La ilaha illallahu wahdahu la sharika lah',
+    custom: false,
+    createdAt: new Date()
+  },
+  {
+    name: 'La hawla wa la quwwata illa Billah',
+    custom: false,
+    createdAt: new Date()
+  },
+  {
+    name: 'Allahumma Ajirni Minan-Nar',
+    custom: false,
+    createdAt: new Date()
+  },
+  {
+    name: 'Hasbiyallahu La ilaha illa Huwa',
+    custom: false,
+    createdAt: new Date()
+  },
+  {
+    name: 'Bismillahilladhi la Yadurru',
+    custom: false,
+    createdAt: new Date()
+  },
+  {
+    name: 'Radhitu Billahi Rabba',
+    custom: false,
+    createdAt: new Date()
+  },
+  {
+    name: 'Allahumma A\'inni ala Dhikrika',
+    custom: false,
+    createdAt: new Date()
+  },
+  {
+    name: 'Sayyidul Istighfar',
+    custom: false,
+    createdAt: new Date()
+  },
+  {
+    name: 'Hasbunallahu wa Ni\'mal Wakeel',
+    custom: false,
+    createdAt: new Date()
+  },
 ];
 
 let seedPromise: Promise<void> | null = null;

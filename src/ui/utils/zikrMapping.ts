@@ -1,6 +1,8 @@
 /**
  * Zikr Mapping Utility
- * Maps predefined zikrs to their Arabic text, translations, and default target counts.
+ * Maps predefined zikrs to their Arabic text, meanings, and default target
+ * counts. Counts follow well-known sunnah practice (e.g. 33/33/34 after
+ * prayer, 100x morning/evening remembrances, 7x/3x protective adhkar).
  * `lang` selects the meaning language ('en' | 'bn').
  * This is a temporary solution until the Zikr schema is extended
  */
@@ -56,6 +58,72 @@ const ZIKR_MAPPING: Record<string, ZikrMeanings> = {
     translation: 'O Allah, bless Muhammad',
     translationBn: 'হে আল্লাহ, মুহাম্মদের উপর রহমত বর্ষণ করুন',
     defaultTarget: 100,
+  },
+  'Subhanallahi wa Bihamdihi': {
+    arabicText: 'سُبْحَانَ ٱللَّٰهِ وَبِحَمْدِهِ',
+    translation: 'Glory be to Allah and all praise is His',
+    translationBn: 'সব প্রশংসাসহ আল্লাহ পবিত্র',
+    defaultTarget: 100,
+  },
+  'Subhanallahi walhamdulillahi wa La ilaha illallahu wallahu Akbar': {
+    arabicText: 'سُبْحَانَ ٱللَّٰهِ وَٱلْحَمْدُ لِلَّٰهِ وَلَا إِلَٰهَ إِلَّا ٱللَّٰهُ وَٱللَّٰهُ أَكْبَرُ',
+    translation: 'Glory, praise, oneness and greatness belong to Allah',
+    translationBn: 'আল্লাহ পবিত্র, সকল প্রশংসা আল্লাহর, আল্লাহ ছাড়া কোনো উপাস্য নেই, আল্লাহ সর্বশ্রেষ্ঠ',
+    defaultTarget: 100,
+  },
+  'La ilaha illallahu wahdahu la sharika lah': {
+    arabicText: 'لَا إِلَٰهَ إِلَّا ٱللَّٰهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ ٱلْمُلْكُ وَلَهُ ٱلْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ',
+    translation: 'Allah alone, no partner — His is the dominion and the praise',
+    translationBn: 'একমাত্র আল্লাহই উপাস্য, কোনো অংশীদার নেই — রাজত্ব ও প্রশংসা তাঁরই',
+    defaultTarget: 100,
+  },
+  'La hawla wa la quwwata illa Billah': {
+    arabicText: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِٱللَّٰهِ',
+    translation: 'There is no might except with Allah',
+    translationBn: 'আল্লাহর সাহায্য ছাড়া কোনো শক্তি নেই',
+    defaultTarget: 100,
+  },
+  'Allahumma Ajirni Minan-Nar': {
+    arabicText: 'ٱللَّٰهُمَّ أَجِرْنِي مِنَ ٱلنَّارِ',
+    translation: 'O Allah, protect me from the Fire',
+    translationBn: 'হে আল্লাহ, আমাকে আগুন থেকে হেফাজত করুন',
+    defaultTarget: 7,
+  },
+  'Hasbiyallahu La ilaha illa Huwa': {
+    arabicText: 'حَسْبِيَ ٱللَّٰهُ لَا إِلَٰهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ ٱلْعَرْشِ ٱلْعَظِيمِ',
+    translation: 'Allah is sufficient for me; in Him I trust',
+    translationBn: 'আল্লাহই আমার জন্য যথেষ্ট; আমি তাঁর উপরই ভরসা করি',
+    defaultTarget: 7,
+  },
+  'Bismillahilladhi la Yadurru': {
+    arabicText: 'بِسْمِ ٱللَّٰهِ ٱلَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي ٱلْأَرْضِ وَلَا فِي ٱلسَّمَاءِ وَهُوَ ٱلسَّمِيعُ ٱلْعَلِيمُ',
+    translation: "In Allah's name — nothing can harm",
+    translationBn: 'আল্লাহর নামে — যাঁর নামে কিছুই ক্ষতি করতে পারে না',
+    defaultTarget: 3,
+  },
+  'Radhitu Billahi Rabba': {
+    arabicText: 'رَضِيتُ بِٱللَّٰهِ رَبًّا وَبِٱلْإِسْلَامِ دِينًا وَبِمُحَمَّدٍ صَلَّىٰ ٱللَّٰهُ عَلَيْهِ وَسَلَّمَ نَبِيًّا',
+    translation: 'I am pleased with Allah as my Lord, Islam as my religion',
+    translationBn: 'আল্লাহই আমার রব, ইসলামই আমার দীন, মুহাম্মদ ﷺ আমার নবী',
+    defaultTarget: 3,
+  },
+  "Allahumma A'inni ala Dhikrika": {
+    arabicText: 'ٱللَّٰهُمَّ أَعِنِّي عَلَىٰ ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ',
+    translation: 'O Allah, help me remember You, thank You, and worship You well',
+    translationBn: 'হে আল্লাহ, আমাকে আপনার স্মরণ, শুকরিয়া ও সুন্দর ইবাদতে সাহায্য করুন',
+    defaultTarget: 10,
+  },
+  'Sayyidul Istighfar': {
+    arabicText: 'ٱللَّٰهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَىٰ عَهْدِكَ وَوَعْدِكَ مَا ٱسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي، فَٱغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ ٱلذُّنُوبَ إِلَّا أَنْتَ',
+    translation: 'O Allah, You are my Lord — forgive me, for none forgives sins but You',
+    translationBn: 'হে আল্লাহ, আপনিই আমার রব — আমাকে ক্ষমা করুন, ক্ষমাকারী কেবল আপনি',
+    defaultTarget: 1,
+  },
+  "Hasbunallahu wa Ni'mal Wakeel": {
+    arabicText: 'حَسْبُنَا ٱللَّٰهُ وَنِعْمَ ٱلْوَكِيلُ',
+    translation: 'Allah is sufficient for us, and He is the best Disposer',
+    translationBn: 'আল্লাহই আমাদের জন্য যথেষ্ট, তিনিই শ্রেষ্ঠ অভিভাবক',
+    defaultTarget: 33,
   },
 };
 

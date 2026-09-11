@@ -120,7 +120,7 @@ const Home: React.FC = () => {
     const practicedIds = new Set(recentZikrIds);
     const remainingZikrs = zikrs.filter(z => !practicedIds.has(z.id!));
 
-    setRecentZikrs([...recentZikrObjects, ...remainingZikrs].slice(0, 10));
+    setRecentZikrs([...recentZikrObjects, ...remainingZikrs].slice(0, 20));
   }, [zikrs, sessions]);
 
   const handleStartZikr = (zikrId: number) => {
