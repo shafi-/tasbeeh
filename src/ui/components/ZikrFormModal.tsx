@@ -13,7 +13,8 @@ import { useI18n } from '../../core/i18n';
 interface ZikrFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: () => void;
+  /** Optional post-save hook. Stores update themselves via liveQuery. */
+  onSave?: () => void;
   editZikr?: Zikr | null;
 }
 
@@ -46,9 +47,8 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
         setIsCustom(editZikr.custom);
         if (editZikr.custom) {
           setCustomName(editZikr.name);
-          const displayInfo = getZikrDisplayInfo(editZikr.name, lang);
-          setCustomTranslation(displayInfo.translation);
-          setCustomArabic(displayInfo.arabicText);
+          setCustomTranslation(editZikr.translation ?? '');
+          setCustomArabic(editZikr.arabicText ?? '');
         } else {
           setSelectedPredefined(editZikr.name);
         }
@@ -85,9 +85,9 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
         newErrors.name = t('zikrForm.nameRequired');
       } else if (customName.length > 50) {
         newErrors.name = t('zikrForm.nameTooLong');
-      } else if (!/^[a-zA-Z\s\-]+$/.test(customName)) {
-        newErrors.name = t('zikrForm.nameInvalidChars');
       }
+      // No character-class restriction: the name is free text shown as-is
+      // (Bangla/Arabic script, digits, punctuation are all legitimate).
 
       if (!customTranslation.trim()) {
         newErrors.translation = t('zikrForm.translationRequired');
@@ -113,12 +113,21 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
 
     try {
       const zikrName = isCustom ? customName.trim() : selectedPredefined;
+      // Persist the user-entered Arabic text and meaning for custom zikrs so
+      // they survive reloads (predefined zikrs resolve these via zikrMapping).
+      const customFields = isCustom
+        ? {
+            arabicText: customArabic.trim() || undefined,
+            translation: customTranslation.trim() || undefined,
+          }
+        : {};
 
       if (editZikr) {
         // Update existing zikr
         await zikrService.update(editZikr.id!, {
           name: zikrName,
           custom: isCustom,
+          ...customFields,
         });
       } else {
         // Create new zikr
@@ -126,15 +135,21 @@ const ZikrFormModal: React.FC<ZikrFormModalProps> = ({
           name: zikrName,
           custom: isCustom,
           createdAt: new Date(),
+          ...customFields,
         });
       }
 
       // Close modal and refresh
-      onSave();
+      onSave?.();
       onClose();
     } catch (error) {
-      console.error('Failed to save zikr:', error);
-      alert(t('zikrForm.saveFailed'));
+      if (error instanceof Error && error.message === 'DUPLICATE_ZIKR') {
+        // Surface as a field error so the user can adjust without losing input
+        setErrors({ name: t('zikrForm.duplicateName') });
+      } else {
+        console.error('Failed to save zikr:', error);
+        alert(t('zikrForm.saveFailed'));
+      }
     } finally {
       setIsSaving(false);
     }

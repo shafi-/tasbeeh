@@ -9,7 +9,7 @@ import MaterialIcon from './MaterialIcon';
 import { useZikrStore } from '../../core/stores/zikrStore';
 import { useSessionStore } from '../../core/stores/sessionStore';
 import { sessionService } from '../../core/services/sessionService';
-import { getZikrDisplayInfo } from '../utils/zikrMapping';
+import { getZikrDisplayInfoFromZikr } from '../utils/zikrMapping';
 import { formatDate, getToday } from '../../core/utils/dateUtils';
 import { useI18n } from '../../core/i18n';
 
@@ -53,7 +53,7 @@ const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess, onCancel }) =>
 
     // Create entries with smart defaults
     const initialEntries: ZikrEntry[] = zikrs.map(zikr => {
-      const displayInfo = getZikrDisplayInfo(zikr.name, lang);
+      const displayInfo = getZikrDisplayInfoFromZikr(zikr, lang);
       const lastCount = lastCounts.get(zikr.id!) || 0;
 
       return {

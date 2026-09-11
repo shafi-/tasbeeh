@@ -4,7 +4,7 @@
  * NOW INTEGRATED WITH ZUSTAND STORES AND SERVICES
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import TopAppBar from '../components/navigation/TopAppBar';
 import CounterCircle from '../components/CounterCircle';
@@ -17,7 +17,7 @@ import { useZikrStore } from '../../core/stores/zikrStore';
 import { useSessionStore } from '../../core/stores/sessionStore';
 import { useSettingsStore } from '../../core/stores/settingsStore';
 import { sessionService } from '../../core/services/sessionService';
-import { getZikrDisplayInfo } from '../utils/zikrMapping';
+import { getZikrDisplayInfoFromZikr } from '../utils/zikrMapping';
 import { Zikr } from '../../core/db/types';
 
 const Counter: React.FC = () => {
@@ -38,6 +38,15 @@ const Counter: React.FC = () => {
   // Local state
   const [localCount, setLocalCount] = useState(0);
   const [selectedZikr, setSelectedZikr] = useState<Zikr | null>(null);
+  // Round flow: when the target is hit, the round saves itself and the UI
+  // switches to "Another Round / Done" instead of the manual save button.
+  const [isRoundSaved, setIsRoundSaved] = useState(false);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const autoSaveTriggeredRef = useRef(false);
+  // Sync mirror of isRoundSaved: clearCurrentSession() can re-run the zikr
+  // selection effect before the state flip renders, which would reset the
+  // achieved count to zero. Refs are synchronous, so this guard cannot race.
+  const isRoundSavedRef = useRef(false);
 
   // Load settings
   useEffect(() => {
@@ -54,6 +63,10 @@ const Counter: React.FC = () => {
 
   // Find the zikr to practice
   useEffect(() => {
+    // While a completed round is on screen, keep the achieved count visible;
+    // the user picks "Another Round" or "Done" from here.
+    if (isRoundSaved || isRoundSavedRef.current) return;
+
     if (zikrs.length === 0) return;
 
     let zikrToUse: Zikr | undefined;
@@ -81,9 +94,9 @@ const Counter: React.FC = () => {
         setCurrentSession({ zikrId: zikrToUse.id || null, count: 0 });
       }
     }
-  }, [zikrs, zikrIdParam, currentSession, setCurrentSession]);
+  }, [zikrs, zikrIdParam, currentSession, setCurrentSession, isRoundSaved]);
 
-  const zikrDisplayInfo = selectedZikr ? getZikrDisplayInfo(selectedZikr.name, lang) : null;
+  const zikrDisplayInfo = selectedZikr ? getZikrDisplayInfoFromZikr(selectedZikr, lang) : null;
   const targetCount = zikrDisplayInfo?.defaultTarget || 33;
 
   const handleIncrement = () => {
@@ -99,11 +112,77 @@ const Counter: React.FC = () => {
 
   const handleReset = () => {
     setLocalCount(0);
+    setIsRoundSaved(false);
+    isRoundSavedRef.current = false;
+    autoSaveTriggeredRef.current = false;
     setCurrentSession({
       zikrId: selectedZikr?.id || null,
       count: 0
     });
     haptic('light');
+  };
+
+  // Persist a round of `countToSave` reps for the selected zikr
+  const persistSession = async (countToSave: number) => {
+    if (!selectedZikr) return;
+    await sessionService.add({
+      zikrId: selectedZikr.id!,
+      count: countToSave,
+      source: 'app',
+      timestamp: new Date(),
+      date: new Date(),
+      editableUntil: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+  };
+
+  // When the target is hit the round saves itself — no save button needed.
+  // autoSaveTriggeredRef keeps this to one attempt per round (manual
+  // "Finish & Save" remains the fallback if the save fails).
+  useEffect(() => {
+    if (
+      targetCount > 0 &&
+      localCount >= targetCount &&
+      !isRoundSaved &&
+      !isAutoSaving &&
+      !autoSaveTriggeredRef.current
+    ) {
+      const autoSave = async () => {
+        autoSaveTriggeredRef.current = true;
+        setIsAutoSaving(true);
+        try {
+          await persistSession(targetCount);
+          isRoundSavedRef.current = true;
+          setIsRoundSaved(true);
+          clearCurrentSession();
+          haptic('success');
+        } catch (error) {
+          console.error('Failed to auto-save round:', error);
+          haptic('warning');
+        } finally {
+          setIsAutoSaving(false);
+        }
+      };
+      void autoSave();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localCount, targetCount, isRoundSaved, isAutoSaving]);
+
+  const handleAnotherRound = () => {
+    isRoundSavedRef.current = false;
+    setIsRoundSaved(false);
+    autoSaveTriggeredRef.current = false;
+    setLocalCount(0);
+    setCurrentSession({
+      zikrId: selectedZikr?.id || null,
+      count: 0
+    });
+    haptic('light');
+  };
+
+  const handleDone = () => {
+    navigate('/?completed=true');
   };
 
   // Handle keyboard shortcuts
@@ -116,7 +195,7 @@ const Counter: React.FC = () => {
         haptic('light');
       }
       // Escape to reset (with confirmation)
-      if (e.key === 'Escape' && localCount > 0) {
+      if (e.key === 'Escape' && localCount > 0 && !isRoundSaved) {
         const confirmed = confirm(t('counter.resetConfirm'));
         if (confirmed) {
           handleReset();
@@ -126,23 +205,14 @@ const Counter: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [handleIncrement, localCount, haptic, handleReset]);
+  }, [handleIncrement, localCount, haptic, handleReset, isRoundSaved]);
 
   const handleComplete = async () => {
     if (!selectedZikr || localCount === 0) return;
 
     try {
       // Save session using sessionService
-      await sessionService.add({
-        zikrId: selectedZikr.id!,
-        count: localCount,
-        source: 'app',
-        timestamp: new Date(),
-        date: new Date(),
-        editableUntil: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
-        createdAt: new Date(),
-        updatedAt: new Date()
-      });
+      await persistSession(localCount);
 
       // Clear current session
       clearCurrentSession();
@@ -241,33 +311,73 @@ const Counter: React.FC = () => {
           hapticsEnabled={hapticsEnabled}
         />
 
-        {/* Reset Button */}
-        <button
-          onClick={handleReset}
-          className="mt-8 text-on-surface-variant flex items-center gap-2 px-4 py-2 rounded-full hover:bg-surface-variant/50 transition-colors z-10 font-caption text-caption active-scale-95"
-        >
-          <MaterialIcon icon="refresh" className="text-[18px]" />
-          {t('counter.reset')}
-        </button>
+        {/* Reset Button — hidden once the round is saved */}
+        {!isRoundSaved && (
+          <button
+            onClick={handleReset}
+            className="mt-8 text-on-surface-variant flex items-center gap-2 px-4 py-2 rounded-full hover:bg-surface-variant/50 transition-colors z-10 font-caption text-caption active-scale-95"
+          >
+            <MaterialIcon icon="refresh" className="text-[18px]" />
+            {t('counter.reset')}
+          </button>
+        )}
       </main>
 
       {/* Bottom Action Area */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-container-padding-mobile pb-[calc(env(safe-area-inset-bottom)+24px)] bg-gradient-to-t from-surface via-surface/90 to-transparent z-40">
-        <button
-          onClick={handleComplete}
-          disabled={localCount === 0}
-          className="
-            w-full h-touch-target-min
-            bg-primary-container text-on-primary
-            rounded-xl font-label-md text-label-md
-            flex items-center justify-center gap-2
-            hover:opacity-90 active-scale-98 transition-all shadow-sm
-            disabled:opacity-50 disabled:cursor-not-allowed
-          "
-        >
-          <MaterialIcon icon="check_circle" className="text-[20px]" />
-          {t('counter.complete')}
-        </button>
+        {isRoundSaved ? (
+          <div className="w-full flex flex-col items-center gap-3">
+            {/* Saved confirmation */}
+            <div className="flex items-center gap-2 text-tertiary font-label-md text-label-md">
+              <MaterialIcon icon="check_circle" filled className="text-[20px]" />
+              <span>{t('counter.roundSaved')}</span>
+            </div>
+            <div className="w-full flex gap-3">
+              <button
+                onClick={handleDone}
+                className="
+                  flex-1 h-touch-target-min
+                  rounded-xl border border-outline-variant/40 text-on-surface
+                  font-label-md text-label-md
+                  flex items-center justify-center gap-2
+                  hover:bg-surface-variant/40 active:scale-[0.98] transition-all
+                "
+              >
+                <MaterialIcon icon="home" className="text-[18px]" />
+                {t('counter.done')}
+              </button>
+              <button
+                onClick={handleAnotherRound}
+                className="
+                  flex-1 h-touch-target-min
+                  bg-primary-container text-on-primary
+                  rounded-xl font-label-md text-label-md
+                  flex items-center justify-center gap-2
+                  hover:opacity-90 active:scale-[0.98] transition-all shadow-sm
+                "
+              >
+                <MaterialIcon icon="replay" className="text-[18px]" />
+                {t('counter.anotherRound')}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={handleComplete}
+            disabled={localCount === 0}
+            className="
+              w-full h-touch-target-min
+              bg-primary-container text-on-primary
+              rounded-xl font-label-md text-label-md
+              flex items-center justify-center gap-2
+              hover:opacity-90 active-scale-98 transition-all shadow-sm
+              disabled:opacity-50 disabled:cursor-not-allowed
+            "
+          >
+            <MaterialIcon icon="check_circle" className="text-[20px]" />
+            {t('counter.complete')}
+          </button>
+        )}
       </div>
     </div>
   );

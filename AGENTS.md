@@ -48,13 +48,15 @@ npm run size-check      # Verify bundle size against 200KB limit
 
 ### Data Layer (Dexie.js + IndexedDB)
 
-**Database:** `zikr-db` with versioned schema (currently v2)
+**Database:** `zikr-db` with versioned schema (currently v4 — goals carry `zikrIds: number[]` + optional `name`; the legacy single-zikr `zikrId` column was folded into `zikrIds` by the v4 upgrade)
 
-**Stores:** zikrs, sessions, goals, streaks, settings, sessionFormState, zikrLastCount
+**Stores:** zikrs, sessions, goals, streaks, settings, sessionFormState, zikrLastCount, sharedRooms, sharedSubmissions, syncOutbox, identity
 
 **Type definitions:** `src/core/db/types.ts` - defines all interfaces
 
-**Migrations:** `src/core/db/migrations.ts` - versioned upgrade logic
+**Migrations:** versioned `.upgrade()` hooks in `src/core/db/db.ts` (+ `src/core/db/migrations.ts` for v2 data moves)
+
+**Predefined library:** `src/core/data/zikrCatalog.ts` is the single source for the predefined zikr library (Arabic, en/bn names & meanings, default targets, Quick Start flag). The seeder writes these onto Zikr records and backfills older rows; `src/ui/utils/zikrMapping.ts` is a thin record-first display adapter. Custom zikrs carry user-entered `arabicText`/`translation` on the record. Duplicate (case/whitespace-insensitive) zikr names are rejected at creation.
 
 **Pattern:** Database operations are wrapped in transactions for data integrity:
 ```typescript
@@ -117,7 +119,8 @@ const unsubscribe = createRetryableSubscription(
 ```
 src/
 ├── core/           # Data + logic layer — NEVER imports from ui/
-│   ├── db/         # IndexedDB schema and migrations
+│   ├── data/       # Predefined zikr catalog (single source for the library)
+│   ├── db/         # IndexedDB schema, migrations, seeding
 │   ├── services/   # Domain services (+ sharedRoom/ backend abstraction)
 │   ├── stores/     # Zustand state
 │   ├── i18n/       # Locales (en/bn) + useI18n hook
@@ -128,17 +131,14 @@ src/
 │   ├── pages/      # Route pages (Home, Counter, Goals, Group, Progress, Settings)
 │   ├── hooks/      # useRipple, useHaptic
 │   ├── types/      # Component prop types
-│   └── utils/      # Display helpers (zikrMapping: Arabic text, meanings, targets)
-├── features/       # (empty — candidate for feature modules)
-├── hooks/          # Legacy V1 hooks (pending removal)
-├── utils/          # V1-era utils (goalUtils, validation) — used by core + tests
-└── pages/          # (removed)
+│   └── utils/      # Display helpers (zikrMapping: record-first adapter over the catalog)
+└── utils/          # V1-era utils (goalUtils, validation) — used by core + tests
 docs/design/        # Static HTML design mockups (reference only, not built)
 ```
 
 **Placement rule:** new UI goes in `src/ui`, new logic goes in `src/core`.
 `core` must never import from `ui`. (Known debt: V1-era `src/utils` and
-`src/core/utils` both exist; `src/features` and `src/hooks` are unused.)
+`src/core/utils` both exist.)
 
 ### UI: "Noor" Design System (src-v2/)
 
@@ -160,7 +160,9 @@ The only UI. Refined Islamic identity: deep emerald + gold on warm parchment (li
 - **Session editing:** Sessions are editable for 3 days after creation (`editableUntil` field)
 - **iOS limitations:** No scheduled local notifications - use in-app notification center
 - **Manual progress:** Core differentiator - users track physical tasbeeh sessions
-- **Testing:** Utilities are well-tested. Use happy-dom for DOM tests, keep tests pure unit tests when possible
+- **Counter rounds:** The counter auto-saves a session when the target is reached and offers "Another Round / Done" — no manual save button at target. Don't reintroduce count state in two places without a sync guard.
+- **Multi-zikr goals:** A goal covers `zikrIds: number[]` with combined progress. Always resolve a goal's zikrs via `goalService.getGoalZikrIds()` and compute progress via `calculateProgress` (it filters by the goal's zikr set itself). Never assume a single zikr.
+- **Testing:** Utilities are well-tested. Use happy-dom for DOM tests, keep tests pure unit tests when possible (DB-backed service tests use `fake-indexeddb/auto`)
 
 ## Project Context
 

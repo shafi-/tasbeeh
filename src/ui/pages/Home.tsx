@@ -18,8 +18,9 @@ import { getNavItems } from '../components/navigation/navItems';
 import { useZikrStore } from '../../core/stores/zikrStore';
 import { useSessionStore } from '../../core/stores/sessionStore';
 import { useGoalStore } from '../../core/stores/goalStore';
+import { goalService } from '../../core/services/goalService';
 import { useI18n } from '../../core/i18n';
-import { getZikrDisplayInfo } from '../utils/zikrMapping';
+import { getZikrDisplayInfoFromZikr } from '../utils/zikrMapping';
 import { formatDate, getToday } from '../../core/utils/dateUtils';
 import { Zikr } from '../../core/db/types';
 
@@ -83,25 +84,33 @@ const Home: React.FC = () => {
     }
     setStreakDays(streak);
 
-    // Calculate daily goal progress (simple version: use first active goal)
+    // Calculate daily goal progress for the first active goal, counting
+    // today's sessions of any zikr that goal covers
     const activeGoal = goals.find(g => g.status === 'active');
-    if (activeGoal && total > 0) {
-      const progress = Math.min(Math.round((total / activeGoal.target) * 100), 100);
+    const goalZikrIds = activeGoal ? goalService.getGoalZikrIds(activeGoal) : [];
+    const goalTodayTotal = goalZikrIds.length > 0
+      ? todaySessions
+          .filter(s => goalZikrIds.includes(s.zikrId))
+          .reduce((sum, s) => sum + s.count, 0)
+      : 0;
+    if (activeGoal && goalTodayTotal > 0) {
+      const progress = Math.min(Math.round((goalTodayTotal / activeGoal.target) * 100), 100);
       setDailyGoalProgress(progress);
     } else {
       setDailyGoalProgress(0);
     }
   }, [sessions, goals]);
 
-  // Quick Start rail: curated library zikrs (isQuickStarter) only —
-  // most recently practiced first, then the rest of the starter set.
+  // Quick Start rail: curated library zikrs (isQuickStarter) first — most
+  // recently practiced first, then the rest of the starter set — followed by
+  // any other zikrs (e.g. user-created) so new additions are usable here.
   useEffect(() => {
     if (zikrs.length === 0) {
       setRecentZikrs([]);
       return;
     }
 
-    const pool = zikrs.filter(z => getZikrDisplayInfo(z.name, lang).isQuickStarter);
+    const pool = zikrs.filter(z => getZikrDisplayInfoFromZikr(z, lang).isQuickStarter);
 
     // Get zikr IDs from recent sessions (last 7 days)
     const sevenDaysAgo = new Date();
@@ -123,15 +132,15 @@ const Home: React.FC = () => {
     const practicedIds = new Set(recentZikrIds);
     const remainingZikrs = pool.filter(z => !practicedIds.has(z.id!));
 
-    setRecentZikrs([...recentZikrObjects, ...remainingZikrs].slice(0, 20));
+    // Then the user's own zikrs (custom etc.) that aren't quick starters
+    const poolIds = new Set(pool.map(z => z.id));
+    const otherZikrs = zikrs.filter(z => !poolIds.has(z.id!));
+
+    setRecentZikrs([...recentZikrObjects, ...remainingZikrs, ...otherZikrs].slice(0, 20));
   }, [zikrs, sessions, lang]);
 
   const handleStartZikr = (zikrId: number) => {
     navigate(`/counter?zikrId=${zikrId}`);
-  };
-
-  const handleRefreshZikrs = () => {
-    useZikrStore.getState().initialize();
   };
 
   // Loading state
@@ -168,7 +177,6 @@ const Home: React.FC = () => {
         <ZikrFormModal
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
-          onSave={handleRefreshZikrs}
         />
       </div>
     );
@@ -243,7 +251,7 @@ const Home: React.FC = () => {
             <h3 className="font-headline-md text-headline-md text-primary">{t('home.quickStart')}</h3>
             <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-2 hide-scrollbar">
               {recentZikrs.map((zikr) => {
-                const displayInfo = getZikrDisplayInfo(zikr.name, lang);
+                const displayInfo = getZikrDisplayInfoFromZikr(zikr, lang);
                 // Check if practiced today
                 const practicedToday = sessions.some(
                   s => s.zikrId === zikr.id && formatDate(s.date) === formatDate(getToday())
@@ -269,8 +277,10 @@ const Home: React.FC = () => {
           </section>
         )}
 
-        {/* Add Zikr CTA (when user has zikrs) */}
-        {recentZikrs.length > 0 && zikrs.length > recentZikrs.length && (
+        {/* Add Zikr CTA — always available once the user has zikrs (the
+            empty state above has its own CTA). The rail may already show
+            every zikr, but this remains the entry point to add more. */}
+        {recentZikrs.length > 0 && (
           <button
             onClick={() => setIsCreateModalOpen(true)}
             className="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl h-touch-target-min flex items-center justify-center gap-2 font-label-md text-label-md text-primary hover:bg-surface-container transition-colors"
@@ -292,7 +302,6 @@ const Home: React.FC = () => {
       <ZikrFormModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onSave={handleRefreshZikrs}
       />
     </div>
   );

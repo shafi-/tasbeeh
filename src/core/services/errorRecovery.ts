@@ -18,9 +18,12 @@ export function createRetryableSubscription<T>(
 ): () => void {
   let retryCount = 0;
   let currentTimeout: number | null = null;
+  let subscription: { unsubscribe: () => void } | null = null;
+  let closed = false;
 
   const attemptQuery = () => {
-    liveQuery(queryFn).subscribe({
+    if (closed) return;
+    subscription = liveQuery(queryFn).subscribe({
       next: (data) => {
         retryCount = 0;
         onNext(data);
@@ -44,6 +47,8 @@ export function createRetryableSubscription<T>(
   attemptQuery();
 
   return () => {
+    closed = true;
+    subscription?.unsubscribe();
     if (currentTimeout !== null) {
       clearTimeout(currentTimeout);
     }

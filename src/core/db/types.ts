@@ -8,6 +8,16 @@ export interface Zikr {
   custom: boolean;
   createdAt: Date;
   deletedAt?: Date;
+  /** Arabic script — user-entered for custom zikrs, seeded for predefined. */
+  arabicText?: string;
+  /** Meaning — user-entered for custom zikrs, seeded for predefined. */
+  translation?: string;
+  /** Predefined zikrs: Bangla name/meaning (seeded from the catalog). */
+  nameBn?: string;
+  translationBn?: string;
+  /** Predefined zikrs: sunnah default count and Quick Start rail flag. */
+  defaultTarget?: number;
+  isQuickStarter?: boolean;
 }
 
 export interface Session {
@@ -24,7 +34,10 @@ export interface Session {
 
 export interface Goal {
   id?: number;
-  zikrId: number;
+  /** Zikrs this goal covers (v4+). Multi-zikr goals track combined counts. */
+  zikrIds: number[];
+  /** Optional user-set goal name; falls back to the covered zikrs' names. */
+  name?: string;
   target: number;
   period: 'daily' | 'weekly' | 'monthly' | 'custom';
   startDate?: Date;

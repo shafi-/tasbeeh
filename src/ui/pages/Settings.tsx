@@ -10,12 +10,12 @@ import MaterialIcon from '../components/MaterialIcon';
 import ZikrFormModal from '../components/ZikrFormModal';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
 import { useSettingsStore } from '../../core/stores/settingsStore';
-import { useZikrStore } from '../../core/stores/zikrStore';
 import { exportService } from '../../core/services/exportService';
 import { zikrService } from '../../core/services/zikrService';
 import { db } from '../../core/db/db';
 import { Zikr } from '../../core/db/types';
 import { useSharedRoomStore } from '../../core/stores/sharedRoomStore';
+import { useZikrStore } from '../../core/stores/zikrStore';
 import { useI18n, LANGUAGES, applyDocumentLanguage } from '../../core/i18n';
 
 const Settings: React.FC = () => {
@@ -140,10 +140,6 @@ const Settings: React.FC = () => {
   };
 
   // Zikr management handlers
-  const handleRefreshZikrs = () => {
-    useZikrStore.getState().initialize();
-  };
-
   const handleEditZikr = (zikr: Zikr) => {
     setEditZikr(zikr);
   };
@@ -552,12 +548,10 @@ const Settings: React.FC = () => {
       <ZikrFormModal
         isOpen={isCreateModalOpen}
         onClose={handleCloseCreateModal}
-        onSave={handleRefreshZikrs}
       />
       <ZikrFormModal
         isOpen={editZikr !== null}
         onClose={handleCloseEditModal}
-        onSave={handleRefreshZikrs}
         editZikr={editZikr}
       />
     </div>

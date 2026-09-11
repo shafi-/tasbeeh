@@ -6,7 +6,7 @@ import { Goal, Session } from '../../src/core/db/types';
 function makeGoal(overrides: Partial<Goal> = {}): Goal {
   return {
     id: 1,
-    zikrId: 1,
+    zikrIds: [1],
     target: 100,
     period: 'daily',
     status: 'active',

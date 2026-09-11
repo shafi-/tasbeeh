@@ -8,6 +8,11 @@ export interface Progress {
   percentage: number;
 }
 
+/** The zikrs a goal covers. Runtime-defensive against rows missing the field. */
+export function getGoalZikrIds(goal: Goal): number[] {
+  return Array.isArray(goal.zikrIds) ? goal.zikrIds : [];
+}
+
 export async function add(goal: Omit<Goal, 'id'>): Promise<number> {
   const id = await db.goals.add(goal);
   return typeof id === 'number' ? id : parseInt(id as string, 10);
@@ -34,7 +39,11 @@ export async function getAllGoals(): Promise<Goal[]> {
 }
 
 export function getGoalsByZikr(zikrId: number): Promise<Goal[]> {
-  return db.goals.where('zikrId').equals(zikrId).toArray();
+  // In-memory filter: the goals table is small and covers goals whose
+  // zikrIds array merely contains the zikr (multi-entry index not needed).
+  return db.goals
+    .toArray()
+    .then(goals => goals.filter(goal => getGoalZikrIds(goal).includes(zikrId)));
 }
 
 export async function getActiveGoals(): Promise<Goal[]> {
@@ -50,6 +59,8 @@ export async function getPausedGoals(): Promise<Goal[]> {
 }
 
 export function calculateProgress(goal: Goal, sessions: Session[]): Progress {
+  const zikrIdSet = new Set(getGoalZikrIds(goal));
+
   const startDate = goal.period === 'custom' && goal.startDate
     ? new Date(goal.startDate)
     : getPeriodStart(goal.period as any);
@@ -58,9 +69,14 @@ export function calculateProgress(goal: Goal, sessions: Session[]): Progress {
     ? new Date(goal.endDate)
     : getPeriodEnd(goal.period as any);
 
+  // Combined counts across every zikr the goal covers
   const filteredSessions = sessions.filter(session => {
     const sessionDate = new Date(session.date);
-    return sessionDate >= startDate && sessionDate <= endDate;
+    return (
+      zikrIdSet.has(session.zikrId) &&
+      sessionDate >= startDate &&
+      sessionDate <= endDate
+    );
   });
 
   const currentCount = filteredSessions.reduce((sum, session) => sum + session.count, 0);
@@ -81,7 +97,7 @@ export async function checkCompletion(zikrId: number): Promise<void> {
 
     const allSessions = await db.sessions
       .where('zikrId')
-      .equals(zikrId)
+      .anyOf(getGoalZikrIds(goal))
       .toArray();
 
     const progress = calculateProgress(goal, allSessions);
@@ -117,7 +133,7 @@ export async function recalculateGoalForSession(
   for (const goal of affectedGoals) {
     const allSessions = await db.sessions
       .where('zikrId')
-      .equals(session.zikrId)
+      .anyOf(getGoalZikrIds(goal))
       .toArray();
 
     const progress = calculateProgress(goal, allSessions);
@@ -145,9 +161,6 @@ export const goalService = {
   getPausedGoals,
   calculateProgress,
   checkCompletion,
-  recalculateGoalForSession
+  recalculateGoalForSession,
+  getGoalZikrIds
 };
-
-// Legacy exports for backward compatibility
-export const addGoal = add;
-export const updateGoal = update;

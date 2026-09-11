@@ -4,7 +4,7 @@
  * NOW INTEGRATED WITH ZUSTAND STORES
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GlassCard from '../components/cards/GlassCard';
 import ToggleSwitch from '../components/forms/ToggleSwitch';
@@ -16,17 +16,24 @@ import { getNavItems } from '../components/navigation/navItems';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
 import { useGoalStore } from '../../core/stores/goalStore';
 import { useZikrStore } from '../../core/stores/zikrStore';
-import { getZikrDisplayInfo } from '../utils/zikrMapping';
+import { useSessionStore } from '../../core/stores/sessionStore';
+import { getZikrDisplayInfo, getZikrDisplayInfoFromZikr } from '../utils/zikrMapping';
 import { Goal } from '../../core/db/types';
-import { goalService } from '../../core/services/goalService';
-import { useI18n } from '../../core/i18n';
+import { goalService, Progress } from '../../core/services/goalService';
+import { localeTag, useI18n } from '../../core/i18n';
+
+interface GoalZikrDisplay {
+  zikrId: number;
+  name: string;
+  arabicText: string;
+  translation: string;
+}
 
 interface GoalWithDisplay extends Goal {
-  zikrName: string;
-  displayInfo: {
-    arabicText: string;
-    translation: string;
-  };
+  /** Goal name, falling back to the covered zikrs' names. */
+  displayName: string;
+  zikrDisplays: GoalZikrDisplay[];
+  progress: Progress;
 }
 
 const Goals: React.FC = () => {
@@ -37,39 +44,49 @@ const Goals: React.FC = () => {
   const goals = useGoalStore(state => state.goals);
   const goalsLoading = useGoalStore(state => state.loading);
   const zikrs = useZikrStore(state => state.zikrs);
+  const sessions = useSessionStore(state => state.sessions);
 
-  // Local state for goals with display info
-  const [enhancedGoals, setEnhancedGoals] = useState<GoalWithDisplay[]>([]);
+  // Local state
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
 
   // Modal state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editGoal, setEditGoal] = useState<Goal | null>(null);
 
-  // Enhance goals with zikr display information
-  useEffect(() => {
-    if (goals.length === 0 || zikrs.length === 0) {
-      setEnhancedGoals([]);
-      return;
-    }
+  // Goals enriched with zikr display info and live progress — derived data,
+  // recomputed whenever the underlying stores change (no effect/state round-trip)
+  const enhancedGoals: GoalWithDisplay[] = useMemo(() => {
+    return goals.map(goal => {
+      const zikrIds = goalService.getGoalZikrIds(goal);
+      const zikrDisplays: GoalZikrDisplay[] = zikrIds
+        .map(zikrId => {
+          const zikr = zikrs.find(z => z.id === zikrId);
+          const displayInfo = zikr
+            ? getZikrDisplayInfoFromZikr(zikr, lang)
+            : getZikrDisplayInfo(t('history.unknownZikr'), lang);
+          return {
+            zikrId,
+            name: zikr?.name || t('history.unknownZikr'),
+            arabicText: displayInfo.arabicText,
+            translation: displayInfo.translation,
+          };
+        });
 
-    const enhanced = goals.map(goal => {
-      const zikr = zikrs.find(z => z.id === goal.zikrId);
-      const zikrName = zikr?.name || t('history.unknownZikr');
-      const displayInfo = getZikrDisplayInfo(zikrName, lang);
+      const displayName =
+        goal.name?.trim() || zikrDisplays.map(d => d.name).join(' · ');
+
+      // Progress over the goal's current period across all its zikrs
+      // (calculateProgress filters by the goal's zikr set itself)
+      const progress = goalService.calculateProgress(goal, sessions);
 
       return {
         ...goal,
-        zikrName,
-        displayInfo: {
-          arabicText: displayInfo.arabicText,
-          translation: displayInfo.translation,
-        },
+        displayName,
+        zikrDisplays,
+        progress,
       };
     });
-
-    setEnhancedGoals(enhanced);
-  }, [goals, zikrs, lang, t]);
+  }, [goals, zikrs, sessions, lang, t]);
 
   const handleToggle = async (goalId: number, newActiveState: boolean) => {
     setIsUpdating(goalId.toString());
@@ -78,9 +95,12 @@ const Goals: React.FC = () => {
       const goal = goals.find(g => g.id === goalId);
       if (!goal) return;
 
+      // completedAt means "target reached" — pausing must not stamp it.
+      // Reactivating clears any stale completion date (Dexie deletes keys
+      // set to undefined).
       await goalService.update(goalId, {
         status: newActiveState ? 'active' : 'paused',
-        completedAt: newActiveState ? undefined : new Date(),
+        ...(newActiveState ? { completedAt: undefined } : {}),
       } as any);
     } catch (error) {
       console.error('Failed to update goal:', error);
@@ -98,10 +118,6 @@ const Goals: React.FC = () => {
     if (goal) {
       setEditGoal(goal);
     }
-  };
-
-  const handleRefreshGoals = () => {
-    useGoalStore.getState().initialize();
   };
 
   const handleCloseCreateModal = () => {
@@ -132,15 +148,23 @@ const Goals: React.FC = () => {
     }
   };
 
-  // Format schedule for display
+  // Format schedule for display — the honest cadence of the goal
+  // (there is no reminder-time feature yet, so never invent clock times)
   const formatSchedule = (goal: Goal) => {
-    if (goal.period === 'weekly') {
-      return 'Fridays'; // Default for weekly, can be enhanced
-    }
-    if (goal.period === 'daily') {
-      return '06:00 AM'; // Default for daily, can be enhanced
+    if (goal.period === 'daily') return t('goals.everyDay');
+    if (goal.period === 'weekly') return t('goals.everyWeek');
+    if (goal.period === 'monthly') return t('goals.everyMonth');
+    if (goal.startDate && goal.endDate) {
+      const fmt = (d: Date) =>
+        new Date(d).toLocaleDateString(localeTag(lang), { day: 'numeric', month: 'short' });
+      return `${fmt(goal.startDate)} – ${fmt(goal.endDate)}`;
     }
     return t('goals.custom');
+  };
+
+  // Jump straight into the counter for the goal's zikr
+  const handleStartZikr = (zikrId: number) => {
+    navigate(`/counter?zikrId=${zikrId}`);
   };
 
   // Loading state
@@ -197,21 +221,40 @@ const Goals: React.FC = () => {
             enhancedGoals.map((goal) => (
               <GlassCard key={goal.id} hover>
                 <div className="flex justify-between items-start mb-4 relative z-10">
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="inline-flex items-center px-3 py-1 rounded-full bg-tertiary-container/10 border border-tertiary-container/30 text-tertiary text-xs font-semibold tracking-wide uppercase mb-3">
                       {formatPeriod(goal.period)}
                     </div>
                     <h2 className="font-headline-md text-headline-md text-primary mb-1">
-                      {goal.zikrName}
+                      {goal.displayName}
                     </h2>
-                    {goal.displayInfo.arabicText && (
+                    {goal.zikrDisplays.length === 1 && goal.zikrDisplays[0].arabicText && (
                       <p className="font-display-arabic text-[22px] leading-8 text-tertiary mb-1" lang="ar" dir="rtl">
-                        {goal.displayInfo.arabicText}
+                        {goal.zikrDisplays[0].arabicText}
                       </p>
                     )}
-                    <p className="font-body-md text-body-md text-on-surface-variant">
-                      {goal.displayInfo.translation}
-                    </p>
+                    {goal.zikrDisplays.length === 1 ? (
+                      <p className="font-body-md text-body-md text-on-surface-variant">
+                        {goal.zikrDisplays[0].translation}
+                      </p>
+                    ) : (
+                      goal.zikrDisplays.length > 1 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {goal.zikrDisplays.map((d) => (
+                            <button
+                              key={d.zikrId}
+                              type="button"
+                              onClick={() => handleStartZikr(d.zikrId)}
+                              className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-variant/60 text-on-surface-variant font-caption text-caption hover:text-primary hover:bg-surface-variant transition-colors"
+                              aria-label={t('goals.startAria', { name: d.name })}
+                            >
+                              <MaterialIcon icon="play_arrow" className="text-[14px]" />
+                              {d.name}
+                            </button>
+                          ))}
+                        </div>
+                      )
+                    )}
                   </div>
 
                   {/* Toggle Switch */}
@@ -224,7 +267,28 @@ const Goals: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between mt-6 relative z-10">
+                {/* Progress toward this period's target */}
+                <div className="mt-4 relative z-10" aria-label={t('goals.progressAria')}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-label-md text-label-md text-tertiary tabular-nums">
+                      {Math.round(goal.progress.percentage)}%
+                    </span>
+                    <span className="font-caption text-caption text-on-surface-variant tabular-nums">
+                      {t('goals.progressOf', {
+                        current: goal.progress.currentCount,
+                        target: goal.target,
+                      })}
+                    </span>
+                  </div>
+                  <div className="h-2 rounded-full bg-surface-variant overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-tertiary transition-all duration-500"
+                      style={{ width: `${Math.min(100, Math.round(goal.progress.percentage))}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between mt-4 relative z-10">
                   <div className="flex items-center gap-2 text-on-surface-variant">
                     <MaterialIcon
                       icon={goal.period === 'daily' ? 'schedule' : 'event'}
@@ -255,6 +319,25 @@ const Goals: React.FC = () => {
                     </button>
                   </div>
                 </div>
+
+                {/* Start the counter for this goal's zikr (first one when several) */}
+                {goal.zikrDisplays.length > 0 && (
+                  <button
+                    onClick={() => handleStartZikr(goal.zikrDisplays[0].zikrId)}
+                    className="
+                      mt-4 w-full h-touch-target-min
+                      rounded-xl border border-tertiary-container/40 bg-tertiary-container/10
+                      text-tertiary font-label-md text-label-md
+                      flex items-center justify-center gap-2
+                      hover:bg-tertiary-container/20 active:scale-[0.98]
+                      transition-all relative z-10
+                    "
+                    aria-label={t('goals.startAria', { name: goal.displayName })}
+                  >
+                    <MaterialIcon icon="play_arrow" className="text-[20px]" />
+                    {t('goals.start')}
+                  </button>
+                )}
               </GlassCard>
             ))
           )}
@@ -290,12 +373,10 @@ const Goals: React.FC = () => {
       <GoalFormModal
         isOpen={isCreateModalOpen}
         onClose={handleCloseCreateModal}
-        onSave={handleRefreshGoals}
       />
       <GoalFormModal
         isOpen={editGoal !== null}
         onClose={handleCloseEditModal}
-        onSave={handleRefreshGoals}
         editGoal={editGoal}
       />
     </div>

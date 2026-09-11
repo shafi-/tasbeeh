@@ -272,11 +272,7 @@ const Progress: React.FC = () => {
           </div>
 
           {entryMode === 'bulk' ? (
-            <BulkEntryForm
-              onSuccess={() => {
-                useSessionStore.getState().initialize();
-              }}
-            />
+            <BulkEntryForm />
           ) : (
             <form className="flex flex-col gap-6" onSubmit={(e) => e.preventDefault()}>
             {/* Zikr Selector */}

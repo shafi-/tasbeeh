@@ -8,18 +8,19 @@ import MaterialIcon from './MaterialIcon';
 import { goalService } from '../../core/services/goalService';
 import { Goal } from '../../core/db/types';
 import { useZikrStore } from '../../core/stores/zikrStore';
-import { getZikrDisplayInfo } from '../utils/zikrMapping';
+import { getZikrDisplayInfoFromZikr } from '../utils/zikrMapping';
 import { useI18n } from '../../core/i18n';
 
 interface GoalFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: () => void;
+  /** Optional post-save hook. Stores update themselves via liveQuery. */
+  onSave?: () => void;
   editGoal?: Goal | null;
 }
 
 interface FormErrors {
-  zikrId?: string;
+  zikrIds?: string;
   target?: string;
   period?: string;
 }
@@ -40,7 +41,8 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
   const { lang, t } = useI18n();
   const zikrs = useZikrStore(state => state.zikrs);
 
-  const [selectedZikrId, setSelectedZikrId] = useState<number | null>(null);
+  const [goalName, setGoalName] = useState('');
+  const [selectedZikrIds, setSelectedZikrIds] = useState<number[]>([]);
   const [target, setTarget] = useState('');
   const [period, setPeriod] = useState<Goal['period']>('daily');
   const [startDate, setStartDate] = useState('');
@@ -52,16 +54,16 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       if (editGoal) {
-        setSelectedZikrId(editGoal.zikrId);
+        setGoalName(editGoal.name ?? '');
+        setSelectedZikrIds(goalService.getGoalZikrIds(editGoal));
         setTarget(editGoal.target.toString());
         setPeriod(editGoal.period);
         setStartDate(editGoal.startDate ? formatDate(editGoal.startDate) : '');
         setEndDate(editGoal.endDate ? formatDate(editGoal.endDate) : '');
       } else {
         // Default to first zikr if available
-        if (zikrs.length > 0) {
-          setSelectedZikrId(zikrs[0].id || null);
-        }
+        setGoalName('');
+        setSelectedZikrIds(zikrs.length > 0 && zikrs[0].id != null ? [zikrs[0].id] : []);
         setTarget('33');
         setPeriod('daily');
         setStartDate('');
@@ -89,11 +91,17 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
     return date.toISOString().split('T')[0];
   };
 
+  const toggleZikr = (zikrId: number) => {
+    setSelectedZikrIds(prev =>
+      prev.includes(zikrId) ? prev.filter(id => id !== zikrId) : [...prev, zikrId]
+    );
+  };
+
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
-    if (!selectedZikrId) {
-      newErrors.zikrId = t('zikrForm.select');
+    if (selectedZikrIds.length === 0) {
+      newErrors.zikrIds = t('zikrForm.select');
     }
 
     if (!target.trim()) {
@@ -128,7 +136,8 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
     try {
       const targetNum = parseInt(target, 10);
       const goalData = {
-        zikrId: selectedZikrId!,
+        name: goalName.trim() || undefined,
+        zikrIds: selectedZikrIds,
         target: targetNum,
         period,
         startDate: startDate ? new Date(startDate) : undefined,
@@ -147,7 +156,7 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
       }
 
       // Close modal and refresh
-      onSave();
+      onSave?.();
       onClose();
     } catch (error) {
       console.error('Failed to save goal:', error);
@@ -188,31 +197,76 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          {/* Zikr Selection */}
+          {/* Goal Name (optional) */}
+          <div>
+            <label className="block font-label-md text-label-md text-on-surface mb-2">
+              {t('goalForm.goalName')}
+            </label>
+            <input
+              type="text"
+              value={goalName}
+              onChange={(e) => setGoalName(e.target.value)}
+              placeholder={t('goalForm.goalNamePlaceholder')}
+              maxLength={60}
+              className="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 h-touch-target-min font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+              disabled={isSaving}
+            />
+            <p className="font-caption text-caption text-on-surface-variant mt-2">
+              {t('goalForm.goalNameHint')}
+            </p>
+          </div>
+
+          {/* Zikr Selection (multi) */}
           <div>
             <label className="block font-label-md text-label-md text-on-surface mb-2">
               {t('goalForm.selectZikr')}
             </label>
-            <select
-              value={selectedZikrId || ''}
-              onChange={(e) => setSelectedZikrId(Number(e.target.value))}
-              className={`w-full bg-surface-container-low border ${
-                errors.zikrId ? 'border-error' : 'border-outline-variant/50'
-              } rounded-xl px-4 h-touch-target-min font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors`}
-              disabled={isSaving}
-            >
-              <option value="">{t('progress.selectZikr')}</option>
-              {zikrs.map((zikr) => {
-                const displayInfo = getZikrDisplayInfo(zikr.name, lang);
-                return (
-                  <option key={zikr.id} value={zikr.id}>
-                    {zikr.name} - {displayInfo.translation}
-                  </option>
-                );
-              })}
-            </select>
-            {errors.zikrId && (
-              <p className="font-caption text-caption text-error mt-2">{errors.zikrId}</p>
+            {zikrs.length === 0 ? (
+              <div className="bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-6 text-center">
+                <p className="font-body-md text-body-md text-on-surface-variant">
+                  {t('progress.selectZikr')}
+                </p>
+              </div>
+            ) : (
+              <div className="max-h-56 overflow-y-auto rounded-xl border border-outline-variant/50 divide-y divide-outline-variant/20">
+                {zikrs.map((zikr) => {
+                  const selected = selectedZikrIds.includes(zikr.id!);
+                  const displayInfo = getZikrDisplayInfoFromZikr(zikr, lang);
+                  return (
+                    <button
+                      key={zikr.id}
+                      type="button"
+                      onClick={() => toggleZikr(zikr.id!)}
+                      aria-pressed={selected}
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${
+                        selected ? 'bg-primary-container/20' : 'hover:bg-surface-variant/30'
+                      }`}
+                      disabled={isSaving}
+                    >
+                      <span
+                        className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 ${
+                          selected
+                            ? 'bg-primary border-primary text-on-primary'
+                            : 'border-outline-variant'
+                        }`}
+                      >
+                        {selected && <MaterialIcon icon="check" className="text-[14px]" />}
+                      </span>
+                      <span className="flex-1 min-w-0">
+                        <span className="block font-body-md text-body-md text-on-surface truncate">
+                          {zikr.name}
+                        </span>
+                        <span className="block font-caption text-caption text-on-surface-variant truncate">
+                          {displayInfo.translation}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            {errors.zikrIds && (
+              <p className="font-caption text-caption text-error mt-2">{errors.zikrIds}</p>
             )}
           </div>
 

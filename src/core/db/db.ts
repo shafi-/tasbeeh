@@ -68,6 +68,31 @@ export class ZikrDatabase extends Dexie {
       syncOutbox: '++id, nextAttemptAt, eventId',                   // NEW
       identity: 'userId'                                            // NEW
     });
+
+    // Version 4: Goal.zikrIds is the single source of truth for a goal's
+    // zikrs (multi-zikr goals). The legacy single-zikr `zikrId` field is
+    // folded into zikrIds and removed; the zikrId index on goals is dropped
+    // (goal lookup by zikr filters in memory — the table is tiny).
+    this.version(4).stores({
+      zikrs: '++id, name, custom, createdAt, deletedAt',
+      sessions: '++id, zikrId, date, editableUntil, [zikrId+date]',
+      goals: '++id, status',
+      streaks: 'zikrId',
+      settings: 'key',
+      sessionFormState: '++id, createdAt',
+      zikrLastCount: 'zikrId, updatedAt',
+      sharedRooms: 'code, status, endsAt',
+      sharedSubmissions: '++id, roomCode, submittedAt, eventId',
+      syncOutbox: '++id, nextAttemptAt, eventId',
+      identity: 'userId'
+    }).upgrade(async (tx) => {
+      await tx.table('goals').toCollection().modify(goal => {
+        goal.zikrIds = Array.isArray(goal.zikrIds) && goal.zikrIds.length > 0
+          ? goal.zikrIds
+          : (goal.zikrId != null ? [goal.zikrId] : []);
+        delete goal.zikrId;
+      });
+    });
   }
 }
 
