@@ -45,8 +45,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             key={item.id}
             onClick={() => onNavigate(item.path)}
             className={`
-              flex flex-col items-center justify-center
-              px-4 py-1
+              flex-1 flex flex-col items-center justify-center
+              py-1
               rounded-xl
               active-scale-90 transition-transform duration-150
               ${isActive
