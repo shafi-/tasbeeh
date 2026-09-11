@@ -98,6 +98,7 @@ export function seedZikrs(database: ZikrDatabase): Promise<void> {
     seedPromise = (async () => {
       await seedZikrsByIdempotentNames(database);
       await removeObsoleteSeedRows(database);
+      await deduplicateZikrs(database);
     })().catch(err => {
       seedPromise = null; // allow retry on failure
       throw err;
@@ -124,6 +125,19 @@ async function removeObsoleteSeedRows(database: ZikrDatabase): Promise<void> {
   await database.zikrs.where('name').equals('Short Salawat').delete();
 }
 
-export async function runSeedMaintenance(database: ZikrDatabase): Promise<void> {
-  await removeObsoleteSeedRows(database);
+/**
+ * Self-heal duplicate predefined rows left by historical seeding races:
+ * keep the oldest row per name, drop the rest.
+ */
+async function deduplicateZikrs(database: ZikrDatabase): Promise<void> {
+  const all = await database.zikrs.toArray();
+  const seen = new Set<string>();
+  const duplicates: number[] = [];
+  for (const zikr of all.sort((a, b) => (a.id ?? 0) - (b.id ?? 0))) {
+    if (seen.has(zikr.name)) duplicates.push(zikr.id!);
+    else seen.add(zikr.name);
+  }
+  if (duplicates.length > 0) {
+    await database.zikrs.bulkDelete(duplicates);
+  }
 }

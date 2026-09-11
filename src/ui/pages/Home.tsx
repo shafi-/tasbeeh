@@ -93,12 +93,15 @@ const Home: React.FC = () => {
     }
   }, [sessions, goals]);
 
-  // Get recent zikrs for quick start (most recently practiced)
+  // Quick Start rail: curated library zikrs (isQuickStarter) only —
+  // most recently practiced first, then the rest of the starter set.
   useEffect(() => {
     if (zikrs.length === 0) {
       setRecentZikrs([]);
       return;
     }
+
+    const pool = zikrs.filter(z => getZikrDisplayInfo(z.name, lang).isQuickStarter);
 
     // Get zikr IDs from recent sessions (last 7 days)
     const sevenDaysAgo = new Date();
@@ -113,15 +116,15 @@ const Home: React.FC = () => {
 
     // Map to zikr objects
     const recentZikrObjects = recentZikrIds
-      .map(id => zikrs.find(z => z.id === id))
+      .map(id => pool.find(z => z.id === id))
       .filter(Boolean) as typeof zikrs;
 
-    // Add any remaining zikrs that haven't been practiced
+    // Add any remaining quick starters that haven't been practiced
     const practicedIds = new Set(recentZikrIds);
-    const remainingZikrs = zikrs.filter(z => !practicedIds.has(z.id!));
+    const remainingZikrs = pool.filter(z => !practicedIds.has(z.id!));
 
     setRecentZikrs([...recentZikrObjects, ...remainingZikrs].slice(0, 20));
-  }, [zikrs, sessions]);
+  }, [zikrs, sessions, lang]);
 
   const handleStartZikr = (zikrId: number) => {
     navigate(`/counter?zikrId=${zikrId}`);
