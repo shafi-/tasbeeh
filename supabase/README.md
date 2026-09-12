@@ -8,22 +8,74 @@ See `docs/SharedGoals-Design.md` for the full design.
 1. Create a project at [supabase.com](https://supabase.com) (free tier is sufficient).
 2. In **Authentication → Providers**, enable **Anonymous sign-in** (required —
    this is how the app works without logins).
-3. Apply the migrations: run the SQL in `migrations/0001_shared_goals.sql` and
-   `migrations/0002_usage_metrics.sql` in the Supabase dashboard (**SQL
-   Editor**), or via the CLI with `supabase db push` after linking your
-   project.
-4. Optionally enable the `pg_cron` extension and uncomment the
-   `cron.schedule` line at the bottom of `0001_shared_goals.sql` to auto-purge
+3. Apply the single migration `migrations/0001_init.sql` in the Supabase
+   dashboard (**SQL Editor**), or via the CLI with `supabase db push` after
+   linking your project.
+4. Leave **Settings → API → Exposed schemas** at its default (`public`
+   only). Do NOT add `zikr_app`: the tables live there and must have no REST
+   endpoints. All app calls go to the nine `public.*` RPC functions, which
+   the migration grants explicitly — every other function is private by
+   default.
+5. Optionally enable the `pg_cron` extension and uncomment the
+   `cron.schedule` line at the bottom of `0001_init.sql` to auto-purge
    expired event ids and old rooms — or call `public.purge_expired()` from
-   your project's keep-alive job (it also prunes analytics events older than
-   90 days).
-5. Copy the project URL and anon key into the app's environment:
+   your project's keep-alive job using the **service role key** (it also
+   prunes analytics events older than 90 days; app clients cannot call it).
+6. Copy the project URL and anon key into the app's environment:
 
 ```
 VITE_SUPABASE_URL=https://<project>.supabase.co
 VITE_SUPABASE_ANON_KEY=<anon key>
 ```
 
-The anon key is safe to ship: it only works through the RPCs and RLS policies
-defined in the migration, and the backend never stores per-member contribution
-data (see the design doc).
+## Local migration validation (Docker)
+
+`docker-compose.yml` + `local-test/` boot a real Postgres 15 with the
+Supabase pieces our SQL relies on (the API roles, `auth.uid()` reading the
+JWT claims GUC, `auth.users`), then auto-apply every file in `migrations/`
+in order — so RLS policies, functions, grants, and triggers are validated
+against real engine behavior before touching the cloud project.
+
+```bash
+cd supabase
+docker compose up -d --wait
+docker compose logs db | grep "local-test: ready"   # wait for init to finish
+docker compose exec -T db psql -U postgres -d zikr_local \
+  -v ON_ERROR_STOP=1 < local-test/example.tests.sql
+```
+
+- **Reset:** `docker compose down -v` (wipes the volume; next `up` re-applies
+  from scratch).
+- **Impersonate a client** in your own test SQL — this is the whole trick:
+
+  ```sql
+  insert into auth.users (id) values ('<fixed-uuid>');
+  set request.jwt.claims = '{"sub":"<fixed-uuid>"}';
+  set role authenticated;   -- now RLS + invoker RPCs behave like production
+  ```
+
+- `local-test/example.tests.sql` is a working reference (happy paths +
+  authorization negatives for every RPC); keep it or per-feature test files
+  in sync with schema changes.
+- Init runs only on an empty volume — after changing a migration, reset
+  with `down -v` first.
+
+## Security model
+
+- Tables (rooms, members, applied_event_ids, devices, analytics_events) live
+  in `zikr_app` with RLS policies doing row-level authorization (ownership,
+  membership, own-device rows). The schema is not exposed to the API, so the
+  tables have no REST endpoints.
+- The RPCs in `public` are `security invoker`: they run with the caller's
+  privileges, so the migration's scoped table grants + RLS authorize every
+  statement. Functions also raise app-specific errors (`room_full`,
+  `window_ended`, `not_owner`, …) that the client maps to messages.
+- Cross-table helpers (membership checks, member counts) live in `zikr_app`
+  as small `security definer` functions — invisible to the API, and immune
+  to RLS recursion in policies.
+- `purge_expired()` is `security definer` and granted to `service_role`
+  only.
+
+The anon key is safe to ship: it only works through the nine granted RPCs,
+and the backend never stores per-member contribution data (see the design
+doc).

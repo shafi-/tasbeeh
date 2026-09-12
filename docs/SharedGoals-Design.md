@@ -81,7 +81,7 @@ syncOutbox          pending increments {eventId, roomCode, delta, attempts, next
 - **`get_room_state(p_code text)`** — returns `{room (goal + total), members: [{name, joined_at}]}` in one call.
 - **`create_room(...)`, `join_room(p_code, p_name)`, `remove_member(p_code, p_user_id)`, `close_room(p_code)`** — owner checks enforced via `owner_id = auth.uid()`.
 
-RLS: rooms readable by anyone (code-gated app flow); members rows readable by room members; only the owner can mutate membership/room status. There is no submissions table to protect.
+RLS: rooms readable by anyone (code-gated app flow); members rows readable by room members; row changes are constrained by policies (owner inserts rooms, users join as themselves, owner-or-member updates rooms, self-or-owner updates membership rows). All RPCs are `security invoker` in the `public` schema and run under those policies with scoped table grants; the `zikr_app` schema itself is not exposed to the API. There is no submissions table to protect.
 
 ## Client architecture
 
@@ -152,8 +152,8 @@ a **device token**, not people:
   credential — the token is only the analytics key.
 - Best-effort events land in `analytics_events (device_token, name,
   properties, created_at)` via a never-throwing `track_event` RPC. **No
-  client can read events** (no RLS policies; definer RPCs only), and raw
-  events purge after **90 days**.
+  client can read events** (insert-only RLS policy, no select grant; the
+  table has no REST endpoint), and raw events purge after **90 days**.
 
 Tracked events (usage shape only):
 
