@@ -25,6 +25,10 @@ export const CounterCircle: React.FC<CounterCircleProps> = ({
   className = '',
 }) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
+  // Pointer contacts currently down on the button. A "tap" is one gesture:
+  // the first contact counts, extra fingers landing while another is still
+  // down belong to the same gesture, and the gesture ends when all lift.
+  const activePointers = useRef<Set<number>>(new Set());
   const { t } = useI18n();
   const { createRipple } = useRipple(buttonRef, hapticsEnabled);
   const { trigger: haptic } = useHaptic(hapticsEnabled);
@@ -35,9 +39,23 @@ export const CounterCircle: React.FC<CounterCircleProps> = ({
   const isComplete = count >= target;
   const isMilestone = count > 0 && (count % 33 === 0 || isComplete);
 
-  const handleInteraction = (
-    e: React.MouseEvent<HTMLButtonElement> | React.TouchEvent<HTMLButtonElement>
-  ) => {
+  // Count on pointerdown — exactly one event per contact — and only for the
+  // first contact of a gesture. The old onTouchStart + onMouseDown pair
+  // double-counted on mobile, where browsers fire an emulated mousedown
+  // after every tap that isn't prevented. Keyboard is covered by the global
+  // Space/Enter listener on the Counter page.
+  const handlePointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (e.button !== 0) return; // primary contact only (mouse left / touch / pen)
+    if (activePointers.current.has(e.pointerId)) return;
+    const isGestureStart = activePointers.current.size === 0;
+    activePointers.current.add(e.pointerId);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // capture is best-effort; pointerup still arrives in normal taps
+    }
+    if (!isGestureStart) return; // multi-finger part of an already-counted tap
+
     createRipple(e);
     onIncrement();
 
@@ -53,6 +71,13 @@ export const CounterCircle: React.FC<CounterCircleProps> = ({
         haptic('light');
       }
     }
+  };
+
+  // Gesture bookkeeping: a pointer leaving the set lets the NEXT contact
+  // start a new tap. `lostpointercapture` is the safety net for pointers
+  // that end without a clean up/cancel.
+  const releasePointer = (e: React.PointerEvent<HTMLButtonElement>) => {
+    activePointers.current.delete(e.pointerId);
   };
 
   // Prevent default zooming/scrolling
@@ -101,16 +126,10 @@ export const CounterCircle: React.FC<CounterCircleProps> = ({
       {/* Interactive counter button */}
       <button
         ref={buttonRef}
-        onMouseDown={(e) => {
-          if (e.button === 0) handleInteraction(e); // Only left click
-        }}
-        onTouchStart={handleInteraction}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleInteraction(e as any);
-          }
-        }}
+        onPointerDown={handlePointerDown}
+        onPointerUp={releasePointer}
+        onPointerCancel={releasePointer}
+        onLostPointerCapture={releasePointer}
         className={`
           relative w-[85%] h-[85%] rounded-full
           bg-surface-bright border

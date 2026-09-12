@@ -29,9 +29,8 @@ export const ZikrCard: React.FC<ZikrCardProps> = ({
     onStart(id);
   };
 
-  const handleInteraction = (
-    e: React.MouseEvent<HTMLButtonElement> | React.TouchEvent<HTMLButtonElement>
-  ) => {
+  // pointerdown only: touch + emulated mousedown double-fired the ripple.
+  const handleInteraction = (e: React.PointerEvent<HTMLButtonElement>) => {
     createRipple(e);
   };
 
@@ -80,8 +79,7 @@ export const ZikrCard: React.FC<ZikrCardProps> = ({
       {/* Start button */}
       <button
         ref={buttonRef}
-        onMouseDown={handleInteraction}
-        onTouchStart={handleInteraction}
+        onPointerDown={handleInteraction}
         onClick={handleStart}
         aria-label={ariaLabel}
         aria-pressed={completed}

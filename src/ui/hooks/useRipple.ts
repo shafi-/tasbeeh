@@ -10,7 +10,7 @@ export const useRipple = <T extends HTMLElement>(
   enabled: boolean = true
 ) => {
   const createRipple = useCallback(
-    (event: React.MouseEvent<T> | React.TouchEvent<T>) => {
+    (event: React.MouseEvent<T> | React.PointerEvent<T> | React.TouchEvent<T>) => {
       if (!enabled || !ref.current) return;
 
       const element = ref.current;
