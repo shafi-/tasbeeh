@@ -17,6 +17,7 @@ import { useZikrStore } from '../../core/stores/zikrStore';
 import { useSessionStore } from '../../core/stores/sessionStore';
 import { useSettingsStore } from '../../core/stores/settingsStore';
 import { sessionService } from '../../core/services/sessionService';
+import { sharedRoomService } from '../../core/services/sharedRoom';
 import { getZikrDisplayInfoFromZikr } from '../utils/zikrMapping';
 import { Zikr } from '../../core/db/types';
 
@@ -125,6 +126,9 @@ const Counter: React.FC = () => {
   // Persist a round of `countToSave` reps for the selected zikr
   const persistSession = async (countToSave: number) => {
     if (!selectedZikr) return;
+    const countToGoals =
+      useSettingsStore.getState().settings.countToGoalsAndGroups ?? true;
+
     await sessionService.add({
       zikrId: selectedZikr.id!,
       count: countToSave,
@@ -133,8 +137,19 @@ const Counter: React.FC = () => {
       date: new Date(),
       editableUntil: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      countsToGoals: countToGoals,
     });
+
+    // Best-effort: the same count also goes to every joined active room
+    // counting this zikr, unless the user turned that behaviour off.
+    if (countToGoals && selectedZikr.name) {
+      try {
+        await sharedRoomService.propagateToRooms(selectedZikr.name, countToSave);
+      } catch {
+        // rooms are best-effort; the session itself is already saved
+      }
+    }
   };
 
   // When the target is hit the round saves itself — no save button needed.

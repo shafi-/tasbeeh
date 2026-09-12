@@ -204,6 +204,8 @@ export const en = {
   'settings.darkModeDesc': 'Switch between light and dark themes',
   'settings.haptics': 'Vibration',
   'settings.hapticsDesc': 'Feel a gentle buzz when you tap',
+  'settings.countGoals': 'Count towards goals & groups',
+  'settings.countGoalsDesc': 'Counter sessions are added to every goal and room that includes the same zikr',
   'settings.language': 'Language',
   'settings.languageDesc': 'Change the app display language',
   'settings.sharedGoals': 'Shared Goals',

@@ -69,13 +69,15 @@ export function calculateProgress(goal: Goal, sessions: Session[]): Progress {
     ? new Date(goal.endDate)
     : getPeriodEnd(goal.period as any);
 
-  // Combined counts across every zikr the goal covers
+  // Combined counts across every zikr the goal covers. Sessions saved while
+  // the "count towards goals & groups" setting was off are excluded.
   const filteredSessions = sessions.filter(session => {
     const sessionDate = new Date(session.date);
     return (
       zikrIdSet.has(session.zikrId) &&
       sessionDate >= startDate &&
-      sessionDate <= endDate
+      sessionDate <= endDate &&
+      session.countsToGoals !== false
     );
   });
 

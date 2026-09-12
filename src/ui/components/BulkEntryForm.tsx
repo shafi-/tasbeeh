@@ -9,6 +9,7 @@ import MaterialIcon from './MaterialIcon';
 import { useZikrStore } from '../../core/stores/zikrStore';
 import { useSessionStore } from '../../core/stores/sessionStore';
 import { sessionService } from '../../core/services/sessionService';
+import { useSettingsStore } from '../../core/stores/settingsStore';
 import { getZikrDisplayInfoFromZikr } from '../utils/zikrMapping';
 import { formatDate, getToday } from '../../core/utils/dateUtils';
 import { useI18n } from '../../core/i18n';
@@ -140,6 +141,7 @@ const BulkEntryForm: React.FC<BulkEntryFormProps> = ({ onSuccess, onCancel }) =>
           editableUntil: new Date(timestampDate.getTime() + 3 * 24 * 60 * 60 * 1000),
           createdAt: new Date(),
           updatedAt: new Date(),
+          countsToGoals: useSettingsStore.getState().settings.countToGoalsAndGroups ?? true,
         })
       );
 

@@ -34,6 +34,7 @@ const Settings: React.FC = () => {
     () => window.matchMedia('(prefers-color-scheme: dark)').matches
   );
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
+  const [countToGoals, setCountToGoals] = useState(true);
   const [nameEditing, setNameEditing] = useState(false);
   const [nameDraft, setNameDraft] = useState('');
   const sharedRoomStore = useSharedRoomStore();
@@ -64,6 +65,7 @@ const Settings: React.FC = () => {
       settings.darkMode ?? window.matchMedia('(prefers-color-scheme: dark)').matches
     );
     setHapticsEnabled(settings.hapticsEnabled ?? true);
+    setCountToGoals(settings.countToGoalsAndGroups ?? true);
   }, [settings]);
 
   const handleDarkModeToggle = async (value: boolean) => {
@@ -81,6 +83,11 @@ const Settings: React.FC = () => {
   const handleHapticsToggle = async (value: boolean) => {
     setHapticsEnabled(value);
     await saveSetting('hapticsEnabled', value);
+  };
+
+  const handleCountToGoalsToggle = async (value: boolean) => {
+    setCountToGoals(value);
+    await saveSetting('countToGoalsAndGroups', value);
   };
 
   const handleExportData = async () => {
@@ -230,6 +237,22 @@ const Settings: React.FC = () => {
                 </div>
               </div>
               <ToggleSwitch checked={hapticsEnabled} onChange={handleHapticsToggle} />
+            </div>
+
+            {/* Count towards goals & groups */}
+            <div className="bg-surface-container-low rounded-xl border border-outline-variant/20 p-4 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="bg-surface-container-high p-2 rounded-lg">
+                  <MaterialIcon icon="track_changes" className="text-primary text-[20px]" />
+                </div>
+                <div>
+                  <p className="font-body-md text-body-md text-on-surface">{t('settings.countGoals')}</p>
+                  <p className="font-caption text-caption text-on-surface-variant">
+                    {t('settings.countGoalsDesc')}
+                  </p>
+                </div>
+              </div>
+              <ToggleSwitch checked={countToGoals} onChange={handleCountToGoalsToggle} />
             </div>
           </div>
         </section>

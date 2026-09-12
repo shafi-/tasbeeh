@@ -91,7 +91,7 @@ const Home: React.FC = () => {
     const coveredZikrIds = new Set(activeGoals.flatMap(g => goalService.getGoalZikrIds(g)));
     const goalTodayTotal = coveredZikrIds.size > 0
       ? todaySessions
-          .filter(s => coveredZikrIds.has(s.zikrId))
+          .filter(s => coveredZikrIds.has(s.zikrId) && s.countsToGoals !== false)
           .reduce((sum, s) => sum + s.count, 0)
       : 0;
     const goalTarget = activeGoals.reduce((sum, g) => sum + g.target, 0);

@@ -30,6 +30,8 @@ export interface Session {
   editableUntil: Date;     // NEW (v2): timestamp + 3 days
   createdAt: Date;         // NEW (v2): Session creation timestamp
   updatedAt: Date;         // NEW (v2): Last edit timestamp
+  /** Saved while "count towards goals & groups" was on (default true). */
+  countsToGoals?: boolean;
 }
 
 export interface Goal {

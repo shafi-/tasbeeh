@@ -291,6 +291,27 @@ export function createSharedRoomService(backend: SharedRoomBackend) {
     },
 
     /**
+     * Best-effort: add this count to every joined ACTIVE room that counts
+     * the same zikr. Individual room failures (not a member, room closed)
+     * are skipped — used by the counter's "count towards goals & groups".
+     */
+    async propagateToRooms(zikrName: string, delta: number): Promise<number> {
+      let applied = 0;
+      const rooms = await this.listRooms();
+      for (const room of rooms) {
+        if (room.status !== 'active' || room.zikrName !== zikrName) continue;
+        if (new Date(room.endsAt) <= new Date()) continue;
+        try {
+          await this.submitContribution(room.code, delta);
+          applied++;
+        } catch {
+          // one room failing must not block the others
+        }
+      }
+      return applied;
+    },
+
+    /**
      * Flush the outbox: apply due increments atomically and idempotently.
      * Single-flight — concurrent calls share one run.
      */

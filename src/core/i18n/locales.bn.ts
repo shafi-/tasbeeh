@@ -203,6 +203,8 @@ export const bn: Dictionary = {
   'settings.darkModeDesc': 'হালকা ও গাঢ় থিমের মাঝে পরিবর্তন করুন',
   'settings.haptics': 'কম্পন',
   'settings.hapticsDesc': 'ট্যাপ করলে হালকা কম্পন অনুভব করুন',
+  'settings.countGoals': 'লক্ষ্য ও গ্রুপে গণনা যোগ করুন',
+  'settings.countGoalsDesc': 'কাউন্টারের সংখ্যা একই জিকিরের সব লক্ষ্য ও রুমে যোগ হবে',
   'settings.language': 'ভাষা',
   'settings.languageDesc': 'অ্যাপের প্রদর্শনের ভাষা পরিবর্তন করুন',
   'settings.sharedGoals': 'যৌথ লক্ষ্য',
