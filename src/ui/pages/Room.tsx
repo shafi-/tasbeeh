@@ -16,6 +16,7 @@ import PatternBackdrop from '../components/decor/PatternBackdrop';
 import OrnamentDivider from '../components/decor/OrnamentDivider';
 import InputField from '../components/forms/InputField';
 import { useSharedRoomStore, sharedRoomErrorMessage } from '../../core/stores/sharedRoomStore';
+import { useZikrStore } from '../../core/stores/zikrStore';
 import { SharedSubmission } from '../../core/db/types';
 import {
   formatTimeRemaining,
@@ -31,6 +32,7 @@ const Room: React.FC = () => {
   const { code = '' } = useParams();
   const navigate = useNavigate();
   const { t } = useI18n();
+  const zikrs = useZikrStore(state => state.zikrs);
   const {
     initialized,
     configured,
@@ -73,6 +75,13 @@ const Room: React.FC = () => {
 
   const room = currentRoom;
   const phase = useMemo(() => (room ? getRoomPhase(room) : 'active'), [room]);
+
+  // The room's zikr as a local record (matched by name) — lets members open
+  // the counter pre-filled with the same dhikr the room is counting.
+  const roomZikr = useMemo(
+    () => (room ? zikrs.find(z => z.name === room.zikrName) ?? null : null),
+    [zikrs, room]
+  );
 
   const shareLink = room
     ? `${window.location.origin}${import.meta.env.BASE_URL}join/${room.code}`
@@ -230,6 +239,23 @@ const Room: React.FC = () => {
                   <MaterialIcon icon="close" className="text-[18px]" />
                 </button>
               </div>
+            )}
+
+            {/* Start the room's zikr on your own counter */}
+            {phase === 'active' && isMember && roomZikr && (
+              <GlassCardLike>
+                <h3 className="font-label-md text-label-md text-primary mb-4 flex items-center gap-2">
+                  <MaterialIcon icon="play_circle" className="text-[20px]" />
+                  {t('room.startZikrTitle', { name: room.zikrName })}
+                </h3>
+                <button
+                  onClick={() => navigate(`/counter?zikrId=${roomZikr.id}`)}
+                  className="w-full min-h-[56px] rounded-xl bg-primary-container text-on-primary font-label-md text-label-md flex items-center justify-center gap-2 hover:opacity-90 active-scale-95 transition-all"
+                >
+                  <MaterialIcon icon="play_arrow" className="text-[20px]" />
+                  {t('room.startCounting')}
+                </button>
+              </GlassCardLike>
             )}
 
             {/* Contribute */}

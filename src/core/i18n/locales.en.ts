@@ -32,6 +32,7 @@ export const en = {
   'home.beginJourneyHint': 'Create your first zikr to start practicing.',
   'home.createZikr': 'Create Zikr',
   'home.doneToday': "You've done {{count}} dhikr today",
+  'card.doneToday': 'Done today',
   'home.beginPractice': 'Begin your practice of remembrance.',
   'home.phrase1': 'Remember Me, and I will remember you',
   'home.phrase1Source': "Qur'an 2:152",
@@ -121,7 +122,9 @@ export const en = {
   'group.timeLeft': '{{time}} left',
 
   'room.addCount': 'Add your count',
-  'room.customAmount': 'Custom amount',
+  'room.customAmount': 'Enter your count',
+  'room.startZikrTitle': 'Count on your own tasbeeh',
+  'room.startCounting': 'Open counter',
   'room.syncing': 'Saving…',
   'room.queued': '{{count}} waiting to be added…',
   'room.allSynced': 'All saved',

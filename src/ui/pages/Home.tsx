@@ -84,17 +84,19 @@ const Home: React.FC = () => {
     }
     setStreakDays(streak);
 
-    // Calculate daily goal progress for the first active goal, counting
-    // today's sessions of any zikr that goal covers
-    const activeGoal = goals.find(g => g.status === 'active');
-    const goalZikrIds = activeGoal ? goalService.getGoalZikrIds(activeGoal) : [];
-    const goalTodayTotal = goalZikrIds.length > 0
+    // Daily ring: aggregate across ALL active goals — only looking at the
+    // first one showed 0% whenever the day's practice belonged to another
+    // goal. Overlapping zikrs between goals are counted once (Set).
+    const activeGoals = goals.filter(g => g.status === 'active');
+    const coveredZikrIds = new Set(activeGoals.flatMap(g => goalService.getGoalZikrIds(g)));
+    const goalTodayTotal = coveredZikrIds.size > 0
       ? todaySessions
-          .filter(s => goalZikrIds.includes(s.zikrId))
+          .filter(s => coveredZikrIds.has(s.zikrId))
           .reduce((sum, s) => sum + s.count, 0)
       : 0;
-    if (activeGoal && goalTodayTotal > 0) {
-      const progress = Math.min(Math.round((goalTodayTotal / activeGoal.target) * 100), 100);
+    const goalTarget = activeGoals.reduce((sum, g) => sum + g.target, 0);
+    if (goalTarget > 0 && goalTodayTotal > 0) {
+      const progress = Math.min(Math.round((goalTodayTotal / goalTarget) * 100), 100);
       setDailyGoalProgress(progress);
     } else {
       setDailyGoalProgress(0);

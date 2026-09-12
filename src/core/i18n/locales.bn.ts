@@ -31,6 +31,7 @@ export const bn: Dictionary = {
   'home.beginJourneyHint': 'শুরু করতে আপনার প্রথম জিকির তৈরি করুন।',
   'home.createZikr': 'জিকির তৈরি করুন',
   'home.doneToday': 'আজ আপনি {{count}} বার জিকির করেছেন',
+  'card.doneToday': 'আজ সম্পন্ন',
   'home.beginPractice': 'আপনার জিকিরের সূচনা করুন।',
   'home.phrase1': 'আমাকে স্মরণ করো, আমি তোমাকে স্মরণ করব',
   'home.phrase1Source': 'কুরআন 2:152',
@@ -120,7 +121,9 @@ export const bn: Dictionary = {
   'group.timeLeft': '{{time}} বাকি',
 
   'room.addCount': 'আপনার সংখ্যা যোগ করুন',
-  'room.customAmount': 'কাস্টম সংখ্যা',
+  'room.customAmount': 'নিজের সংখ্যা লিখুন',
+  'room.startZikrTitle': 'নিজের তাসবিহে পড়ুন',
+  'room.startCounting': 'কাউন্টার খুলুন',
   'room.syncing': 'সেভ হচ্ছে…',
   'room.queued': '{{count}} টি যোগ হওয়ার অপেক্ষায়…',
   'room.allSynced': 'সবই সংরক্ষিত',

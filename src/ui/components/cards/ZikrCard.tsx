@@ -9,6 +9,7 @@ import MaterialIcon from '../MaterialIcon';
 import { ZikrCardProps } from '../../types/components';
 import useRipple from '../../hooks/useRipple';
 import useHaptic from '../../hooks/useHaptic';
+import { useI18n } from '../../../core/i18n';
 
 export const ZikrCard: React.FC<ZikrCardProps> = ({
   id,
@@ -21,6 +22,7 @@ export const ZikrCard: React.FC<ZikrCardProps> = ({
   completed = false,
 }) => {
   const buttonRef = React.useRef<HTMLButtonElement>(null);
+  const { t } = useI18n();
   const { createRipple } = useRipple(buttonRef);
   const { trigger: haptic } = useHaptic();
 
@@ -76,26 +78,35 @@ export const ZikrCard: React.FC<ZikrCardProps> = ({
         </p>
       </div>
 
+      {/* Completed-today chip: status lives here, the CTA stays "Start" —
+          counting past the target is normal practice. */}
+      {completed && (
+        <span
+          className="relative z-10 self-start inline-flex items-center gap-1 px-2 py-0.5 rounded-full
+            bg-tertiary-container/15 border border-tertiary-container/30 text-tertiary
+            font-caption text-caption"
+        >
+          <MaterialIcon icon="check_circle" filled className="text-[14px]" />
+          {t('card.doneToday')}
+        </span>
+      )}
+
       {/* Start button */}
       <button
         ref={buttonRef}
         onPointerDown={handleInteraction}
         onClick={handleStart}
         aria-label={ariaLabel}
-        aria-pressed={completed}
         className={`
           mt-2 w-full min-h-[56px] rounded-xl
           font-label-md text-label-md
           flex items-center justify-center gap-2
           active-scale-95 transition-transform
-          ${completed
-            ? 'bg-primary-container text-on-primary'
-            : 'bg-surface-container-high text-primary border border-outline-variant/50'
-          }
+          bg-primary-container text-on-primary
         `}
       >
-        <MaterialIcon icon={completed ? 'check' : 'play_arrow'} className="text-[20px]" />
-        {completed ? 'Done' : 'Start'}
+        <MaterialIcon icon="play_arrow" className="text-[20px]" />
+        {t('common.start')}
       </button>
     </div>
   );
