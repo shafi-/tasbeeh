@@ -145,6 +145,7 @@ export const en = {
   'join.sub': 'Join a shared dhikr goal — no account needed',
   'join.invalidLink': 'This invite link has an invalid code. Check the link or join manually from the Group tab.',
   'join.goToGroup': 'Go to Group',
+  'join.yourName': 'Your name',
   'join.privacyNote': 'Your name is all other members will ever see.',
 
   'createRoom.title': 'New Shared Goal',
