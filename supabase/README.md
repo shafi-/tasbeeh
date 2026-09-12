@@ -28,6 +28,23 @@ VITE_SUPABASE_URL=https://<project>.supabase.co
 VITE_SUPABASE_ANON_KEY=<anon key>
 ```
 
+## CAPTCHA protection (recommended for public deployments)
+
+The anon key is public by design, so anyone can script anonymous sign-ins.
+CAPTCHA makes that expensive:
+
+1. Create a **Cloudflare Turnstile** widget (free) at
+   [dash.cloudflare.com](https://dash.cloudflare.com/?to=/:account/turnstile)
+   and note the **site key** and **secret key**.
+2. In Supabase: **Authentication → Settings → CAPTCHA protection** — enable
+   it, choose **Cloudflare Turnstile**, paste the **secret key**. This guards
+   the signup endpoint, which anonymous sign-in uses.
+3. Put the **site key** in the app env as `VITE_TURNSTILE_SITE_KEY` (and in
+   the GitHub `VITE_TURNSTILE_SITE_KEY` variable for deploys). The app then
+   attaches a fresh token to every `signInAnonymously()` call.
+4. Leave `VITE_TURNSTILE_SITE_KEY` empty in dev if your local project has
+   captcha disabled — the client skips the token entirely in that case.
+
 ## Local migration validation (Docker)
 
 `docker-compose.yml` + `local-test/` boot a real Postgres 15 with the

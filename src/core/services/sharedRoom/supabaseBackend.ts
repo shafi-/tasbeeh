@@ -8,6 +8,7 @@
  */
 
 import { SharedRoomError } from './contract';
+import { isCaptchaEnabled, getCaptchaToken } from './captcha';
 import type {
   CreateRoomInput,
   RoomStatePayload,
@@ -84,7 +85,18 @@ export class SupabaseSharedRoomBackend implements SharedRoomBackend {
     const userId = sessionData?.session?.user?.id;
     if (userId) return userId;
 
-    const { data, error } = await sb.auth.signInAnonymously();
+    // When the project has captcha protection enabled, the signup endpoint
+    // rejects sign-ins without a fresh Turnstile token.
+    let captchaToken: string | undefined;
+    if (isCaptchaEnabled()) {
+      try {
+        captchaToken = await getCaptchaToken();
+      } catch (e) {
+        throw new SharedRoomError('not-authenticated', (e as Error)?.message);
+      }
+    }
+
+    const { data, error } = await sb.auth.signInAnonymously({ captchaToken });
     if (error || !data?.user?.id) {
       throw new SharedRoomError('not-authenticated', error?.message);
     }
