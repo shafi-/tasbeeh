@@ -20,6 +20,11 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # The build needs the VITE_* values, which live in this environment
+    # (settings → environments → github-pages). Without declaring it here,
+    # the job resolves none of the environment's variables/secrets and the
+    # app builds unconfigured (Group tab hidden).
+    environment: github-pages
     steps:
       - uses: actions/checkout@v4
 
@@ -56,9 +61,12 @@ jobs:
 
       - name: Build
         env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          VITE_SHARED_ROOMS_BACKEND: ${{ secrets.VITE_SHARED_ROOMS_BACKEND }}
+          # Values may live as environment variables (github-pages) or repo
+          # secrets — secrets win if both are set.
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || vars.VITE_SUPABASE_ANON_KEY }}
+          VITE_SHARED_ROOMS_BACKEND: ${{ secrets.VITE_SHARED_ROOMS_BACKEND || vars.VITE_SHARED_ROOMS_BACKEND }}
+          VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY || vars.VITE_TURNSTILE_SITE_KEY }}
         run: npm run build
 
       # GitHub Pages has no server-side rewrites: index.html is copied to
