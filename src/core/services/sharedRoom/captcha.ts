@@ -32,6 +32,7 @@ declare global {
 
 let scriptLoaded: Promise<void> | null = null;
 let widgetId: string | null = null;
+let widgetHost: HTMLElement | null = null;
 let tokenResolver: ((token: string) => void) | null = null;
 let errorRejector: ((err: Error) => void) | null = null;
 
@@ -65,6 +66,7 @@ function ensureWidget(): string {
   // rare interactive challenge doesn't disrupt the UI.
   host.style.cssText = 'position:fixed;left:12px;bottom:12px;z-index:40;';
   document.body.appendChild(host);
+  widgetHost = host;
 
   widgetId = window.turnstile!.render(host, {
     sitekey: SITE_KEY,
@@ -108,9 +110,30 @@ function freshToken(): Promise<string> {
   });
 }
 
-/** One token per call; safe to call repeatedly. */
+/** The token Turnstile auto-solved into its hidden response field, if any. */
+function currentResponse(): string {
+  return widgetHost?.querySelector<HTMLInputElement>('.cf-turnstile-response')?.value ?? '';
+}
+
+function clearResponseField(): void {
+  const input = widgetHost?.querySelector<HTMLInputElement>('.cf-turnstile-response');
+  if (input) input.value = '';
+}
+
+/**
+ * One token per call. The widget auto-solves shortly after render — that
+ * unused token is returned as-is (and the field cleared, since tokens are
+ * single-use). Only when no token is queued do we reset (re-solve) and wait
+ * for the fresh callback; resetting an already-solved widget unconditionally
+ * was racing the auto-solve and hanging sign-in.
+ */
 export async function getCaptchaToken(): Promise<string> {
   await loadTurnstileScript();
   ensureWidget();
+  const existing = currentResponse();
+  if (existing) {
+    clearResponseField();
+    return existing;
+  }
   return freshToken();
 }
