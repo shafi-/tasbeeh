@@ -118,7 +118,9 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <BrowserRouter>
+      {/* BASE_URL keeps routing working under a non-root deploy base
+          (GitHub Pages project sites serve from /<repo>/). */}
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         {/* Centered phone-width column on desktop; full-bleed on mobile */}
         <div className="min-h-screen bg-surface flex justify-center">
           <div className="w-full max-w-md min-h-screen md:border-x md:border-outline-variant/20">
