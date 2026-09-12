@@ -59,11 +59,14 @@ function loadTurnstileScript(): Promise<void> {
 }
 
 function currentResponse(): string {
-  return widgetHost?.querySelector<HTMLInputElement>('.cf-turnstile-response')?.value ?? '';
+  return (
+    widgetHost?.querySelector<HTMLInputElement>('input[name="cf-turnstile-response"], .cf-turnstile-response')
+      ?.value ?? ''
+  );
 }
 
 function clearResponseField(): void {
-  const input = widgetHost?.querySelector<HTMLInputElement>('.cf-turnstile-response');
+  const input = widgetHost?.querySelector<HTMLInputElement>('input[name="cf-turnstile-response"]');
   if (input) input.value = '';
 }
 

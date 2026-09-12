@@ -99,7 +99,10 @@ export class SupabaseSharedRoomBackend implements SharedRoomBackend {
       }
     }
 
-    const { data, error } = await sb.auth.signInAnonymously({ captchaToken });
+    const { data, error } = await sb.auth.signInAnonymously({
+      // auth-js 2.116 reads the captcha token from credentials.options
+      options: { captchaToken },
+    });
     if (error || !data?.user?.id) {
       throw new SharedRoomError('not-authenticated', error?.message);
     }
