@@ -92,7 +92,10 @@ export class SupabaseSharedRoomBackend implements SharedRoomBackend {
       try {
         captchaToken = await getCaptchaToken();
       } catch (e) {
-        throw new SharedRoomError('not-authenticated', (e as Error)?.message);
+        throw new SharedRoomError('captcha-failed', (e as Error)?.message);
+      }
+      if (!captchaToken) {
+        throw new SharedRoomError('captcha-failed', 'empty turnstile token');
       }
     }
 

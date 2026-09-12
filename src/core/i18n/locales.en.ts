@@ -333,6 +333,7 @@ export const en = {
   'errors.not-configured': 'Shared goals are not configured on this device.',
   'errors.network': 'You appear to be offline. Your counts are saved and will sync.',
   'errors.not-authenticated': 'Could not verify this device. Try again.',
+  'errors.captcha-failed': 'Security check failed. Please try again in a moment.',
   'errors.unknown': 'Something went wrong. Please try again.',
 };
 

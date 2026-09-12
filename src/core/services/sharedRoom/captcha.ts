@@ -33,6 +33,7 @@ declare global {
 let scriptLoaded: Promise<void> | null = null;
 let widgetId: string | null = null;
 let tokenResolver: ((token: string) => void) | null = null;
+let errorRejector: ((err: Error) => void) | null = null;
 
 export function isCaptchaEnabled(): boolean {
   return Boolean(SITE_KEY);
@@ -69,28 +70,37 @@ function ensureWidget(): string {
     sitekey: SITE_KEY,
     // Keeps the widget out of sight unless interaction is required.
     appearance: 'interaction-only',
+    action: 'signup',
     callback: (token: string) => {
       const resolve = tokenResolver;
       tokenResolver = null;
       resolve?.(token);
     },
-    'error-callback': () => {
+    'error-callback': (code?: unknown) => {
+      // A widget error (bad/missing hostname, network…) must FAIL the
+      // waiters — sending an empty token would only produce a misleading
+      // server-side "captcha token missing" later.
+      const reject = errorRejector;
+      errorRejector = null;
       const resolve = tokenResolver;
       tokenResolver = null;
       resolve?.('');
+      reject?.(new Error(`turnstile challenge failed${code ? ` (${code})` : ''}`));
       return true;
     },
   });
   return widgetId;
 }
 
-/** Resolves with a fresh single-use token, or '' if the challenge failed. */
+/** Resolves with a fresh single-use token; rejects on widget error/timeout. */
 function freshToken(): Promise<string> {
   return new Promise((resolve, reject) => {
     tokenResolver = resolve;
+    errorRejector = reject;
     window.setTimeout(() => {
       if (tokenResolver === resolve) {
         tokenResolver = null;
+        errorRejector = null;
         reject(new Error('captcha token timeout'));
       }
     }, TOKEN_TIMEOUT_MS);

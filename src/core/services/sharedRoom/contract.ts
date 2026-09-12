@@ -16,6 +16,7 @@
 export type SharedRoomErrorCode =
   | 'not-configured'
   | 'not-authenticated'
+  | 'captcha-failed'
   | 'network'
   | 'room-not-found'
   | 'room-closed'
