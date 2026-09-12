@@ -14,7 +14,14 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icons/*.png'],
+      // No `virtual:pwa-register` import in the app — inject a registration
+      // script into index.html instead. Without this the service worker
+      // never registers and the app is not installable.
+      injectRegister: 'script-defer',
+      // Serve the manifest + SW on the dev server too, so install intent
+      // works on localhost while developing.
+      devOptions: { enabled: true },
+      includeAssets: ['icons/*.png', 'zikr.svg'],
       manifest: {
         name: 'Zikr',
         short_name: 'Zikr',
@@ -22,9 +29,11 @@ export default defineConfig({
         theme_color: '#012d1d',
         background_color: '#faf7f0',
         display: 'standalone',
+        // Relative to the manifest URL — survives a non-root base
+        // (GitHub Pages serves project sites from /<repo>/).
         icons: [
-          { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' }
+          { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' }
         ]
       },
       workbox: {

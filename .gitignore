@@ -49,3 +49,6 @@ coverage/
 
 # ZCode session artifacts
 .zcode/
+
+# vite-plugin-pwa dev service worker output
+dev-dist/
