@@ -13,11 +13,11 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
-      // No `virtual:pwa-register` import in the app — inject a registration
-      // script into index.html instead. Without this the service worker
-      // never registers and the app is not installable.
-      injectRegister: 'script-defer',
+      // 'prompt' + the in-app update banner (UpdateBanner.tsx): a new deploy
+      // never silently serves different code — the user is told and reloads
+      // into it. The app registers the worker itself via
+      // virtual:pwa-register/react, so no injectRegister script is needed.
+      registerType: 'prompt',
       // Serve the manifest + SW on the dev server too, so install intent
       // works on localhost while developing.
       devOptions: { enabled: true },

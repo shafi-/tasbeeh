@@ -9,6 +9,7 @@ import { db } from './core/db/db';
 import { seedZikrs } from './core/db/seed';
 import { sharedRoomService } from './core/services/sharedRoom';
 import { applyDocumentLanguage, detectLanguage } from './core/i18n';
+import { UpdateBanner } from './ui/components/UpdateBanner';
 import { useEffect, useState } from 'react';
 
 // Noor UI (V2)
@@ -118,6 +119,7 @@ function App() {
 
   return (
     <ErrorBoundary>
+      <UpdateBanner />
       {/* BASE_URL keeps routing working under a non-root deploy base
           (GitHub Pages project sites serve from /<repo>/). */}
       <BrowserRouter basename={import.meta.env.BASE_URL}>

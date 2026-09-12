@@ -19,6 +19,10 @@ export const en = {
   'common.close': 'Close',
   'common.settings': 'Settings',
 
+  'update.newVersion': 'New version available',
+  'update.reload': 'Reload',
+  'update.offlineReady': 'App ready for offline use',
+
   'home.streak': '{{count}} Day Streak',
   'home.keepGoing': 'Keep it going!',
   'home.dailyGoal': 'Daily Goal',

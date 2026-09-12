@@ -18,6 +18,10 @@ export const bn: Dictionary = {
   'common.close': 'বন্ধ করুন',
   'common.settings': 'সেটিংস',
 
+  'update.newVersion': 'নতুন সংস্করণ উপলব্ধ',
+  'update.reload': 'রিলোড',
+  'update.offlineReady': 'অ্যাপ অফলাইনে ব্যবহারের জন্য প্রস্তুত',
+
   'home.streak': 'টানা {{count}} দিন',
   'home.keepGoing': 'এভাবেই এগিয়ে যান!',
   'home.dailyGoal': 'দৈনিক লক্ষ্য',
