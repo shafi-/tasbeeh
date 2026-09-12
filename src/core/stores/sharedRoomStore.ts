@@ -110,7 +110,9 @@ export const useSharedRoomStore = create<SharedRoomState>((set, get) => ({
       // Deliver anything queued from previous sessions.
       await get().flush();
     } catch (err) {
-      set({ initialized: true, error: errorToMessage(err) });
+      // Store the raw code — the UI translates it (errorToMessage would
+      // double-translate here and render a literal "errors." prefix).
+      set({ initialized: true, error: errorCode(err) });
     }
   },
 
