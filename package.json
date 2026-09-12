@@ -10,7 +10,10 @@
     "lint": "eslint src --ext ts,tsx",
     "test": "vitest run",
     "test:ui": "vitest --ui",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "predev": "node scripts/check-node.js",
+    "prebuild": "node scripts/check-node.js",
+    "pretest": "node scripts/check-node.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.116.0",
@@ -50,5 +53,8 @@
       "maxSize": "200 kB",
       "compression": "gzip"
     }
-  ]
+  ],
+  "engines": {
+    "node": ">=20.12.0"
+  }
 }
