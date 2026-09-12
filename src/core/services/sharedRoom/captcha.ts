@@ -10,9 +10,11 @@
  * When the env var is absent this module is inert and sign-in proceeds
  * without a token (a project with captcha disabled ignores tokens anyway).
  *
- * The widget renders `interaction-only` in a corner container: invisible
- * unless Turnstile decides it needs a human check. Tokens are single-use,
- * so each request resets the widget and waits for a fresh callback.
+ * Token acquisition is field-polling based: Turnstile writes every solved
+ * token into the widget's hidden `.cf-turnstile-response` input, so we
+ * consume that field instead of racing the render/callback timing. Tokens
+ * are single-use — the field is cleared after hand-off and reset before
+ * re-solving.
  */
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
@@ -33,8 +35,6 @@ declare global {
 let scriptLoaded: Promise<void> | null = null;
 let widgetId: string | null = null;
 let widgetHost: HTMLElement | null = null;
-let tokenResolver: ((token: string) => void) | null = null;
-let errorRejector: ((err: Error) => void) | null = null;
 
 export function isCaptchaEnabled(): boolean {
   return Boolean(SITE_KEY);
@@ -58,6 +58,15 @@ function loadTurnstileScript(): Promise<void> {
   return scriptLoaded;
 }
 
+function currentResponse(): string {
+  return widgetHost?.querySelector<HTMLInputElement>('.cf-turnstile-response')?.value ?? '';
+}
+
+function clearResponseField(): void {
+  const input = widgetHost?.querySelector<HTMLInputElement>('.cf-turnstile-response');
+  if (input) input.value = '';
+}
+
 function ensureWidget(): string {
   if (widgetId !== null) return widgetId;
 
@@ -73,67 +82,34 @@ function ensureWidget(): string {
     // Keeps the widget out of sight unless interaction is required.
     appearance: 'interaction-only',
     action: 'signup',
-    callback: (token: string) => {
-      const resolve = tokenResolver;
-      tokenResolver = null;
-      resolve?.(token);
-    },
-    'error-callback': (code?: unknown) => {
-      // A widget error (bad/missing hostname, network…) must FAIL the
-      // waiters — sending an empty token would only produce a misleading
-      // server-side "captcha token missing" later.
-      const reject = errorRejector;
-      errorRejector = null;
-      const resolve = tokenResolver;
-      tokenResolver = null;
-      resolve?.('');
-      reject?.(new Error(`turnstile challenge failed${code ? ` (${code})` : ''}`));
-      return true;
-    },
   });
   return widgetId;
 }
 
-/** Resolves with a fresh single-use token; rejects on widget error/timeout. */
-function freshToken(): Promise<string> {
-  return new Promise((resolve, reject) => {
-    tokenResolver = resolve;
-    errorRejector = reject;
-    window.setTimeout(() => {
-      if (tokenResolver === resolve) {
-        tokenResolver = null;
-        errorRejector = null;
-        reject(new Error('captcha token timeout'));
-      }
-    }, TOKEN_TIMEOUT_MS);
-    window.turnstile!.reset(widgetId!);
-  });
-}
-
-/** The token Turnstile auto-solved into its hidden response field, if any. */
-function currentResponse(): string {
-  return widgetHost?.querySelector<HTMLInputElement>('.cf-turnstile-response')?.value ?? '';
-}
-
-function clearResponseField(): void {
-  const input = widgetHost?.querySelector<HTMLInputElement>('.cf-turnstile-response');
-  if (input) input.value = '';
-}
-
 /**
- * One token per call. The widget auto-solves shortly after render — that
- * unused token is returned as-is (and the field cleared, since tokens are
- * single-use). Only when no token is queued do we reset (re-solve) and wait
- * for the fresh callback; resetting an already-solved widget unconditionally
- * was racing the auto-solve and hanging sign-in.
+ * One token per call: consume the auto-solved token when present, otherwise
+ * reset (re-solve) and poll the response field until Turnstile fills it.
+ * Deterministic — no dependence on callback ordering.
  */
 export async function getCaptchaToken(): Promise<string> {
   await loadTurnstileScript();
   ensureWidget();
+
   const existing = currentResponse();
   if (existing) {
     clearResponseField();
     return existing;
   }
-  return freshToken();
+
+  window.turnstile!.reset(widgetId!);
+  const deadline = Date.now() + TOKEN_TIMEOUT_MS;
+  while (Date.now() < deadline) {
+    await new Promise((r) => setTimeout(r, 250));
+    const token = currentResponse();
+    if (token) {
+      clearResponseField();
+      return token;
+    }
+  }
+  throw new Error('captcha token timeout');
 }
